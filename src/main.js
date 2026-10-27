@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { mountCastleTour } from "./castle3d.js";
 
 const $ = (s) => document.querySelector(s);
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -384,3 +385,4 @@ function createPumpkinScene() {
   }catch(error){stopScene(error?.message||"initial render unavailable");}
 }
 createPumpkinScene();
+mountCastleTour(THREE,{isEffectsEnabled:()=>effects});

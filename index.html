@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="./magic.css" />
   <link rel="stylesheet" href="./alchemy.css" />
   <link rel="stylesheet" href="./expedition.css" />
+  <link rel="stylesheet" href="./castle-tour.css" />
   <link rel="stylesheet" href="./pumpkin.css" />
   <link rel="stylesheet" href="./candy.css" />
   <link rel="stylesheet" href="./poster.css" />
@@ -188,6 +189,47 @@
           <h2 id="expedition-heading">KHÁM PHÁ <em>LÂU ĐÀI MA ÁM</em></h2>
           <p>Bốn căn phòng, bốn cổ vật và một kho báu bị phong ấn. Theo dấu những mật thư của học viện, giải câu đố và mở căn hầm cuối cùng.</p>
         </div>
+        <div class="castle-tour" id="castle-tour" data-render-mode="illustration" aria-labelledby="castle-tour-heading">
+          <div class="castle-tour-header">
+            <span>✦ RAVENHOLLOW REAL-TIME ARCHITECTURE</span>
+            <span id="castle-tour-mode">3D CHƯA KÍCH HOẠT</span>
+          </div>
+          <div class="castle-tour-stage" id="castle-tour-stage">
+            <canvas id="castle-tour-canvas" tabindex="0" aria-label="Mô hình lâu đài Ravenhollow ba chiều: kéo để xoay, cuộn để thu phóng và dùng phím mũi tên để điều khiển" aria-description="Bấm kích hoạt 3D, sau đó dùng phím mũi tên hoặc kéo chuột để xoay, dùng cuộn chuột hoặc nút phóng to thu nhỏ để điều chỉnh khoảng cách"></canvas>
+            <div id="castle-tour-illustration" class="castle-tour-illustration" role="img" aria-label="Minh họa lâu đài ma thuật với trăng tròn, hai tháp cao, cổng vòm và ánh sáng kỳ ảo">
+              <div class="tour-moon"></div><div class="tour-sky-stars">✧　✦　☽　✧　✶</div>
+              <div class="tour-structure" aria-hidden="true">
+                <div class="tour-tower tour-tower-left"><div class="tour-roof"></div><div class="tour-window">✦</div></div>
+                <div class="tour-tower tour-tower-right"><div class="tour-roof"></div><div class="tour-window">☾</div></div>
+                <div class="tour-keep"><div class="tour-keep-roof"></div><div class="tour-door">✧</div><div class="tour-window left">✶</div><div class="tour-window right">✶</div></div>
+              </div>
+              <div class="tour-foreground"></div>
+            </div>
+            <div class="castle-tour-overlay">
+              <div class="castle-tour-eyebrow">A JOURNEY THROUGH FOUR SECRET REALMS</div>
+              <h3 id="castle-tour-heading">BƯỚC VÀO <em>LÂU ĐÀI 3D.</em></h3>
+              <p id="castle-tour-status" role="status" aria-live="polite">Đang dùng minh họa tiết kiệm GPU. Bấm KÍCH HOẠT 3D để khám phá lâu đài.</p>
+            </div>
+          </div>
+          <div class="castle-tour-footer">
+            <div class="castle-tour-room-list" role="group" aria-label="Chọn một trong bốn cổng lâu đài">
+              <button type="button" data-castle-room="hall" aria-pressed="true"><span>♜</span> ĐẠI SẢNH</button>
+              <button type="button" data-castle-room="library" aria-pressed="false"><span>❖</span> THƯ VIỆN</button>
+              <button type="button" data-castle-room="tower" aria-pressed="false"><span>☽</span> THIÊN VĂN</button>
+              <button type="button" data-castle-room="crypt" aria-pressed="false"><span>✶</span> HẦM MỘ</button>
+            </div>
+            <div class="castle-tour-actions">
+              <button type="button" class="btn btn-outline" id="castle-tour-start" aria-pressed="false">✦ KÍCH HOẠT 3D</button>
+              <button type="button" class="castle-tour-control" id="castle-tour-left" aria-label="Xoay lâu đài sang trái">↶</button>
+              <button type="button" class="castle-tour-control" id="castle-tour-right" aria-label="Xoay lâu đài sang phải">↷</button>
+              <button type="button" class="castle-tour-control" id="castle-tour-zoom-in" aria-label="Phóng to lâu đài">+</button>
+              <button type="button" class="castle-tour-control" id="castle-tour-zoom-out" aria-label="Thu nhỏ lâu đài">−</button>
+              <button type="button" class="btn btn-primary" id="castle-tour-enter">VÀO PHÒNG ĐÃ CHỌN ↗</button>
+            </div>
+            <p class="castle-tour-help">DÙNG CHUỘT / CHẠM ĐỂ XOAY, CUỘN ĐỂ THU PHÓNG · BẤM ĐIỂM SÁNG TRONG CẢNH 3D ĐỂ CHỌN PHÒNG · CÁC NÚT CHỌN PHÒNG LUÔN HOẠT ĐỘNG Ở CHẾ ĐỘ 2D.</p>
+          </div>
+        </div>
+
         <div class="expedition-shell">
           <div class="expedition-sidebar">
             <div class="expedition-caption">ANCIENT CASTLE MAP <span>✧</span></div>

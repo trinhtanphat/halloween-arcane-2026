@@ -125,3 +125,13 @@ The virtual Halloween date is 31 October 2026, 18:00 in GMT+7; the website is a 
 - Automated tests cover a deliberate mismatch, its timed reset, keyboard-driven matching, victory, best score persistence and replay at both normal and hard difficulty, all earlier site features and offline rendering.
 
 The game is fiction and is fully client-side. No account or server endpoint is used for player data.
+
+## Procedural Interactive Castle Tour — opt-in Three.js 3D
+
+- Four-room castle tour integrated into the existing relic expedition, including the Great Hall, Lost Library, Moon Tower and Ancient Crypt.
+- The real-time 3D scene is original geometry (stone keep, five turret roofs, illuminated windows, an arched gate, magical floating room orbs, moon and glowing braziers) produced by the already installed Three.js dependency. No additional remote models or textures.
+- **Opt-in performance:** 3D stays off until the player clicks Activate 3D. Frame rate is capped at 25 fps on phones / 36 fps elsewhere; the renderer is skipped in hidden/offscreen tabs and disposed when switched off.
+- **Interaction:** Drag, touch, wheel, arrow keys, accessible rotate/zoom buttons, and the four named room selectors. Click/tap a glowing orb to focus on a room; Enter Selected Room synchronizes with the original riddles and preserves relic progress.
+- **WebGL-safe:** Gracefully uses an original CSS-illustrated castle when WebGL is disabled or lost. The room selector and all riddles remain available in 2D, with truthful mode labels.
+- **Offline PWA:** service worker cache v10 includes castle-tour.css; the bundled app.js contains the new procedural Three.js module.
+- **Automated tests:** confirm the 3D launch and teardown, arrow-key orbit controls, zoom, 2D-only fallback, integration with room selection, offline mode, and all existing quests.

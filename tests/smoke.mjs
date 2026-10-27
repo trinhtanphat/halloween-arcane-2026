@@ -36,11 +36,44 @@ try {
   assert.match(await page.locator("#hero-title").innerText(),/MAGIC/);
   assert.equal(await page.locator(".realm-card").count(),3);
   assert.equal(await page.locator(".timeline-item").count(),4);
-  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css","expedition.js","expedition.css","pumpkin.css","soundscape.js","candy.js","candy.css","poster.js","poster.css","runes.js","runes.css"];
+  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css","expedition.js","expedition.css","castle-tour.css","pumpkin.css","soundscape.js","candy.js","candy.css","poster.js","poster.css","runes.js","runes.css"];
   for(const asset of assets){
     const response=await page.request.get(base+"/"+asset);
     assert.equal(response.status(),200,"asset missing: "+asset);
   }
+  // Interactive Three.js castle is opt-in; its 2D controls must remain useful.
+  assert.equal(await page.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
+  assert.equal(await page.locator("[data-castle-room]").count(),4);
+  assert.equal(await page.locator("#castle-tour-start").getAttribute("aria-pressed"),"false");
+  await page.locator('[data-castle-room="library"]').click();
+  assert.equal(await page.locator('[data-castle-room="library"]').getAttribute("aria-pressed"),"true");
+  await page.locator("#castle-tour-enter").click();
+  assert.equal(await page.locator("#expedition-scene").getAttribute("data-room-scene"),"library");
+  const yawBefore=Number(await page.locator("#castle-tour-canvas").getAttribute("data-orbit-yaw"));
+  const distanceBefore=Number(await page.locator("#castle-tour-canvas").getAttribute("data-orbit-zoom"));
+  await page.locator("#castle-tour-right").click();
+  await page.locator("#castle-tour-zoom-in").click();
+  assert.notEqual(Number(await page.locator("#castle-tour-canvas").getAttribute("data-orbit-yaw")),yawBefore);
+  assert.ok(Number(await page.locator("#castle-tour-canvas").getAttribute("data-orbit-zoom"))<distanceBefore);
+  await page.locator("#castle-tour-start").click();
+  await page.waitForFunction(()=>["webgl","illustration"].includes(document.querySelector("#castle-tour")?.dataset.renderMode)
+    && document.querySelector("#castle-tour-mode")?.textContent!=="3D CHƯA KÍCH HOẠT",{timeout:20000});
+  const castleMode=await page.locator("#castle-tour").getAttribute("data-render-mode");
+  if(castleMode==="webgl"){
+    assert.equal(await page.locator("#castle-tour-canvas").isVisible(),true);
+    assert.equal(await page.locator("#castle-tour-start").getAttribute("aria-pressed"),"true");
+    const yaw=Number(await page.locator("#castle-tour-canvas").getAttribute("data-orbit-yaw"));
+    await page.locator("#castle-tour-canvas").focus();
+    await page.keyboard.press("ArrowLeft");
+    assert.notEqual(Number(await page.locator("#castle-tour-canvas").getAttribute("data-orbit-yaw")),yaw);
+    await page.locator("#castle-tour-start").click();
+    assert.equal(await page.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
+  }else{
+    assert.equal(await page.locator("#castle-tour-illustration").isVisible(),true);
+  }
+  await page.locator('[data-castle-room="hall"]').click();
+  await page.locator("#castle-tour-enter").click();
+  assert.equal(await page.locator("#expedition-scene").getAttribute("data-room-scene"),"hall");
   await page.locator("#summon-ghosts").click();
   assert.equal(await page.locator(".cemetery").evaluate(e=>e.classList.contains("summoned")),true);
   await page.locator("#wizard-name").fill("Merlin Demo");
@@ -254,6 +287,12 @@ try {
   assert.equal(await forcedFallback.locator("#pumpkin-canvas").isVisible(),false);
   assert.match(await forcedFallback.locator("#scene-badge").innerText(),/2D FALLBACK/);
   assert.equal(await forcedFallback.locator(".pumpkin-eye").count(),2);
+  await forcedFallback.locator("#castle-tour-start").click();
+  assert.equal(await forcedFallback.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
+  assert.equal(await forcedFallback.locator("#castle-tour-start").getAttribute("aria-pressed"),"false");
+  await forcedFallback.locator('[data-castle-room="crypt"]').click();
+  await forcedFallback.locator("#castle-tour-enter").click();
+  assert.equal(await forcedFallback.locator("#expedition-scene").getAttribute("data-room-scene"),"crypt");
   await forcedFallback.close();
   // Simulate GPU context loss in an isolated Chrome tab; keep the main tab untouched.
   const lossPage=await context.newPage();
@@ -334,6 +373,8 @@ try {
     assert.equal(await offlineTab.locator("#rune-board .rune-card").count(),12);
     assert.equal(await offlineTab.locator("#rune-best").innerText(),"7");
     assert.equal(await offlineTab.evaluate(()=>localStorage.getItem("ravenhollow-runes-best-hard")),"8");
+    assert.equal(await offlineTab.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
+    assert.equal(await offlineTab.locator("[data-castle-room]").count(),4);
     assert.equal(await offlineTab.locator("#poster-canvas").evaluate(canvas=>canvas.width),900);
     assert.equal(await offlineTab.locator("#poster-name").inputValue(),"Luna Pháp Sư");
     assert.equal(await offlineTab.locator("[data-room]").count(),4);
@@ -342,7 +383,7 @@ try {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

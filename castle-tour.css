@@ -1,0 +1,40 @@
+/* 3D castle tour: GPU-rendered only on explicit request; illustrated fallback always usable */
+.castle-tour{border:1px solid #d8a9717a;background:#171123;margin:0 0 29px;box-shadow:0 17px 57px #06020d90;overflow:hidden}
+.castle-tour-header{padding:13px 20px;background:#2a1c39;display:flex;align-items:center;justify-content:space-between;gap:15px;color:#edc68b;font:600 9px/1.5 var(--sans);letter-spacing:.14em}
+.castle-tour-stage{position:relative;isolation:isolate;height:440px;overflow:hidden;background:radial-gradient(ellipse at 51% 35%,#634a82,#19142b 63%,#090c19);user-select:none}
+#castle-tour-canvas{position:absolute;inset:0;width:100%;height:100%;display:none;cursor:grab;touch-action:pan-y;z-index:2}
+#castle-tour-canvas:active{cursor:grabbing}
+#castle-tour-canvas:focus-visible{outline:3px solid #ffe3a1;outline-offset:-6px}
+.castle-tour-illustration{position:absolute;inset:0;overflow:hidden;background:radial-gradient(circle at 50% 42%,#754a89aa,transparent 44%),linear-gradient(#24152d,#15122b 68%,#11101b);z-index:1}
+.tour-moon{width:160px;height:160px;border-radius:50%;position:absolute;left:calc(50% - 80px);top:36px;background:radial-gradient(circle at 38% 31%,#fff7d0,#e1c6b6 75%,#b49db4);box-shadow:0 0 80px #c9a7e580,0 0 150px #a17fdf3b}
+.tour-sky-stars{position:absolute;inset:35px 6% auto;text-align:center;color:#f8dba5;letter-spacing:4em;white-space:nowrap;overflow:hidden;font-size:21px}
+.tour-structure{position:absolute;bottom:31px;left:50%;width:min(80%,630px);height:320px;transform:translateX(-50%);filter:drop-shadow(0 0 27px #a471b055)}
+.tour-keep{position:absolute;left:18%;width:64%;bottom:0;height:205px;background:linear-gradient(105deg,#473453,#30233c 65%,#21182e);border:2px solid #af947a6b;box-shadow:inset 0 0 31px #0d0c21}
+.tour-keep-roof{position:absolute;width:110%;height:53px;left:-5%;top:-51px;background:#2b213b;clip-path:polygon(0 100%,50% 0,100% 100%);filter:drop-shadow(0 0 5px #e6b87862)}
+.tour-tower{position:absolute;bottom:0;width:23%;height:253px;border:2px solid #907681;background:linear-gradient(100deg,#544259,#291b3b 75%);z-index:2}
+.tour-tower-left{left:4%}.tour-tower-right{right:4%;height:290px}
+.tour-roof{position:absolute;top:-95px;left:-22%;width:144%;height:98px;background:linear-gradient(135deg,#745176,#291e3f);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.tour-tower .tour-window,.tour-keep .tour-window{position:absolute;top:43%;left:35%;width:30%;height:57px;border-radius:50% 50% 5% 5%;background:#d4a95d;color:#391f38;text-align:center;font-size:18px;padding-top:14px;box-shadow:0 0 23px #f9bd589c}
+.tour-keep .tour-window{top:25%;width:13%;height:47px;left:18%}.tour-keep .tour-window.right{left:auto;right:18%}
+.tour-door{position:absolute;bottom:0;left:36%;height:108px;width:28%;border-radius:48% 48% 0 0;background:#21152e;border:4px solid #b69c767a;box-shadow:inset 0 0 35px #d49b5973;color:#d8b578;display:grid;place-items:center;font-size:40px}
+.tour-foreground{position:absolute;inset:auto -5% 0;height:65px;background:radial-gradient(ellipse at 50% 20%,#ae815e55,transparent 60%),linear-gradient(transparent,#080918)}
+.castle-tour-overlay{position:absolute;z-index:3;inset:16px 20px auto;pointer-events:none;text-shadow:0 2px 18px #000e}
+.castle-tour-eyebrow{font:600 9px var(--sans);color:#ffdc98;letter-spacing:.18em}
+.castle-tour-overlay h3{margin:8px 0;font:600 clamp(22px,2.7vw,38px) var(--serif);color:#fff0d5}
+.castle-tour-overlay h3 em{font:400 1.13em "Great Vibes",cursive;color:#e6be7d}
+.castle-tour-overlay p{margin:0;max-width:670px;font:11px/1.7 var(--sans);color:#f6d7b4}
+.castle-tour-footer{padding:18px 21px 19px;background:linear-gradient(130deg,#2b2037,#1e172d)}
+.castle-tour-room-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.castle-tour-room-list button{min-height:55px;border:1px solid #e0b57564;background:#342540;color:#e8d2c0;font:600 10px var(--sans);letter-spacing:.03em;display:flex;align-items:center;justify-content:center;gap:10px}
+.castle-tour-room-list button span{font:25px var(--serif);color:#e4b778}
+.castle-tour-room-list button[aria-pressed=true]{border-color:#f5d69f;background:#584060;box-shadow:inset 0 0 18px #deb17c2e}
+.castle-tour-room-list button:hover{border-color:#ffe1ac}
+.castle-tour-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:15px}
+.castle-tour-actions .btn{font-size:9px;min-height:43px;padding:12px 13px;white-space:normal}
+.castle-tour-control{border:1px solid #e5bd796b;color:#efd4a6;background:#382d43;min-width:42px;min-height:43px;font:600 19px var(--sans)}
+.castle-tour-control:hover,.castle-tour-control:focus-visible{border-color:#ffe4b4;background:#58415b}
+.castle-tour-help{color:#bca7c8;font:9px/1.9 var(--sans);letter-spacing:.08em;margin:14px 0 0}
+.castle-tour[data-render-mode=webgl] .castle-tour-illustration{display:none}
+.castle-tour[data-render-mode=webgl] #castle-tour-canvas{display:block}
+@media(max-width:720px){.castle-tour-stage{height:380px}.castle-tour-room-list{grid-template-columns:repeat(2,minmax(0,1fr))}.castle-tour-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}.castle-tour-actions #castle-tour-start,.castle-tour-actions #castle-tour-enter{grid-column:span 2}.castle-tour-actions .btn{font-size:9px}.castle-tour-control{min-width:0}}
+@media(max-width:430px){.castle-tour-header{font-size:8px;padding:12px}.castle-tour-stage{height:340px}.castle-tour-overlay{inset:13px 13px auto}.castle-tour-overlay h3{font-size:21px}.castle-tour-overlay p{font-size:10px}.tour-structure{width:93%;height:245px}.tour-tower{height:192px}.tour-tower-right{height:210px}.tour-keep{height:160px}.tour-door{height:82px}.tour-moon{width:108px;height:108px;left:calc(50% - 54px)}.castle-tour-footer{padding:13px}.castle-tour-room-list button{font-size:9px}.castle-tour-help{font-size:8px}}
