@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#100d1e" />
+  <meta name="description" content="Ravenhollow: một trải nghiệm Halloween 2026 kỳ ảo với bí ngô 3D, lâu đài phép thuật, cổng bí ẩn và thử thách tương tác." />
+  <meta property="og:title" content="Ravenhollow — The Enchanted Halloween" />
+  <meta property="og:description" content="Trăng lên. Phép thuật thức giấc. Bước vào Halloween 31/10/2026." />
+  <meta property="og:type" content="website" />
+  <title>Ravenhollow | The Enchanted Halloween 2026</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
+  <script defer type="module" src="./app.js"></script>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="stars" id="stars" aria-hidden="true"></div>
+  <div class="sky-glow" aria-hidden="true"></div>
+  <div class="bat-field" id="bat-field" aria-hidden="true"></div>
+  <a href="#main" class="skip-link">Đi tới nội dung</a>
+  <header class="site-header" id="top">
+    <div class="shell nav-inner">
+      <a href="#top" class="brand" aria-label="Ravenhollow - trang chủ">
+        <span class="brand-mark" aria-hidden="true">✦<small>R</small>✦</span>
+        <span class="brand-text"><strong>RAVENHOLLOW</strong><span>ACADEMY OF THE ARCANE</span></span>
+      </a>
+      <button class="menu-toggle" id="menu-toggle" aria-label="Mở menu" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
+      <nav id="nav-links" aria-label="Điều hướng chính">
+        <a href="#about">Truyền thuyết</a><a href="#realms">Khám phá</a><a href="#portal">Cổng phép thuật</a><a href="#schedule">Đêm hội</a>
+      </nav>
+      <a href="#portal" class="nav-cta"><span>Nhận thư mời</span><span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero shell" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-line"></span> THE ENCHANTED HALLOWEEN <span class="eyebrow-line"></span></div>
+        <p class="hero-pretitle">ĐÊM 31 THÁNG 10, 2026</p>
+        <h1 id="hero-title">WHEN MAGIC<br><em>MEETS</em> <span class="serif-italic">MIDNIGHT.</span></h1>
+        <div class="hero-rule"><span>✧</span><span>✧</span><span>✧</span></div>
+        <p class="hero-description">Giữa màn sương huyền bí, một học viện cổ xưa thức giấc. Nơi bí ngô phát sáng, phép thuật hiện hình, và mỗi cánh cửa mở ra một bí mật chưa từng được kể.</p>
+        <div class="hero-actions"><a href="#portal" class="btn btn-primary"><span>✦</span> BƯỚC VÀO THẾ GIỚI PHÉP THUẬT <span>→</span></a><a href="#realms" class="btn btn-outline">KHÁM PHÁ <span>↗</span></a></div>
+        <div class="countdown-panel"><p class="countdown-label"><span class="pulse-dot"></span> COUNTDOWN TO THE ENCHANTED NIGHT <span class="tz">GMT+7</span></p><div class="countdown" aria-label="Đếm ngược đến Halloween" role="timer"><div><strong id="days">--</strong><span>NGÀY</span></div><b>:</b><div><strong id="hours">--</strong><span>GIỜ</span></div><b>:</b><div><strong id="minutes">--</strong><span>PHÚT</span></div><b>:</b><div><strong id="seconds">--</strong><span>GIÂY</span></div></div><p class="countdown-end" id="countdown-end"></p></div>
+      </div>
+      <div class="hero-art" aria-label="Bí ngô 3D phát sáng với các hạt ma thuật và lâu đài trong đêm Halloween">
+        <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="moon" aria-hidden="true"></div>
+        <div class="floating-sigil sigil-a" aria-hidden="true">✧</div><div class="floating-sigil sigil-b" aria-hidden="true">☾</div><div class="floating-sigil sigil-c" aria-hidden="true">✶</div>
+        <div class="castle" aria-hidden="true"><div class="tower t1"></div><div class="tower t2"></div><div class="tower t3"></div><div class="tower t4"></div><div class="castle-main"><i></i><i></i><i></i><i></i><i></i></div></div>
+        <canvas id="pumpkin-canvas" aria-label="Bí ngô 3D tương tác; kéo chuột để xoay"></canvas>
+        <div class="pumpkin-fallback" id="pumpkin-fallback" aria-hidden="true">🎃</div>
+        <div class="hero-floor" aria-hidden="true"></div>
+        <div class="art-caption"><span class="diamond">◆</span><div><strong>THE ENCHANTED PUMPKIN</strong><span>CHẠM & KÉO ĐỂ XOAY BÍ NGÔ 3D</span></div></div>
+        <div class="scene-badge"><span>✺</span> REAL-TIME WEBGL</div>
+      </div>
+      <div class="scroll-indicator">SCROLL TO DISCOVER <span>↓</span></div>
+    </section>
+
+    <div class="marquee-strip" aria-hidden="true"><div class="marquee-track">✧ RAVENHOLLOW ACADEMY &nbsp;&nbsp; ✦ THE ENCHANTED HALLOWEEN &nbsp;&nbsp; ☾ OCTOBER 31ST, 2026 &nbsp;&nbsp; ✧ THE MAGIC IS REAL &nbsp;&nbsp; ✦ RAVENHOLLOW ACADEMY &nbsp;&nbsp; ✧ RAVENHOLLOW ACADEMY &nbsp;&nbsp; ✦ THE ENCHANTED HALLOWEEN &nbsp;&nbsp; ☾ OCTOBER 31ST, 2026 &nbsp;&nbsp; ✧ THE MAGIC IS REAL &nbsp;&nbsp; ✦ RAVENHOLLOW ACADEMY</div></div>
+
+    <section id="about" class="section about-section shell">
+      <div class="section-heading center"><span class="kicker">✦ THE LEGEND AWAKENS ✦</span><h2>MỘT ĐÊM <em>DIỆU KỲ</em><br>KHÔNG THỂ QUÊN</h2><p>Ravenhollow không phải một nơi bình thường. Ở đây, những câu chuyện cổ tích u tối hòa cùng phép thuật của đêm Halloween.</p></div>
+      <div class="about-layout">
+        <div class="about-art"><img src="./assets/haunted-hero.jpg" alt="Không khí Halloween với cảnh tối huyền bí" loading="lazy" /><div class="about-frame"></div><div class="about-sticker">EST. <strong>1693</strong><span>✦</span></div><div class="about-img-label">RAVENHOLLOW, WHERE LEGENDS BEGIN</div></div>
+        <div class="about-copy"><div class="tiny-rule">CHAPTER I — THE AWAKENING</div><h3>Học viện bị lãng quên<br><em>bên kia ánh trăng.</em></h3><p>Khi đồng hồ điểm mười hai, cánh cổng sắt của Ravenhollow mở ra trong tiếng chuông ngân. Đèn nến bay lơ lửng, những trang sách tự lật, và một lời mời bí ẩn đang chờ bạn.</p><p>Hãy đến để khám phá không gian giả tưởng lấy cảm hứng từ trường phù thủy cổ điển — với những phép thuật, bộ môn huyền bí và truyền thuyết riêng của Ravenhollow.</p><div class="mini-features"><div><span>✦</span><strong>PHÉP THUẬT 3D</strong><small>WebGL & hạt ánh sáng</small></div><div><span>☽</span><strong>KHÁM PHÁ BÍ ẨN</strong><small>Cổng tương tác & câu đố</small></div><div><span>✧</span><strong>HALLOWEEN NIGHT</strong><small>Không khí lễ hội kỳ ảo</small></div></div><a href="#realms" class="text-link">KHÁM PHÁ CÁC VƯƠNG QUỐC <span>↗</span></a></div>
+      </div>
+    </section>
+
+    <section class="section realms-section" id="realms"><div class="shell">
+      <div class="section-heading center"><span class="kicker">✧ CHOOSE YOUR PATH ✧</span><h2>BA CÁNH CỬA.<br><em>VÔ VÀN BÍ ẨN.</em></h2><p>Đêm nay bạn muốn tìm kiếm điều gì? Mỗi thế giới mang đến một trải nghiệm Halloween khác biệt.</p></div>
+      <div class="realm-grid">
+        <article class="realm-card realm-one"><div class="realm-img"><img src="./assets/party-hero.webp" alt="Minh họa lễ hội Halloween" loading="lazy" /></div><div class="realm-overlay"><span class="realm-no">01 / THE CELEBRATION</span><div class="realm-icon">♜</div><h3>THE HAUNTED<br>MASQUERADE</h3><p>Vũ hội hóa trang giữa lâu đài cổ, đèn lồng ma mị và những vị khách đến từ bóng tối.</p><a href="#schedule" aria-label="Tìm hiểu về lễ hội hóa trang">KHÁM PHÁ <span>↗</span></a></div></article>
+        <article class="realm-card realm-two"><div class="realm-img"><img src="./assets/haunted-origins.jpg" alt="Khung cảnh u tối ma mị" loading="lazy" /></div><div class="realm-overlay"><span class="realm-no">02 / THE MYSTERY</span><div class="realm-icon">☽</div><h3>THE FORBIDDEN<br>FOREST</h3><p>Rừng cấm đầy sương, những ngôi mộ cổ và lời thì thầm từ các linh hồn lang thang.</p><a href="#graveyard" aria-label="Tìm hiểu khu rừng cấm">KHÁM PHÁ <span>↗</span></a></div></article>
+        <article class="realm-card realm-three"><div class="realm-img"><img src="./assets/party-location.webp" alt="Địa điểm Halloween kỳ ảo" loading="lazy" /></div><div class="realm-overlay"><span class="realm-no">03 / THE ENCHANTMENT</span><div class="realm-icon">✧</div><h3>THE ARCANE<br>ACADEMY</h3><p>Những căn phòng bí mật, đũa phép, cuộn giấy cổ và thử thách dành cho pháp sư tập sự.</p><a href="#portal" aria-label="Thử thách học viện phép thuật">KHÁM PHÁ <span>↗</span></a></div></article>
+      </div>
+    </div></section>
+
+    <section class="section graveyard-section" id="graveyard"><div class="shell graveyard-layout"><div class="graveyard-copy"><span class="kicker">✦ BEYOND THE VEIL ✦</span><h2>ĐÊM TỐI<br><em>CÓ NHỮNG BÍ MẬT.</em></h2><p>Đi ngang những bia mộ rêu phong, nghe tiếng dơi vỗ cánh và ngắm các linh hồn phát sáng trôi qua khu rừng cấm.</p><button class="btn btn-outline" id="summon-ghosts" type="button">✧ TRIỆU HỒI LINH HỒN</button><div id="ghost-message" class="ghost-message" aria-live="polite"></div></div><div class="cemetery" aria-label="Mô phỏng nghĩa địa với bia mộ, trăng tròn và các linh hồn"><div class="cemetery-moon"></div><div class="tree tree-left"></div><div class="tree tree-right"></div><div class="grave g1"><i>RIP</i></div><div class="grave g2"><i>✝</i></div><div class="grave g3"><i>RIP</i></div><div class="grave g4"><i>✦</i></div><div class="ghost gho1">✧</div><div class="ghost gho2">✧</div><div class="ghost gho3">✧</div><div class="grave-ground"></div></div></div></section>
+
+    <section id="portal" class="section portal-section"><div class="shell"><div class="section-heading center"><span class="kicker">✧ THE INITIATION ✧</span><h2>CÁNH CỔNG <em>PHÉP THUẬT</em><br>ĐANG CHỜ BẠN</h2><p>Chỉ những người dũng cảm mới có thể vượt qua ba câu đố của học viện Ravenhollow.</p></div><div class="portal-stage"><div class="portal-stars" aria-hidden="true"></div><div class="portal-orbit po-one"></div><div class="portal-orbit po-two"></div><div class="portal-arch"><div class="arch-inside"><div class="portal-vortex"></div><div class="portal-center">✶</div></div><span class="arch-rune r1">ᚠ</span><span class="arch-rune r2">ᚹ</span><span class="arch-rune r3">ᛟ</span><span class="arch-rune r4">ᚷ</span></div><div class="portal-controls"><span>THE GATE IS OPEN</span><button type="button" class="btn btn-primary" id="open-portal">✦ BƯỚC QUA CỔNG PHÉP THUẬT ↗</button><small>MINIGAME · 3 CÂU ĐỐ · THÀNH TỰU PHÁP SƯ</small></div></div></div></section>
+
+    <section class="section schedule-section shell" id="schedule"><div class="section-heading center"><span class="kicker">☾ MARK YOUR CALENDAR ☾</span><h2>THE NIGHT OF <em>WONDERS</em></h2><p>Lịch trình tưởng tượng trong trải nghiệm web Halloween ngày 31/10/2026. Không phải sự kiện bán vé ngoài đời thực.</p></div><div class="event-header"><div><span>ONE NIGHT ONLY</span><strong>31 <small>OCT</small> 2026</strong></div><div><span>ĐÊM PHÉP THUẬT</span><strong>RAVENHOLLOW ACADEMY</strong></div><div><span>ONLINE EXPERIENCE</span><strong>OPEN ALL NIGHT</strong></div></div><div class="timeline"><div class="timeline-item"><time>18:00</time><span class="tl-marker">✦</span><div><h3>THE GATES OPEN</h3><p>Cổng học viện đón những pháp sư đầu tiên.</p></div><b>01</b></div><div class="timeline-item"><time>19:30</time><span class="tl-marker">☽</span><div><h3>THE HAUNTED MASQUERADE</h3><p>Dạ tiệc hóa trang dưới ánh trăng tím.</p></div><b>02</b></div><div class="timeline-item"><time>21:00</time><span class="tl-marker">✧</span><div><h3>THE ARCANE TRIALS</h3><p>Giải mã những mật thư và câu đố phép thuật.</p></div><b>03</b></div><div class="timeline-item"><time>00:00</time><span class="tl-marker">✶</span><div><h3>THE MIDNIGHT AWAKENING</h3><p>Khoảnh khắc huyền bí nhất của đêm Halloween.</p></div><b>04</b></div></div></section>
+
+    <section class="invitation-section shell" id="invitation"><div class="invitation-card"><div class="invitation-seal">✦ <span>R</span> ✦</div><span class="kicker">A LETTER FROM RAVENHOLLOW</span><h2>THƯ MỜI ĐANG<br><em>CHỜ BẠN.</em></h2><p>Để lại bí danh phù thủy của bạn để nhận thư mời ngay trong trải nghiệm này. Dữ liệu chỉ được lưu trong trình duyệt của bạn.</p><form id="invitation-form" class="invitation-form"><label for="wizard-name" class="sr-only">Bí danh phù thủy</label><input id="wizard-name" name="wizard-name" type="text" maxlength="32" autocomplete="nickname" placeholder="Bí danh phù thủy của bạn..." required /><button type="submit">NHẬN THƯ MỜI ✦</button></form><p id="invitation-response" class="invitation-response" aria-live="polite"></p><small>DEMO ONLY · KHÔNG GỬI EMAIL · KHÔNG THU THẬP DỮ LIỆU MÁY CHỦ</small></div></section>
+  </main>
+  <footer class="site-footer"><div class="shell"><div class="footer-top"><div class="footer-brand"><span class="brand-mark">✦<small>R</small>✦</span><div><strong>RAVENHOLLOW</strong><span>THE ENCHANTED HALLOWEEN 2026</span></div></div><p>Where midnight meets magic.<br>Một đêm huyền bí do bạn tạo nên.</p><a href="#top">TRỞ VỀ ĐẦU TRANG ↑</a></div><div class="footer-bottom"><span>© 2026 RAVENHOLLOW · FAN-INSPIRED ORIGINAL EXPERIENCE</span><span>INSPIRED BY COMMUNITY OPEN-SOURCE CREATORS · <a href="./CREDITS.md">CREDITS & LICENSES</a></span><button id="effects-toggle" type="button" aria-pressed="true">✨ HIỆU ỨNG: BẬT</button></div></div></footer>
+  <dialog id="portal-dialog" aria-labelledby="dialog-title"><div class="dialog-shell"><button type="button" id="close-portal" class="close-dialog" aria-label="Đóng">✕</button><span class="kicker">✦ TRIAL OF THE ARCANE ✦</span><div class="challenge-status" id="challenge-status">THỬ THÁCH 1 / 3</div><h2 id="dialog-title">THE ARCANE TRIALS</h2><div class="dialog-rune" id="dialog-rune">☾</div><p id="question-text">Bạn đã sẵn sàng?</p><div class="answer-list" id="answer-list"></div><div class="quiz-message" id="quiz-message" aria-live="polite"></div><button class="btn btn-outline quiz-next" id="quiz-next" type="button" hidden>TIẾP TỤC →</button><p class="quiz-note">Không yêu cầu tài khoản · Không lưu dữ liệu máy chủ</p></div></dialog>
+  <div id="toast" class="toast" aria-live="polite"></div>
+</body>
+</html>
