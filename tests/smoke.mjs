@@ -88,9 +88,42 @@ try {
     assert.equal(await page.locator("#castle-walk-interact").isEnabled(),true,"must reach a glowing portal");
     await page.locator("#castle-tour-canvas").focus();
     await page.keyboard.press("e");
-    assert.ok(["tower","library"].includes(await page.locator("#expedition-scene").getAttribute("data-room-scene")),"E interacts with nearby portal");
-    await page.locator("#castle-walk-interact").click();
-    assert.ok(["tower","library"].includes(await page.locator("#expedition-scene").getAttribute("data-room-scene")));
+    assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"interior","E at a gateway enters the real indoor 3D scene");
+    const firstInterior=await page.locator("#castle-tour").getAttribute("data-interior-room");
+    assert.ok(["tower","library"].includes(firstInterior));
+    assert.equal(await page.locator("#expedition-scene").getAttribute("data-room-scene"),firstInterior);
+    assert.equal(await page.locator("#castle-interior-exit").isVisible(),true);
+    assert.equal(await page.locator("#castle-walk-interact").isDisabled(),true,"riddle is proximity gated");
+    // Approach the indoor relic by walking around the central furniture.
+    for(let i=0;i<3;i++)await page.locator('[data-walk-action="right"]').click();
+    for(let i=0;i<7;i++)await page.locator('[data-walk-action="forward"]').click();
+    for(let i=0;i<3;i++)await page.locator('[data-walk-action="left"]').click();
+    for(let i=0;i<2;i++)await page.locator('[data-walk-action="forward"]').click();
+    assert.equal(await page.locator("#castle-walk-interact").isEnabled(),true,"indoor artifact is reachable");
+    await page.locator("#castle-tour-canvas").focus();
+    await page.keyboard.press("e");
+    assert.equal(await page.locator("#expedition-scene").getAttribute("data-room-scene"),firstInterior);
+    assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"interior");
+    const castleRooms=["hall","library","tower","crypt"];
+    await page.locator("#castle-interior-exit").click();
+    assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"courtyard");
+    assert.ok(Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"))>=4.75);
+    // Independently enter and leave all four distinct interior scenes.
+    for(const room of castleRooms){
+      await page.locator('[data-castle-room="'+room+'"]').click();
+      await page.locator("#castle-tour-enter").click();
+      assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"interior");
+      assert.equal(await page.locator("#castle-tour").getAttribute("data-interior-room"),room);
+      assert.equal(await page.locator("#expedition-scene").getAttribute("data-room-scene"),room);
+      const bound0=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+      for(let i=0;i<19;i++)await page.locator('[data-walk-action="back"]').click();
+      const boundZ=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+      assert.ok(boundZ>=-4.05&&boundZ<=4.05,"indoor collision bounds");
+      assert.ok(boundZ>=bound0,"back button moves within room");
+      await page.locator("#castle-interior-exit").click();
+      assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"courtyard");
+    }
+    // Exterior collision bounds remain intact.
     for(let i=0;i<15;i++)await page.locator('[data-walk-action="forward"]').click();
     const boundaryZ=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
     assert.ok(boundaryZ>=4.75 && boundaryZ<=14.2,"walking remains in the courtyard");
@@ -416,7 +449,7 @@ try {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,first_person_walk:castleMode==='webgl',candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,first_person_walk:castleMode==='webgl',castle_interiors:'4/4',castle_indoor_collision:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

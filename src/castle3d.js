@@ -1,3 +1,5 @@
+import { createCastleInterior } from "./castle-interiors.js";
+
 /**
  * Ravenhollow procedural castle (original geometry, no asset downloads).
  * Lazy Three.js initialization; every control has a functional 2D fallback.
@@ -14,12 +16,14 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   const walkHud=document.querySelector("#castle-walk-hud");
   const walkPad=document.querySelector("#castle-walk-pad");
   const walkInteract=document.querySelector("#castle-walk-interact");
+  const interiorExit=document.querySelector("#castle-interior-exit");
   const roomButtons=[...root.querySelectorAll("[data-castle-room]")];
   const roomNames={hall:"Đại Sảnh Bóng Đêm",library:"Thư Viện Bí Ẩn",tower:"Tháp Thiên Văn",crypt:"Hầm Mộ Cổ"};
   const roomPoints={hall:[0,2.15,2.5],library:[-3.65,4.3,1.8],tower:[3.65,5.05,-1.1],crypt:[0,1.4,-4.45]};
   let selected="hall",renderer=null,scene=null,camera=null,hotspots=[],glowObjects=[],raf=0,active=false,inView=true;
   let theta=.58,phi=.43,radius=13.8,dragging=false,moved=false,lastX=0,lastY=0,lastFrame=0;
   let viewMode="orbit",walkX=0,walkZ=11.5,walkYaw=0,walkPitch=-.08,walkNear=null,walkLast=0,walkPortals=[];
+  let zone="courtyard",interior=null,exteriorObjects=[],outsidePosition=null;
   const walkKeys=new Set();
   const target=new THREE.Vector3(0,2,0),wanted=new THREE.Vector3(0,2,0);
   const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
@@ -35,11 +39,13 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     canvas.style.display=mode==="webgl"?"block":"none";
     if(mode!=="webgl"){viewMode="orbit";walkKeys.clear();}
     root.dataset.tourView=viewMode;
+    root.dataset.tourZone=zone;
     viewToggle.disabled=mode!=="webgl";
     viewToggle.setAttribute("aria-pressed",String(mode==="webgl"&&viewMode==="walk"));
     viewToggle.textContent=viewMode==="walk"?"✧ TRỞ VỀ TOÀN CẢNH":"🚶 ĐI BỘ WASD";
     walkHud.hidden=mode!=="webgl"||viewMode!=="walk";
     walkPad.hidden=mode!=="webgl"||viewMode!=="walk";
+    interiorExit.hidden=mode!=="webgl"||zone!=="interior";
   }
   function pickRoom(id,notify=true){
     if(!Object.hasOwn(roomNames,id))return;
@@ -192,9 +198,63 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     canvas.dataset.walkX=walkX.toFixed(2);
     canvas.dataset.walkZ=walkZ.toFixed(2);
     canvas.dataset.walkYaw=walkYaw.toFixed(3);
+    canvas.dataset.walkZone=zone;
     document.querySelector("#castle-walk-coords").textContent="X "+walkX.toFixed(1)+" · Z "+walkZ.toFixed(1);
   }
+  function disposeInterior(){
+    if(!interior||!scene)return;
+    const group=interior.group;
+    scene.remove(group);
+    group.traverse(node=>{
+      node.geometry?.dispose?.();
+      const mats=node.material?(Array.isArray(node.material)?node.material:[node.material]):[];
+      mats.forEach(mat=>mat.dispose?.());
+    });
+    interior=null;
+    exteriorObjects.forEach(obj=>{obj.visible=true;});
+    exteriorObjects=[];
+  }
+  function enterInterior(id){
+    if(!active||viewMode!=="walk"||zone!=="courtyard"||!Object.hasOwn(roomNames,id))return;
+    const previous={x:walkX,z:walkZ,yaw:walkYaw,pitch:walkPitch};
+    try{
+      const room=createCastleInterior(THREE,id);
+      const outside=[...scene.children];
+      outside.forEach(obj=>{obj.visible=false;});
+      scene.add(room.group);
+      interior=room;exteriorObjects=outside;outsidePosition=previous;
+      zone="interior";root.dataset.tourZone=zone;root.dataset.interiorRoom=id;
+      pickRoom(id,false);
+      walkX=0;walkZ=3.15;walkYaw=0;walkPitch=-.08;
+      walkKeys.clear();walkNear=null;walkLast=0;
+      updateWalkCamera();updateNearby();
+      interiorExit.hidden=false;
+      // Match the existing expedition selection without revealing its answer.
+      document.querySelector('#expedition-map [data-room="'+id+'"]')?.click();
+      showStatus("✦ Đang ở trong "+roomNames[id]+". Tìm cổ vật phát sáng và nhấn E để mở câu đố.");
+    }catch(error){
+      disposeInterior();zone="courtyard";root.dataset.tourZone=zone;
+      showStatus("Không thể mở nội thất 3D. Bạn vẫn có thể vào câu đố bằng bản đồ.");
+      console.info("Interior 3D unavailable:",error?.message||error);
+    }
+  }
+  function exitInterior(){
+    if(zone!=="interior")return;
+    disposeInterior();zone="courtyard";
+    root.dataset.tourZone=zone;
+    delete root.dataset.interiorRoom;
+    const restore=outsidePosition||{x:0,z:11.5,yaw:0,pitch:-.08};
+    walkX=restore.x;walkZ=restore.z;walkYaw=restore.yaw;walkPitch=restore.pitch;
+    outsidePosition=null;walkKeys.clear();walkNear=null;
+    interiorExit.hidden=true;
+    updateWalkCamera();updateNearby();
+    showStatus("✦ Đã ra sân lâu đài. Đến gần cổng khác để khám phá phòng tiếp theo.");
+  }
   function nearestPortal(){
+    if(zone==="interior"&&interior){
+      return Math.hypot(interior.relic.position.x-walkX,interior.relic.position.z-walkZ)<=1.75
+        ?interior.roomId:null;
+    }
     let nearest=null,distance=Infinity;
     for(const portal of walkPortals){
       const d=Math.hypot(portal.position.x-walkX,portal.position.z-walkZ);
@@ -205,12 +265,16 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   function updateNearby(){
     const found=nearestPortal();
     walkInteract.disabled=!(active&&viewMode==="walk"&&found);
-    document.querySelector("#castle-walk-nearby").textContent=found
-      ?"✦ CỔNG "+roomNames[found].toUpperCase()+" — NHẤN E / VÀO CỔNG"
-      :"ĐI ĐẾN MỘT TRONG BỐN CỔNG SÁNG ĐỂ TƯƠNG TÁC";
+    walkInteract.textContent=zone==="interior"?"✦ GIẢI CÂU ĐỐ":"✦ VÀO CỔNG";
+    document.querySelector("#castle-walk-nearby").textContent=zone==="interior"
+      ?(found?"✦ CỔ VẬT ĐÃ Ở TRONG TẦM TAY — NHẤN E ĐỂ GIẢI ĐỐ":"TÌM CỔ VẬT PHÁT SÁNG Ở CUỐI PHÒNG — NHẤN E KHI ĐẾN GẦN")
+      :(found?"✦ CỔNG "+roomNames[found].toUpperCase()+" — NHẤN E / VÀO CỔNG"
+      :"ĐI ĐẾN MỘT TRONG BỐN CỔNG SÁNG ĐỂ TƯƠNG TÁC");
     if(found!==walkNear){
       walkNear=found;
-      if(found)showStatus("✦ Đã đến cổng "+roomNames[found]+". Nhấn E hoặc VÀO CỔNG để mở câu đố.");
+      if(found)showStatus(zone==="interior"
+        ?"✦ Đã tìm thấy cổ vật trong "+roomNames[found]+". Nhấn E để giải câu đố."
+        :"✦ Đã đến cổng "+roomNames[found]+". Nhấn E để đi vào nội thất 3D.");
     }
   }
   function walkMove(forward=0,strafe=0,units=.65){
@@ -218,8 +282,20 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     const length=Math.hypot(forward,strafe)||1;
     forward/=length;strafe/=length;
     // Solid courtyard bounds keep the player outside castle walls and cliffs.
-    walkX=THREE.MathUtils.clamp(walkX+(-Math.sin(walkYaw)*forward+Math.cos(walkYaw)*strafe)*units,-6.6,6.6);
-    walkZ=THREE.MathUtils.clamp(walkZ+(-Math.cos(walkYaw)*forward-Math.sin(walkYaw)*strafe)*units,4.75,14.2);
+    const dx=(-Math.sin(walkYaw)*forward+Math.cos(walkYaw)*strafe)*units;
+    const dz=(-Math.cos(walkYaw)*forward-Math.sin(walkYaw)*strafe)*units;
+    if(zone==="interior"&&interior){
+      const radius=.28;
+      const blocked=(x,z)=>interior.colliders.some(c=>
+        x>c.minX-radius&&x<c.maxX+radius&&z>c.minZ-radius&&z<c.maxZ+radius);
+      const nextX=THREE.MathUtils.clamp(walkX+dx,-4.05,4.05);
+      if(!blocked(nextX,walkZ))walkX=nextX;
+      const nextZ=THREE.MathUtils.clamp(walkZ+dz,-4.05,4.05);
+      if(!blocked(walkX,nextZ))walkZ=nextZ;
+    }else{
+      walkX=THREE.MathUtils.clamp(walkX+dx,-6.6,6.6);
+      walkZ=THREE.MathUtils.clamp(walkZ+dz,4.75,14.2);
+    }
     updateWalkCamera();updateNearby();
   }
   function updateWalkMovement(now){
@@ -235,6 +311,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   }
   function switchView(){
     if(!active)return;
+    if(viewMode==="walk"&&zone==="interior")exitInterior();
     viewMode=viewMode==="walk"?"orbit":"walk";
     walkKeys.clear();dragging=false;
     if(viewMode==="walk"){
@@ -270,7 +347,9 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       });
     }
     try{renderer?.dispose();}catch(_){}
-    renderer=null;scene=null;camera=null;hotspots=[];glowObjects=[];
+    renderer=null;scene=null;camera=null;hotspots=[];glowObjects=[];walkPortals=[];
+    interior=null;exteriorObjects=[];outsidePosition=null;zone="courtyard";
+    delete root.dataset.interiorRoom;root.dataset.tourZone=zone;
   }
   function stop(reason){
     active=false;dragging=false;walkKeys.clear();walkNear=null;dispose();setMode("illustration");
@@ -284,6 +363,10 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     lastFrame=now;
     if(viewMode==="walk")updateWalkMovement(now);
     else updateCamera();
+    if(interior&&isEffectsEnabled()&&!reduceMotion){
+      interior.relic.rotation.y=now*.0008;
+      interior.relicHalo.rotation.z=now*.00035;
+    }
     if(isEffectsEnabled()&&!reduceMotion){
       const t=now*.001;
       glowObjects.forEach((mesh,i)=>{mesh.rotation.z=Math.sin(t*.55+i)*.12;});
@@ -374,6 +457,13 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     const rect=canvas.getBoundingClientRect();
     pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);
     raycaster.setFromCamera(pointer,camera);
+    if(zone==="interior"&&interior){
+      if(raycaster.intersectObject(interior.relic,false).length){
+        if(nearestPortal())openSelectedRoom();
+        else showStatus("✦ Hãy tiến gần cổ vật trước khi nhận thử thách.");
+      }
+      return;
+    }
     const intersections=raycaster.intersectObjects(viewMode==="walk"?walkPortals:hotspots,false);
     if(intersections.length)pickRoom(intersections[0].object.userData.room);
   });
@@ -394,11 +484,18 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     document.querySelector("#expedition-scene")?.scrollIntoView({block:"center",behavior:reduceMotion?"auto":"smooth"});
     showStatus("✦ Đã mở câu đố tại "+roomNames[selected]+".");
   }
-  document.querySelector("#castle-tour-enter").addEventListener("click",openSelectedRoom);
+  document.querySelector("#castle-tour-enter").addEventListener("click",()=>{
+    if(active&&viewMode==="walk"&&zone==="courtyard")enterInterior(selected);
+    else openSelectedRoom();
+  });
+  interiorExit.addEventListener("click",exitInterior);
   walkInteract.addEventListener("click",()=>{
     if(!active||viewMode!=="walk"||!walkNear)return;
-    pickRoom(walkNear);
-    openSelectedRoom();
+    if(zone==="interior"){
+      openSelectedRoom();
+      return;
+    }
+    enterInterior(walkNear);
   });
   document.querySelectorAll("#expedition-map [data-room]").forEach(button=>{
     button.addEventListener("click",()=>pickRoom(button.dataset.room,false));

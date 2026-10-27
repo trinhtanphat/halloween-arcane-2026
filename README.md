@@ -146,3 +146,11 @@ The game is fiction and is fully client-side. No account or server endpoint is u
 - FPS throttling, hidden/offscreen rendering pauses, and disposal of Three.js geometry/materials remain in place; no movement continues after keyboard focus leaves the canvas.
 - Automated browser checks cover movement via W and on-screen controls, turning, portal entry, boundary collision, mode switch and 2D fallback.
 - Offline service-worker cache v11 refreshes the modified bundled app.js, castle-tour.css and index.html.
+
+## Four explorable 3D castle interiors — Chapter XIII
+
+The four courtyard gateways lead into distinct, original indoor Three.js scenes: a candlelit Great Hall, the Enchanted Library with shelves and levitating pages, a Moon Tower with telescope and orrery, and an Ancient Crypt with sarcophagi and glowing seals. Each interior is built from code-generated geometry (no external 3D files), has walls and furniture collision, and a luminous relic near the back of the chamber.
+
+From first-person courtyard mode, approach any glowing gateway and press E or VÀO CỔNG to enter its indoor scene. Navigate with WASD, arrows or touch controls. Reach the glowing relic and press E to open the *existing* corresponding expedition riddle. The separate RỜI PHÒNG control returns the visitor to the courtyard at their previous location; panorama view and 2D fallback still work. Four pre-existing relic quests and all seven Arcane Passport stamps persist unchanged.
+
+When switching interiors or returning outdoors, indoor geometries and materials are explicitly disposed. Offline PWA cache v12 refreshes the bundled geometry and visuals. The browser regression test covers each of the four indoor scenes, returning to the courtyard, reaching a relic, collision limits, keyboard E interaction, GPU fallback, old quests and mobile layouts.
