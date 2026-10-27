@@ -91,3 +91,13 @@ These are fictional story scenarios, not real Halloween event bookings or licens
 - Offline cache v6 includes CSS fallback and soundscape JS.
 
 Graphics acceleration is browser/device-specific; passing headless Chromium WebGL tests does not verify all physical GPUs.
+
+## Moonlight Candy Hunt and sixth achievement
+
+- **Five-lane Candy Hunt minigame:** Ten untimed turns, keyboard/touch/mouse controls, collectible candy and ghost hazards. No ads or server leaderboard. Pick a lane and press Collect or Space from the focused board.
+- **Accessible controls:** Arrow keys, lane buttons, large mobile controls, live text feedback; no time limit or required reflexes.
+- **Achievement progression now 6/6:** Collect at least 6 candies to unlock the Sweet Hunter badge. Existing five badges are retained. Highest score and unlocked badge are stored only in localStorage.
+- **Offline:** PWA service worker v7 caches the new game files.
+- **QA:** Browser tests cover ghost collision, ArrowLeft/Space input, ten-turn victory, 6/6 badge, high-score replay, 20 static resources, offline reload and regressions.
+
+The game is original, fictional and browser-only; no login, purchases or analytics.

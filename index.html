@@ -25,12 +25,14 @@
   <link rel="stylesheet" href="./alchemy.css" />
   <link rel="stylesheet" href="./expedition.css" />
   <link rel="stylesheet" href="./pumpkin.css" />
+  <link rel="stylesheet" href="./candy.css" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <script defer type="module" src="./app.js"></script>
   <script defer type="module" src="./magic.js"></script>
   <script defer type="module" src="./alchemy.js"></script>
   <script defer type="module" src="./expedition.js"></script>
   <script defer type="module" src="./soundscape.js"></script>
+  <script defer type="module" src="./candy.js"></script>
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -46,7 +48,7 @@
       </a>
       <button class="menu-toggle" id="menu-toggle" aria-label="Mở menu" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
       <nav id="nav-links" aria-label="Điều hướng chính">
-        <a href="#about">Truyền thuyết</a><a href="#realms">Khám phá</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#expedition">Khám phá</a><a href="#alchemy">Pha chế</a><a href="#schedule">Đêm hội</a>
+        <a href="#about">Truyền thuyết</a><a href="#realms">Khám phá</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#expedition">Khám phá</a><a href="#candy-hunt">Săn kẹo</a><a href="#alchemy">Pha chế</a><a href="#schedule">Đêm hội</a>
       </nav>
       <a href="#invitation" class="nav-cta"><span>Nhận thư mời</span><span aria-hidden="true">↗</span></a>
     </div>
@@ -223,6 +225,47 @@
       </div>
     </section>
 
+
+    <section class="section candy-section" id="candy-hunt" aria-labelledby="candy-title">
+      <div class="shell">
+        <div class="section-heading center">
+          <span class="kicker">✧ HALLOWEEN ARCADE ✧</span>
+          <h2 id="candy-title">SĂN KẸO <em>ĐÊM TRĂNG</em></h2>
+          <p>Đêm Halloween, những viên kẹo thần kỳ rơi xuống năm con đường. Đổi làn, né những bóng ma và nhặt ít nhất sáu viên kẹo trong mười lượt để nhận Huy hiệu Kẹo Ngọt.</p>
+        </div>
+        <div class="candy-layout">
+          <div class="candy-arena">
+            <div class="candy-sky" aria-hidden="true"><span>☾</span><span>✧</span><span>✦</span></div>
+            <div class="candy-arena-header"><span>RAVENHOLLOW NIGHT RUN</span><strong id="candy-round">LƯỢT 01 / 10</strong></div>
+            <div class="candy-road" id="candy-road" tabindex="0" role="group" aria-label="Đường săn kẹo gồm năm làn, dùng mũi tên trái phải để di chuyển">
+              <button type="button" class="candy-lane" data-lane="0" aria-label="Làn 1"></button>
+              <button type="button" class="candy-lane" data-lane="1" aria-label="Làn 2"></button>
+              <button type="button" class="candy-lane" data-lane="2" aria-label="Làn 3"></button>
+              <button type="button" class="candy-lane" data-lane="3" aria-label="Làn 4"></button>
+              <button type="button" class="candy-lane" data-lane="4" aria-label="Làn 5"></button>
+            </div>
+            <div class="candy-arena-bottom"><span>← → DI CHUYỂN</span><span>SPACE / ENTER ĐỂ NHẶT</span></div>
+          </div>
+          <div class="candy-panel">
+            <div class="tiny-rule">CHAPTER X — THE MOONLIGHT CANDY HUNT</div>
+            <h3>Chiếc túi <em>kẹo phù thủy.</em></h3>
+            <div class="candy-stats"><div><span>ĐÃ NHẶT</span><strong id="candy-score">0</strong><small>/ 10 VIÊN</small></div><div><span>KỶ LỤC</span><strong id="candy-best">0</strong><small>/ 10 VIÊN</small></div></div>
+            <div class="candy-progress"><div id="candy-progress-fill"></div></div>
+            <p class="candy-instruction">Nhấn một trong năm làn để chọn vị trí, hoặc dùng mũi tên trái/phải. Sau đó chọn <strong>NHẶT KẸO</strong> để kết thúc lượt. Đừng đứng cùng làn với bóng ma!</p>
+            <div class="candy-controls">
+              <button type="button" id="candy-left" aria-label="Chuyển sang làn trái">← TRÁI</button>
+              <button type="button" id="candy-grab" class="candy-grab">✦ NHẶT KẸO</button>
+              <button type="button" id="candy-right" aria-label="Chuyển sang làn phải">PHẢI →</button>
+            </div>
+            <p id="candy-feedback" class="candy-feedback" role="status" aria-live="polite">Chọn làn có viên kẹo phát sáng 🍬 rồi nhặt!</p>
+            <div class="candy-completion" id="candy-completion" hidden><span>✦</span><div><strong id="candy-outcome">KẾT QUẢ</strong><p id="candy-result-text"></p></div></div>
+            <button type="button" id="candy-replay" class="btn btn-outline candy-replay">↺ CHƠI LẠI</button>
+            <small class="candy-privacy">GAME LƯỢT · KHÔNG QUẢNG CÁO · KHÔNG GỬI ĐIỂM LÊN MÁY CHỦ</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="section alchemy-section" id="alchemy" aria-labelledby="alchemy-title">
       <div class="shell">
         <div class="section-heading center">
@@ -268,7 +311,7 @@
       <div class="passport-panel">
         <div class="passport-heading">
           <div><span class="kicker">✧ YOUR ARCANE PASSPORT ✧</span><h2 id="passport-title">HÀNH TRÌNH <em>PHÁP SƯ</em></h2><p>Hoàn thành các thử thách trong trang web để mở khóa huy hiệu Đại Pháp Sư. Thành tích chỉ lưu trên trình duyệt hiện tại.</p></div>
-          <div class="passport-ring"><strong id="passport-count">0/5</strong><span>NHIỆM VỤ</span></div>
+          <div class="passport-ring"><strong id="passport-count">0/6</strong><span>NHIỆM VỤ</span></div>
         </div>
         <div class="passport-progress"><div id="passport-progress-bar"></div></div>
         <div class="passport-grid">
@@ -277,6 +320,7 @@
           <div class="passport-stamp" id="stamp-portal"><span>☽</span><strong>VƯỢT CỔNG BÍ ẨN</strong><small>Giải xong ba câu đố</small></div>
           <div class="passport-stamp" id="stamp-potion"><span>⚗</span><strong>NHÀ GIẢ KIM</strong><small>Pha đủ 3 loại thuốc</small></div>
           <div class="passport-stamp" id="stamp-vault"><span>✶</span><strong>NGƯỜI GIỮ KHO BÁU</strong><small>Khám phá 4 căn phòng</small></div>
+          <div class="passport-stamp" id="stamp-candy"><span>🍬</span><strong>THỢ SĂN KẸO</strong><small>Nhặt ít nhất 6/10 viên kẹo</small></div>
         </div>
         <p class="passport-status" id="passport-status" aria-live="polite">Hành trình học viện của bạn đang bắt đầu.</p>
         <button type="button" class="btn btn-outline passport-share" id="passport-share">✦ SAO CHÉP THÀNH TÍCH</button>

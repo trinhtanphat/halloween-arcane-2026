@@ -101,7 +101,7 @@ nextButton?.addEventListener("click",()=>{
 loadRecipe();
 
 // Achievements are intentionally checked from local state, never inferred from UI alone.
-const stampIds = ["order","spells","portal","potion","vault"];
+const stampIds = ["order","spells","portal","potion","vault","candy"];
 function completed(){
   const rawOrder=read("ravenhollow-order");
   let spellList=[];
@@ -112,7 +112,8 @@ function completed(){
     spells: allSpells,
     portal: read("ravenhollow-portal-finished")==="1",
     potion: read("ravenhollow-potion-finished")==="1",
-    vault: read("ravenhollow-vault-finished")==="1"
+    vault: read("ravenhollow-vault-finished")==="1",
+    candy: read("ravenhollow-candy-finished")==="1"
   };
 }
 function updatePassport(){
@@ -142,7 +143,7 @@ $("#passport-share")?.addEventListener("click",async ()=>{
     "✧ RAVENHOLLOW — THE ENCHANTED HALLOWEEN 2026",
     "Hộ chiếu pháp sư: "+count+"/"+stampIds.length+" nhiệm vụ",
     ...stampIds.map((id,i)=>(progress[id]?"✓ ":"○ ")+[
-      "Gia nhập hội pháp sư","Thi triển 4 thần chú","Vượt cổng bí ẩn","Pha chế 3 thuốc phép","Giải phong ấn kho báu"
+      "Gia nhập hội pháp sư","Thi triển 4 thần chú","Vượt cổng bí ẩn","Pha chế 3 thuốc phép","Giải phong ấn kho báu","Săn đủ kẹo đêm trăng"
     ][i]),
     "https://trinhtanphat.github.io/halloween-arcane-2026/"
   ];
