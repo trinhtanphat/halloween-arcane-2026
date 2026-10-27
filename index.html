@@ -205,6 +205,17 @@
               </div>
               <div class="tour-foreground"></div>
             </div>
+            <dialog id="castle-riddle-dialog" class="castle-riddle-dialog" aria-labelledby="castle-riddle-title" aria-describedby="castle-riddle-question">
+              <div class="castle-riddle-top"><span>✶ THE ENCHANTED RELIC CHALLENGE</span><button type="button" id="castle-riddle-close" aria-label="Đóng câu đố và trở lại đi bộ">✕</button></div>
+              <span class="castle-riddle-room" id="castle-riddle-room">RAVENHOLLOW ACADEMY</span>
+              <h3 id="castle-riddle-title">CỔ VẬT <em>THỨC TỈNH</em></h3>
+              <p id="castle-riddle-story" class="castle-riddle-story"></p>
+              <p id="castle-riddle-question" class="castle-riddle-question"></p>
+              <div class="castle-riddle-choices" id="castle-riddle-choices" role="group" aria-label="Chọn đáp án câu đố cổ vật"></div>
+              <p id="castle-riddle-feedback" class="castle-riddle-feedback" role="status" aria-live="polite"></p>
+              <div class="castle-riddle-earned" id="castle-riddle-earned" hidden><span>✦</span><strong id="castle-riddle-relic-name">CỔ VẬT ĐÃ ĐƯỢC THU THẬP</strong></div>
+              <div class="castle-riddle-bottom"><span>PHÍM 1–3: CHỌN CÂU TRẢ LỜI · ESC: ĐÓNG</span><button type="button" id="castle-riddle-continue">✧ TIẾP TỤC KHÁM PHÁ</button></div>
+            </dialog>
             <div class="castle-walk-hud" id="castle-walk-hud" hidden aria-live="off"><span>✦ FIRST-PERSON EXPLORATION</span><strong id="castle-walk-coords">X 0.0 · Z 11.0</strong><small id="castle-walk-nearby">TIẾN GẦN CỔNG PHÉP THUẬT ĐỂ VÀO PHÒNG</small></div>
             <div class="castle-tour-overlay">
               <div class="castle-tour-eyebrow">A JOURNEY THROUGH FOUR SECRET REALMS</div>

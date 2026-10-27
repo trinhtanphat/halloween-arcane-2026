@@ -16,6 +16,9 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   const walkHud=document.querySelector("#castle-walk-hud");
   const walkPad=document.querySelector("#castle-walk-pad");
   const walkInteract=document.querySelector("#castle-walk-interact");
+  const riddleDialog=document.querySelector("#castle-riddle-dialog");
+  const riddleChoices=document.querySelector("#castle-riddle-choices");
+  const riddleFeedback=document.querySelector("#castle-riddle-feedback");
   const interiorExit=document.querySelector("#castle-interior-exit");
   const roomButtons=[...root.querySelectorAll("[data-castle-room]")];
   const roomNames={hall:"Đại Sảnh Bóng Đêm",library:"Thư Viện Bí Ẩn",tower:"Tháp Thiên Văn",crypt:"Hầm Mộ Cổ"};
@@ -214,6 +217,83 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     exteriorObjects.forEach(obj=>{obj.visible=true;});
     exteriorObjects=[];
   }
+  function closeRelicRiddle(){
+    if(riddleDialog.open)riddleDialog.close();
+  }
+  function refreshRelicRiddle(){
+    if(!interior)return;
+    const id=interior.roomId;
+    // Existing expedition logic remains the single source of truth for riddles,
+    // correct answers, localStorage relics and Arcane Passport updates.
+    const current=document.querySelector("#expedition-scene")?.dataset.roomScene;
+    if(current!==id)document.querySelector('#expedition-map [data-room="'+id+'"]')?.click();
+    document.querySelector("#castle-riddle-room").textContent=roomNames[id];
+    document.querySelector("#castle-riddle-story").textContent=document.querySelector("#expedition-room-story")?.textContent||"";
+    document.querySelector("#castle-riddle-question").textContent=document.querySelector("#expedition-question")?.textContent||"";
+    const previousButtons=[...document.querySelectorAll("#expedition-answers [data-answer]")];
+    riddleChoices.replaceChildren();
+    for(const original of previousButtons){
+      const button=document.createElement("button");
+      button.type="button";
+      button.dataset.riddleAnswer=original.dataset.answer;
+      button.disabled=original.disabled;
+      if(original.classList.contains("wrong"))button.classList.add("wrong");
+      if(original.classList.contains("correct"))button.classList.add("correct");
+      const number=document.createElement("span");
+      number.textContent=String(Number(original.dataset.answer)+1);
+      number.setAttribute("aria-hidden","true");
+      const answer=document.createElement("strong");
+      answer.textContent=original.lastElementChild?.textContent||original.textContent;
+      button.append(number,answer);
+      button.addEventListener("click",()=>{
+        if(button.disabled)return;
+        original.click();
+        refreshRelicRiddle();
+        const same=riddleChoices.querySelector('[data-riddle-answer="'+original.dataset.answer+'"]');
+        if(same&&!same.disabled)same.focus();
+        else document.querySelector("#castle-riddle-continue").focus();
+      });
+      riddleChoices.append(button);
+    }
+    const found=!document.querySelector("#expedition-relic")?.hidden;
+    riddleFeedback.textContent=document.querySelector("#expedition-feedback")?.textContent||"";
+    document.querySelector("#castle-riddle-earned").hidden=!found;
+    document.querySelector("#castle-riddle-relic-name").textContent=
+      found?(document.querySelector("#expedition-relic-name")?.textContent||"CỔ VẬT ĐÃ ĐƯỢC THU THẬP"):"";
+    if(interior.relic?.material){
+      const originalColors={hall:0xffc57f,library:0xb99aff,tower:0xa9d8ff,crypt:0x91d6a4};
+      interior.relic.material.color.setHex(found?0xa8e7ae:originalColors[id]);
+      interior.relic.material.emissive.setHex(found?0x78d594:originalColors[id]);
+      interior.relic.material.emissiveIntensity=found?2.3:1.6;
+    }
+    root.dataset.riddleSolved=String(found);
+  }
+  function openRelicRiddle(){
+    if(!active||viewMode!=="walk"||zone!=="interior"||!interior)return;
+    if(nearestPortal()!==interior.roomId){
+      showStatus("☽ Hãy tiến gần cổ vật phát sáng trước khi mở câu đố.");
+      return;
+    }
+    walkKeys.clear();dragging=false;
+    refreshRelicRiddle();
+    if(!riddleDialog.open)riddleDialog.showModal();
+    const first=riddleChoices.querySelector("button:not(:disabled)")||document.querySelector("#castle-riddle-continue");
+    first?.focus();
+    showStatus("✦ Đang giải câu đố tại "+roomNames[interior.roomId]+".");
+  }
+  document.querySelector("#castle-riddle-close").addEventListener("click",closeRelicRiddle);
+  document.querySelector("#castle-riddle-continue").addEventListener("click",closeRelicRiddle);
+  riddleDialog.addEventListener("close",()=>{
+    walkKeys.clear();
+    if(active&&viewMode==="walk"&&zone==="interior")canvas.focus({preventScroll:true});
+  });
+  document.addEventListener("keydown",e=>{
+    if(!riddleDialog.open)return;
+    if(["1","2","3"].includes(e.key)){
+      e.preventDefault();
+      riddleChoices.querySelector('[data-riddle-answer="'+(Number(e.key)-1)+'"]:not(:disabled)')?.click();
+    }
+  },{capture:true});
   function enterInterior(id){
     if(!active||viewMode!=="walk"||zone!=="courtyard"||!Object.hasOwn(roomNames,id))return;
     const previous={x:walkX,z:walkZ,yaw:walkYaw,pitch:walkPitch};
@@ -240,6 +320,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   }
   function exitInterior(){
     if(zone!=="interior")return;
+    closeRelicRiddle();
     disposeInterior();zone="courtyard";
     root.dataset.tourZone=zone;
     delete root.dataset.interiorRoom;
@@ -278,7 +359,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     }
   }
   function walkMove(forward=0,strafe=0,units=.65){
-    if(!active||viewMode!=="walk")return;
+    if(!active||viewMode!=="walk"||riddleDialog.open)return;
     const length=Math.hypot(forward,strafe)||1;
     forward/=length;strafe/=length;
     // Solid courtyard bounds keep the player outside castle walls and cliffs.
@@ -299,6 +380,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     updateWalkCamera();updateNearby();
   }
   function updateWalkMovement(now){
+    if(riddleDialog.open){walkKeys.clear();walkLast=now;return;}
     const delta=Math.min(.065,Math.max(0,(now-walkLast)/1000));
     walkLast=now;
     if(!walkKeys.size)return;
@@ -352,7 +434,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     delete root.dataset.interiorRoom;root.dataset.tourZone=zone;
   }
   function stop(reason){
-    active=false;dragging=false;walkKeys.clear();walkNear=null;dispose();setMode("illustration");
+    active=false;closeRelicRiddle();dragging=false;walkKeys.clear();walkNear=null;dispose();setMode("illustration");
     if(reason)showStatus(reason);
   }
   function renderFrame(now){
@@ -459,7 +541,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     raycaster.setFromCamera(pointer,camera);
     if(zone==="interior"&&interior){
       if(raycaster.intersectObject(interior.relic,false).length){
-        if(nearestPortal())openSelectedRoom();
+        if(nearestPortal())openRelicRiddle();
         else showStatus("✦ Hãy tiến gần cổ vật trước khi nhận thử thách.");
       }
       return;
@@ -486,13 +568,14 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   }
   document.querySelector("#castle-tour-enter").addEventListener("click",()=>{
     if(active&&viewMode==="walk"&&zone==="courtyard")enterInterior(selected);
+    else if(active&&viewMode==="walk"&&zone==="interior")openRelicRiddle();
     else openSelectedRoom();
   });
   interiorExit.addEventListener("click",exitInterior);
   walkInteract.addEventListener("click",()=>{
     if(!active||viewMode!=="walk"||!walkNear)return;
     if(zone==="interior"){
-      openSelectedRoom();
+      openRelicRiddle();
       return;
     }
     enterInterior(walkNear);

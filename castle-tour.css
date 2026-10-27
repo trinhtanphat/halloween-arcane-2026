@@ -68,3 +68,30 @@
 .castle-tour[data-tour-zone="interior"] #castle-interior-exit:not([hidden]){display:inline-flex;align-items:center;justify-content:center;background:#523b66;border-color:#e7c5a5;color:#ffefd2}
 .castle-tour[data-tour-zone="interior"] .castle-tour-header{background:linear-gradient(90deg,#402e50,#241e3b)}
 @media(max-width:530px){.castle-tour[data-tour-zone="interior"] #castle-interior-exit{width:100%}}
+
+/* Immersive, keyboard-accessible relic question layer. Native <dialog> traps focus. */
+.castle-riddle-dialog{border:1px solid #e5bb7b;padding:0;width:min(92vw,610px);max-height:min(90vh,790px);overflow-y:auto;background:radial-gradient(ellipse at 70% 4%,#61427069,transparent 55%),#1e152b;color:#f7e9d4;box-shadow:0 20px 90px #080612ee,0 0 70px #6a407970}
+.castle-riddle-dialog::backdrop{background:#080512c9;backdrop-filter:blur(5px)}
+.castle-riddle-top{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px 21px;border-bottom:1px solid #d1aa6c57;color:#edc88e;font:600 9px var(--sans);letter-spacing:.16em;background:#312139b5}
+.castle-riddle-top button{min-width:37px;min-height:37px;border:1px solid #dab67b96;background:#46324b;color:#fff0d9;font-size:17px}
+.castle-riddle-room{display:block;padding:23px 29px 0;font:600 10px var(--sans);color:#d4b8ec;letter-spacing:.13em}
+.castle-riddle-dialog h3{font:600 clamp(22px,3.2vw,32px)/1.3 var(--serif);padding:0 29px;margin:9px 0 13px}
+.castle-riddle-dialog h3 em{font:400 1.22em "Great Vibes",cursive;color:#e7b875}
+.castle-riddle-story{padding:0 29px;font:13px/1.8 var(--sans);color:#cbbbcc;margin:0 0 18px}
+.castle-riddle-question{padding:18px 20px;margin:0 29px 16px;background:#422f50a0;border-left:3px solid #eac088;font:600 clamp(15px,2.2vw,20px)/1.5 var(--serif);color:#fff4de}
+.castle-riddle-choices{display:grid;gap:9px;margin:0 29px 16px}
+.castle-riddle-choices button{display:flex;gap:12px;align-items:center;min-height:49px;padding:12px 15px;text-align:left;background:#31233c;border:1px solid #d5ab755c;color:#f6e3d6;font:12px/1.6 var(--sans)}
+.castle-riddle-choices button span{min-width:24px;min-height:24px;display:grid;place-items:center;color:#ffe0a2;border:1px solid #d3ab7f60;font:700 12px var(--sans)}
+.castle-riddle-choices button:hover:not(:disabled),.castle-riddle-choices button:focus-visible{border-color:#fbd7a0;background:#513759}
+.castle-riddle-choices button.wrong{border-color:#dd808e;background:#5b3245}
+.castle-riddle-choices button.correct{border-color:#a5dcaa;background:#35513f}
+.castle-riddle-choices button:disabled{cursor:default;opacity:.7}
+.castle-riddle-feedback{margin:0 29px 17px;min-height:19px;color:#f2c994;font:12px/1.7 var(--sans)}
+.castle-riddle-earned{margin:0 29px 18px;padding:15px;display:flex;align-items:center;gap:13px;background:#3651439b;border:1px solid #a8d1a49c}
+.castle-riddle-earned[hidden]{display:none}
+.castle-riddle-earned span{font:30px var(--serif);color:#d5f0bf}
+.castle-riddle-earned strong{font:600 12px var(--serif);color:#e8ffdf}
+.castle-riddle-bottom{display:flex;justify-content:space-between;gap:13px;align-items:center;padding:18px 29px 22px;border-top:1px solid #d0ae8352}
+.castle-riddle-bottom>span{font:9px/1.6 var(--sans);color:#b7a2c7;letter-spacing:.08em}
+.castle-riddle-bottom button{border:1px solid #edc084;background:#e5b77b;color:#241729;padding:12px 18px;min-height:44px;font:700 10px var(--sans)}
+@media(max-width:580px){.castle-riddle-top{padding:11px 15px}.castle-riddle-room{padding:16px 17px 0}.castle-riddle-dialog h3{padding:0 17px}.castle-riddle-story{padding:0 17px}.castle-riddle-question{margin:0 17px 14px;padding:14px}.castle-riddle-choices{margin:0 17px 16px}.castle-riddle-feedback{margin:0 17px 17px}.castle-riddle-earned{margin:0 17px 17px}.castle-riddle-bottom{padding:16px 17px;flex-direction:column;align-items:stretch}.castle-riddle-bottom button{width:100%}}

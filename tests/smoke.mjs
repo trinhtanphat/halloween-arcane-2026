@@ -102,8 +102,20 @@ try {
     assert.equal(await page.locator("#castle-walk-interact").isEnabled(),true,"indoor artifact is reachable");
     await page.locator("#castle-tour-canvas").focus();
     await page.keyboard.press("e");
+    assert.equal(await page.locator("#castle-riddle-dialog").isVisible(),true);
+    assert.equal(await page.locator("#castle-riddle-choices button").count(),3);
     assert.equal(await page.locator("#expedition-scene").getAttribute("data-room-scene"),firstInterior);
     assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"interior");
+    await page.locator('[data-riddle-answer="1"]').click();
+    assert.match(await page.locator("#castle-riddle-feedback").innerText(),/Chưa đúng/);
+    assert.equal(await page.locator("#expedition-relic").isVisible(),false);
+    const rightAnswer=firstInterior==="library"?"0":"2";
+    await page.locator('[data-riddle-answer="'+rightAnswer+'"]').click();
+    assert.equal(await page.locator("#castle-riddle-earned").isVisible(),true);
+    assert.equal(await page.locator("#expedition-relic").isVisible(),true);
+    assert.ok(JSON.parse(await page.evaluate(()=>localStorage.getItem("ravenhollow-expedition-relics"))).includes(firstInterior));
+    await page.keyboard.press("Escape");
+    assert.equal(await page.locator("#castle-riddle-dialog").isVisible(),false);
     const castleRooms=["hall","library","tower","crypt"];
     await page.locator("#castle-interior-exit").click();
     assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"courtyard");
@@ -231,7 +243,8 @@ try {
   const riddles = [["hall",1],["library",0],["tower",2],["crypt",0]];
   for(const [room,correct] of riddles) {
     await page.locator('[data-room="'+room+'"]').click();
-    await page.locator('#expedition-answers [data-answer="'+correct+'"]').click();
+    const realAnswer=page.locator('#expedition-answers [data-answer="'+correct+'"]');
+    if(await realAnswer.isEnabled())await realAnswer.click();
     assert.equal(await page.locator("#expedition-relic").isVisible(),true);
     assert.equal(await page.locator('[data-room="'+room+'"] .room-check').innerText(),"✓");
   }
@@ -449,7 +462,7 @@ try {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,first_person_walk:castleMode==='webgl',castle_interiors:'4/4',castle_indoor_collision:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,first_person_walk:castleMode==='webgl',castle_interiors:'4/4',castle_indoor_collision:true,immersive_relic_riddle:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
-finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
+finally{console.error("SMOKE_CLEANUP_START");await browser?.close();console.error("SMOKE_BROWSER_CLOSED");server.closeAllConnections();await new Promise(resolve=>server.close(resolve));console.error("SMOKE_CLEANUP_DONE");}

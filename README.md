@@ -154,3 +154,11 @@ The four courtyard gateways lead into distinct, original indoor Three.js scenes:
 From first-person courtyard mode, approach any glowing gateway and press E or VÀO CỔNG to enter its indoor scene. Navigate with WASD, arrows or touch controls. Reach the glowing relic and press E to open the *existing* corresponding expedition riddle. The separate RỜI PHÒNG control returns the visitor to the courtyard at their previous location; panorama view and 2D fallback still work. Four pre-existing relic quests and all seven Arcane Passport stamps persist unchanged.
 
 When switching interiors or returning outdoors, indoor geometries and materials are explicitly disposed. Offline PWA cache v12 refreshes the bundled geometry and visuals. The browser regression test covers each of the four indoor scenes, returning to the courtyard, reaching a relic, collision limits, keyboard E interaction, GPU fallback, old quests and mobile layouts.
+
+## Immersive in-room relic puzzles (Chapter XIV)
+
+When exploring an interior in first-person WebGL, approach its luminous relic and press **E** or the action control. The new, accessible native HTML dialog displays the exact existing expedition story, question and three choices **without navigating away from the 3D scene**. On keyboard, **1–3** choose answers and **Esc** closes the dialog. Buttons are touch-friendly with distinct right/wrong states and screen-reader feedback.
+
+The dialog does not own a second answer list or progress store. Instead it mirrors the already installed `expedition.js` controls and clicks the canonical answer, preserving all four relics, existing `localStorage` progress, vault unlock, passport badges, and replay. Wrong answers do not grant a relic; correct answers make the matching 3D crystal glow green. Reopening a previously completed challenge displays the earned relic as read-only. Movement is frozen while the dialog is open and returns on close. WebGL fallback and 2D quests remain functional.
+
+Service worker cache v13 refreshes the new interface. Regression tests verify the dialog, wrong answer, correct answer, saved progress, close/return controls, all four rooms and legacy quests.
