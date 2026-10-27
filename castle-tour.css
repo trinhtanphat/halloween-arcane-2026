@@ -115,3 +115,21 @@
 .castle-vault-return{background:transparent;color:#f4d8b1;border-color:#a88378;margin-bottom:25px}
 .castle-vault-dialog[data-completed=true] .castle-vault-crown{color:#d9f3a7;text-shadow:0 0 60px #83ca76}
 @media(max-width:480px){.castle-vault-relics{grid-template-columns:1fr}.castle-vault-crown{font-size:69px}.castle-vault-dialog h3{font-size:26px}}
+
+/* Secret treasury / Crown Chamber: an optional finale with no additional unlocks */
+.castle-vault-enter{display:block;width:calc(100% - 50px);margin:10px 25px;min-height:50px;padding:11px 16px;border:1px solid #bce7b5;background:linear-gradient(110deg,#43674d,#5c8061);color:#f5ffe9;font:700 12px/1.5 var(--sans);letter-spacing:.05em}
+.castle-vault-enter[hidden]{display:none!important}
+.castle-vault-enter:focus-visible,.castle-crown-dialog button:focus-visible{outline:3px solid #fff1af;outline-offset:3px}
+.castle-tour[data-tour-zone="vault-chamber"] .castle-walk-hud{border-color:#e9c081;background:#291b36ea}
+.castle-tour[data-tour-zone="vault-chamber"] .castle-tour-header{background:linear-gradient(90deg,#453457,#2a1e3b)}
+.castle-tour[data-tour-zone="vault-chamber"] #castle-interior-exit:not([hidden]){display:inline-flex;align-items:center;justify-content:center;background:#624062;border-color:#e6cc9b;color:#fff1d6}
+.castle-crown-dialog{border:1px solid #d4b77c;width:min(92vw,565px);max-height:90vh;overflow:auto;background:radial-gradient(circle at 50% 21%,#654b78,#1b152a 60%);color:#f9ead4;padding:0;text-align:center;box-shadow:0 24px 95px #030109f0}
+.castle-crown-dialog::backdrop{background:#080511d6;backdrop-filter:blur(6px)}
+.castle-crown-symbol{font:115px/1.2 Georgia,serif;color:#f3d995;margin-top:16px;text-shadow:0 0 30px #eab36da0,0 0 78px #e7b36277}
+.castle-crown-label{display:block;font:700 10px var(--sans);letter-spacing:.14em;color:#e9c586}
+.castle-crown-dialog h3{font:600 clamp(22px,4vw,34px)/1.35 var(--serif);margin:10px 18px}
+.castle-crown-dialog h3 em{font:400 1.22em "Great Vibes",cursive;color:#edc28a}
+.castle-crown-dialog p{font:13px/1.9 var(--sans);margin:13px 26px;color:#dfcfe8}
+#castle-crown-player{color:#e9d29c;font-weight:700}
+#castle-crown-continue{display:block;margin:21px 24px 25px;width:calc(100% - 48px);background:#e4bd83;border:1px solid #fff1be;padding:13px;color:#2f1d36;font:700 11px/1.6 var(--sans)}
+@media(max-width:500px){.castle-crown-symbol{font-size:80px}.castle-crown-dialog p{margin-inline:16px}}

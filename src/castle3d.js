@@ -1,4 +1,5 @@
 import { createCastleInterior } from "./castle-interiors.js";
+import { createVaultChamber } from "./vault-chamber.js";
 
 /**
  * Ravenhollow procedural castle (original geometry, no asset downloads).
@@ -20,6 +21,8 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   const vaultDialog=document.querySelector("#castle-vault-dialog");
   const vaultAction=document.querySelector("#castle-vault-action");
   const vaultUnlock=document.querySelector("#castle-vault-unlock");
+  const vaultEnter=document.querySelector("#castle-vault-enter");
+  const crownDialog=document.querySelector("#castle-crown-dialog");
   const riddleChoices=document.querySelector("#castle-riddle-choices");
   const riddleFeedback=document.querySelector("#castle-riddle-feedback");
   const interiorExit=document.querySelector("#castle-interior-exit");
@@ -53,7 +56,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     viewToggle.textContent=viewMode==="walk"?"✧ TRỞ VỀ TOÀN CẢNH":"🚶 ĐI BỘ WASD";
     walkHud.hidden=mode!=="webgl"||viewMode!=="walk";
     walkPad.hidden=mode!=="webgl"||viewMode!=="walk";
-    interiorExit.hidden=mode!=="webgl"||zone!=="interior";
+    interiorExit.hidden=mode!=="webgl"||(zone!=="interior"&&zone!=="vault-chamber");
   }
   function pickRoom(id,notify=true){
     if(!Object.hasOwn(roomNames,id))return;
@@ -102,10 +105,13 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     vaultUnlock.disabled=!progress.ready||progress.completed;
     vaultUnlock.textContent=progress.completed?"✦ KHO BÁU ĐÃ MỞ":progress.ready
       ?"✦ GIẢI PHONG ẤN KHO BÁU":"♛ CẦN ĐỦ BỐN CỔ VẬT";
+    vaultEnter.hidden=!(progress.completed&&active&&viewMode==="walk"&&zone==="courtyard"&&nearVault());
+    vaultEnter.disabled=vaultEnter.hidden;
     return progress;
   }
   function syncVaultState(){
     const progress=vaultProgress();
+    if(zone==="vault-chamber"&&!progress.completed)exitInterior();
     root.dataset.vaultState=progress.completed?"opened":progress.ready?"ready":"locked";
     root.dataset.vaultRelics=String(progress.collected.length);
     vaultAction.setAttribute("aria-label",progress.completed?"Kho báu đã mở":progress.ready
@@ -147,6 +153,11 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   });
   document.querySelector("#castle-vault-close").addEventListener("click",closeVaultDialog);
   document.querySelector("#castle-vault-return").addEventListener("click",closeVaultDialog);
+  vaultEnter.addEventListener("click",()=>{
+    if(vaultEnter.disabled||!vaultProgress().completed)return;
+    closeVaultDialog();
+    enterVaultChamber();
+  });
   vaultDialog.addEventListener("close",()=>{
     walkKeys.clear();
     if(active&&viewMode==="walk")canvas.focus({preventScroll:true});
@@ -430,6 +441,59 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       riddleChoices.querySelector('[data-riddle-answer="'+(Number(e.key)-1)+'"]:not(:disabled)')?.click();
     }
   },{capture:true});
+  function closeCrownDialog(){
+    if(crownDialog.open)crownDialog.close();
+  }
+  function nearCrown(){
+    return zone==="vault-chamber"&&interior?.roomId==="vault"&&
+      Math.hypot(walkX-interior.relic.position.x,walkZ-interior.relic.position.z)<=2.05;
+  }
+  function showCrownFinale(){
+    if(!active||viewMode!=="walk"||!vaultProgress().completed||!nearCrown()){
+      showStatus("☽ Hãy bước đến gần Vương Miện Bí Ẩn trên ngai.");
+      return;
+    }
+    walkKeys.clear();
+    let wizard="Người Giữ Ravenhollow";
+    try{
+      const value=localStorage.getItem("ravenhollow-wizard");
+      if(value&&value.trim())wizard=value.trim().slice(0,40);
+    }catch(_){}
+    document.querySelector("#castle-crown-player").textContent="✦ Chào mừng "+wizard+" — người giữ vương miện!";
+    if(!crownDialog.open)crownDialog.showModal();
+    document.querySelector("#castle-crown-continue")?.focus();
+    showStatus("♛ Vương Miện Bí Ẩn đã công nhận bạn là người giữ kho báu.");
+  }
+  document.querySelector("#castle-crown-close").addEventListener("click",closeCrownDialog);
+  document.querySelector("#castle-crown-continue").addEventListener("click",closeCrownDialog);
+  crownDialog.addEventListener("close",()=>{
+    walkKeys.clear();
+    if(active&&viewMode==="walk")canvas.focus({preventScroll:true});
+  });
+  function enterVaultChamber(){
+    if(!active||viewMode!=="walk"||zone!=="courtyard"||!vaultProgress().completed||!nearVault()){
+      showStatus("☽ Mật thất chỉ mở sau khi giải phong ấn kho báu và đến gần rương.");
+      return;
+    }
+    const previous={x:walkX,z:walkZ,yaw:walkYaw,pitch:walkPitch};
+    try{
+      const chamber=createVaultChamber(THREE);
+      const outside=[...scene.children];
+      outside.forEach(obj=>{obj.visible=false;});
+      scene.add(chamber.group);
+      interior=chamber;exteriorObjects=outside;outsidePosition=previous;
+      zone="vault-chamber";root.dataset.tourZone=zone;root.dataset.interiorRoom="vault";
+      walkX=0;walkZ=3.1;walkYaw=0;walkPitch=-.08;
+      walkKeys.clear();walkNear=null;walkLast=0;
+      interiorExit.hidden=false;interiorExit.textContent="↩ RỜI MẬT THẤT";
+      updateWalkCamera();updateNearby();
+      showStatus("♛ Đã bước vào mật thất. Tiến đến vương miện trên ngai và nhấn E.");
+    }catch(error){
+      disposeInterior();zone="courtyard";root.dataset.tourZone=zone;
+      showStatus("Không thể dựng mật thất 3D. Kho báu 2D và thành tích vẫn có thể xem được.");
+      console.info("Vault chamber unavailable:",error?.message||error);
+    }
+  }
   function enterInterior(id){
     if(!active||viewMode!=="walk"||zone!=="courtyard"||!Object.hasOwn(roomNames,id))return;
     const previous={x:walkX,z:walkZ,yaw:walkYaw,pitch:walkPitch};
@@ -455,19 +519,20 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     }
   }
   function exitInterior(){
-    if(zone!=="interior")return;
-    closeRelicRiddle();
+    if(zone!=="interior"&&zone!=="vault-chamber")return;
+    closeRelicRiddle();closeCrownDialog();
     disposeInterior();zone="courtyard";
     root.dataset.tourZone=zone;
     delete root.dataset.interiorRoom;
     const restore=outsidePosition||{x:0,z:11.5,yaw:0,pitch:-.08};
     walkX=restore.x;walkZ=restore.z;walkYaw=restore.yaw;walkPitch=restore.pitch;
     outsidePosition=null;walkKeys.clear();walkNear=null;
-    interiorExit.hidden=true;
+    interiorExit.hidden=true;interiorExit.textContent="↩ RỜI PHÒNG";
     updateWalkCamera();updateNearby();
     showStatus("✦ Đã ra sân lâu đài. Đến gần cổng khác để khám phá phòng tiếp theo.");
   }
   function nearestPortal(){
+    if(zone==="vault-chamber")return nearCrown()?"crown":null;
     if(zone==="courtyard"&&nearVault())return "vault";
     if(zone==="interior"&&interior){
       return Math.hypot(interior.relic.position.x-walkX,interior.relic.position.z-walkZ)<=1.75
@@ -483,26 +548,30 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   function updateNearby(){
     const found=nearestPortal();
     walkInteract.disabled=!(active&&viewMode==="walk"&&found);
-    walkInteract.textContent=zone==="interior"?"✦ GIẢI CÂU ĐỐ":found==="vault"?"♛ KHO BÁU":"✦ VÀO CỔNG";
-    document.querySelector("#castle-walk-nearby").textContent=zone==="interior"
+    walkInteract.textContent=zone==="vault-chamber"?"♛ VƯƠNG MIỆN":zone==="interior"?"✦ GIẢI CÂU ĐỐ":found==="vault"?"♛ KHO BÁU":"✦ VÀO CỔNG";
+    document.querySelector("#castle-walk-nearby").textContent=zone==="vault-chamber"
+      ?(found==="crown"?"♛ VƯƠNG MIỆN TRONG TẦM TAY — NHẤN E ĐỂ CHIÊM NGƯỠNG":"ĐẾN GẦN VƯƠNG MIỆN TRÊN NGAI ĐỂ XEM ĐOẠN KẾT")
+      :zone==="interior"
       ?(found?"✦ CỔ VẬT ĐÃ Ở TRONG TẦM TAY — NHẤN E ĐỂ GIẢI ĐỐ":"TÌM CỔ VẬT PHÁT SÁNG Ở CUỐI PHÒNG — NHẤN E KHI ĐẾN GẦN")
       :(found==="vault"?"♛ RƯƠNG BÁU CUỐI CÙNG — NHẤN E ĐỂ KIỂM TRA CỔ VẬT":found?"✦ CỔNG "+roomNames[found].toUpperCase()+" — NHẤN E / VÀO CỔNG"
       :"ĐI ĐẾN MỘT TRONG BỐN CỔNG SÁNG ĐỂ TƯƠNG TÁC");
     if(found!==walkNear){
       walkNear=found;
-      if(found)showStatus(zone==="interior"
+      if(found)showStatus(zone==="vault-chamber"
+        ?"♛ Đã đến gần Vương Miện Bí Ẩn. Nhấn E để xem đoạn kết."
+        :zone==="interior"
         ?"✦ Đã tìm thấy cổ vật trong "+roomNames[found]+". Nhấn E để giải câu đố."
         :found==="vault"?"♛ Đã đến rương báu. Nhấn E để giải phong ấn.":"✦ Đã đến cổng "+roomNames[found]+". Nhấn E để đi vào nội thất 3D.");
     }
   }
   function walkMove(forward=0,strafe=0,units=.65){
-    if(!active||viewMode!=="walk"||riddleDialog.open||vaultDialog.open)return;
+    if(!active||viewMode!=="walk"||riddleDialog.open||vaultDialog.open||crownDialog.open)return;
     const length=Math.hypot(forward,strafe)||1;
     forward/=length;strafe/=length;
     // Solid courtyard bounds keep the player outside castle walls and cliffs.
     const dx=(-Math.sin(walkYaw)*forward+Math.cos(walkYaw)*strafe)*units;
     const dz=(-Math.cos(walkYaw)*forward-Math.sin(walkYaw)*strafe)*units;
-    if(zone==="interior"&&interior){
+    if((zone==="interior"||zone==="vault-chamber")&&interior){
       const radius=.28;
       const blocked=(x,z)=>interior.colliders.some(c=>
         x>c.minX-radius&&x<c.maxX+radius&&z>c.minZ-radius&&z<c.maxZ+radius);
@@ -517,7 +586,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     updateWalkCamera();updateNearby();
   }
   function updateWalkMovement(now){
-    if(riddleDialog.open||vaultDialog.open){walkKeys.clear();walkLast=now;return;}
+    if(riddleDialog.open||vaultDialog.open||crownDialog.open){walkKeys.clear();walkLast=now;return;}
     const delta=Math.min(.065,Math.max(0,(now-walkLast)/1000));
     walkLast=now;
     if(!walkKeys.size)return;
@@ -530,7 +599,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   }
   function switchView(){
     if(!active)return;
-    if(viewMode==="walk"&&zone==="interior")exitInterior();
+    if(viewMode==="walk"&&(zone==="interior"||zone==="vault-chamber"))exitInterior();
     viewMode=viewMode==="walk"?"orbit":"walk";
     walkKeys.clear();dragging=false;
     if(viewMode==="walk"){
@@ -572,7 +641,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     delete root.dataset.interiorRoom;root.dataset.tourZone=zone;
   }
   function stop(reason){
-    closeVaultDialog();
+    closeVaultDialog();closeCrownDialog();
     active=false;closeRelicRiddle();dragging=false;walkKeys.clear();walkNear=null;dispose();setMode("illustration");
     if(reason)showStatus(reason);
   }
@@ -683,6 +752,10 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     const rect=canvas.getBoundingClientRect();
     pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);
     raycaster.setFromCamera(pointer,camera);
+    if(zone==="vault-chamber"&&interior){
+      if(raycaster.intersectObject(interior.relic,true).length)showCrownFinale();
+      return;
+    }
     if(zone==="interior"&&interior){
       if(raycaster.intersectObject(interior.relic,false).length){
         if(nearestPortal())openRelicRiddle();
@@ -716,18 +789,24 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   }
   document.querySelector("#castle-tour-enter").addEventListener("click",()=>{
     if(active&&viewMode==="walk"&&zone==="courtyard")enterInterior(selected);
+    else if(active&&viewMode==="walk"&&zone==="vault-chamber")showCrownFinale();
     else if(active&&viewMode==="walk"&&zone==="interior")openRelicRiddle();
     else openSelectedRoom();
   });
   interiorExit.addEventListener("click",exitInterior);
   walkInteract.addEventListener("click",()=>{
     if(!active||viewMode!=="walk"||!walkNear)return;
+    if(zone==="vault-chamber"){
+      showCrownFinale();
+      return;
+    }
     if(zone==="interior"){
       openRelicRiddle();
       return;
     }
     if(walkNear==="vault"){
-      openVaultDialog(true);
+      if(vaultProgress().completed)enterVaultChamber();
+      else openVaultDialog(true);
       return;
     }
     enterInterior(walkNear);

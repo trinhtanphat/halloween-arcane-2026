@@ -48,6 +48,7 @@ try {
   assert.equal(await page.locator("#castle-vault-dialog").isVisible(),true);
   assert.equal(await page.locator("#castle-vault-relics [data-collected=true]").count(),0);
   assert.equal(await page.locator("#castle-vault-unlock").isDisabled(),true);
+  assert.equal(await page.locator("#castle-vault-enter").isVisible(),false);
   await page.locator("#castle-vault-close").click();
   assert.equal(await page.locator("[data-castle-room]").count(),4);
   assert.equal(await page.locator("#castle-tour-start").getAttribute("aria-pressed"),"false");
@@ -271,12 +272,35 @@ try {
   assert.equal(await page.locator("#castle-vault-dialog").isVisible(),true);
   assert.equal(await page.locator("#castle-vault-relics [data-collected=true]").count(),4);
   assert.equal(await page.locator("#castle-vault-unlock").isEnabled(),true);
+  assert.equal(await page.locator("#castle-vault-enter").isVisible(),false);
   await page.locator("#castle-vault-unlock").click();
   assert.equal(await page.locator("#castle-tour").getAttribute("data-vault-state"),"opened");
   assert.equal(await page.locator("#castle-vault-dialog").getAttribute("data-completed"),"true");
   assert.equal(await page.locator("#castle-vault-unlock").isDisabled(),true);
   assert.equal(await page.locator("#expedition-final").isVisible(),true);
-  await page.locator("#castle-vault-return").click();
+  assert.equal(await page.locator("#castle-vault-enter").isVisible(),true,"secret chamber unlocks after canonical vault");
+  await page.locator("#castle-vault-enter").click();
+  assert.equal(await page.locator("#castle-vault-dialog").isVisible(),false);
+  assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"vault-chamber");
+  assert.equal(await page.locator("#castle-tour").getAttribute("data-interior-room"),"vault");
+  assert.equal(await page.locator("#castle-interior-exit").isVisible(),true);
+  assert.match(await page.locator("#castle-interior-exit").innerText(),/MẬT THẤT/);
+  assert.equal(await page.locator("#castle-walk-interact").isDisabled(),true);
+  for(let i=0;i<7;i++)await page.locator('[data-walk-action="forward"]').click();
+  assert.equal(await page.locator("#castle-walk-interact").isEnabled(),true,"the throne crown must be reachable");
+  assert.match(await page.locator("#castle-walk-interact").innerText(),/VƯƠNG MIỆN/);
+  await page.locator("#castle-tour-canvas").focus();
+  await page.keyboard.press("e");
+  assert.equal(await page.locator("#castle-crown-dialog").isVisible(),true);
+  assert.match(await page.locator("#castle-crown-player").innerText(),/Luna Pháp Sư/);
+  await page.keyboard.press("Escape");
+  assert.equal(await page.locator("#castle-crown-dialog").isVisible(),false);
+  await page.locator("#castle-interior-exit").click();
+  assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"courtyard");
+  assert.ok(Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"))>=4.75);
+  await page.locator("#castle-walk-interact").click();
+  assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"vault-chamber","opened chest supports reentry");
+  await page.locator("#castle-interior-exit").click();
   await page.locator("#castle-tour-start").click();
   assert.equal(await page.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
   assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-vault-finished")),"1");
@@ -490,7 +514,7 @@ try {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,first_person_walk:castleMode==='webgl',castle_interiors:'4/4',castle_indoor_collision:true,immersive_relic_riddle:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,first_person_walk:castleMode==='webgl',castle_interiors:'4/4',castle_indoor_collision:true,immersive_relic_riddle:true,secret_crown_chamber:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{console.error("SMOKE_CLEANUP_START");await browser?.close();console.error("SMOKE_BROWSER_CLOSED");server.closeAllConnections();await new Promise(resolve=>server.close(resolve));console.error("SMOKE_CLEANUP_DONE");}

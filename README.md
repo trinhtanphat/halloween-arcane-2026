@@ -170,3 +170,11 @@ The Ravenhollow courtyard now includes an original procedural **3D treasure ches
 The treasury dialog lists all four canonical relics and marks which were earned; unlocking is disabled until all four are collected. On unlock, it clicks the *existing* #vault-open action, which remains the single source of truth for the existing localStorage key, vault achievement, and all seven Arcane Passport stamps. In 3D the original quest no longer scrolls the page away from the immersive scene. Dialog close/return retains the camera and progress, and the fallback 2D vault remains supported.
 
 The updated Playwright smoke suite checks the locked dialog, 0/4 and 4/4 relic state, the courtyard proximity trigger, keyboard E, unlocking via the 3D dialog, and the existing vault localStorage + passport side effects, as well as all old games, responsive widths, and PWA offline. PWA cache v14 refreshes the update.
+
+## Chapter XVI — Secret Crown Chamber (3D)
+
+The opened courtyard treasure chest now unlocks a **walkable secret 3D throne room**. Visitors who earned all four relics and completed the canonical Forgotten Vault can enter using the "BƯỚC VÀO MẬT THẤT 3D" control in the vault dialog, or by approaching the already-open chest and pressing E. The chamber is available only with an activated Three.js WebGL walk session; the original 2D victory remains accessible on devices without WebGL.
+
+Original offline geometry includes rune-inlaid stone floor, six gothic pillars, four relic shrines, a torchlit raised dais, and a rotating seven-spired crown. WASD, keyboard turning, touchscreen movement, collision handling and the "RỜI MẬT THẤT" exit all reuse the existing controls. Near the crown, press E or tap its mesh to open the accessible cinematic finale (personalized using the existing local invitation nickname; no new personal data storage). Escape returns to the 3D chamber. Exiting restores the prior courtyard position, and subsequent entry is supported.
+
+Chamber meshes/materials are disposed when leaving; no extra Three.js dependency or external files are downloaded. Existing seven Passport achievements and four relics are unchanged. WebGL disabled/fallback continues to show the original quest ending. Smoke tests cover locked/ready/unlocked gating, entry, crown proximity and E, finale, exit/re-entry, responsive screens and offline PWA cache v15.
