@@ -152,3 +152,8 @@
 #castle-wayfinder-next:disabled{opacity:.57;cursor:default}
 @media(max-width:660px){.castle-wayfinder{grid-template-columns:122px minmax(0,1fr);gap:11px;padding:10px}.castle-wayfinder-map-frame{width:122px;height:122px}.castle-wayfinder-information{gap:6px}.castle-wayfinder-information strong{font-size:19px}.castle-wayfinder-information p{font-size:10px;line-height:1.6}.castle-wayfinder-stats{gap:4px}.castle-wayfinder-stats span{font-size:8px;padding:4px 5px}#castle-wayfinder-next{font-size:9px;min-height:33px;padding:5px 8px}}
 @media(max-width:390px){.castle-wayfinder{grid-template-columns:106px minmax(0,1fr)}.castle-wayfinder-map-frame{width:106px;height:106px}.castle-wayfinder-kicker{font-size:8px}.castle-wayfinder-information strong{font-size:16px}.castle-wayfinder-information p{font-size:9px}}
+
+/* Mobile gamepad: one tap = one step, press and hold = continuous movement. */
+.castle-walk-pad [data-walk-action]{touch-action:none;user-select:none;-webkit-user-select:none;overscroll-behavior:contain}
+.castle-walk-pad [data-walk-action][data-pressed=true]{background:#796189;border-color:#ffe5b4;box-shadow:inset 0 0 13px #edc58c55;transform:scale(.98)}
+@media(prefers-reduced-motion:reduce){.castle-walk-pad [data-walk-action]{transition:none;transform:none!important}}

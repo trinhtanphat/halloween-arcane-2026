@@ -37,6 +37,9 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   let vaultChest=null,vaultLid=null,vaultGem=null;
   const vaultPosition={x:0,z:13.45};
   const walkKeys=new Set();
+  const walkHeld=new Map();
+  const HOLD_DELAY=170;
+  function clearWalkInput(){walkKeys.clear();walkHeld.clear();root.querySelectorAll("[data-walk-action]").forEach(b=>{delete b.dataset.pressed;});}
   const target=new THREE.Vector3(0,2,0),wanted=new THREE.Vector3(0,2,0);
   const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
   const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -56,7 +59,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     toggle.setAttribute("aria-pressed",String(mode==="webgl"));
     toggle.textContent=mode==="webgl"?"✧ TẮT 3D":"✦ KÍCH HOẠT 3D";
     canvas.style.display=mode==="webgl"?"block":"none";
-    if(mode!=="webgl"){viewMode="orbit";walkKeys.clear();}
+    if(mode!=="webgl"){viewMode="orbit";clearWalkInput();}
     root.dataset.tourView=viewMode;
     root.dataset.tourZone=zone;
     viewToggle.disabled=mode!=="webgl";
@@ -145,7 +148,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       showStatus("☽ Hãy đến gần rương báu ở cuối sân lâu đài.");
       return;
     }
-    walkKeys.clear();dragging=false;
+    clearWalkInput();dragging=false;
     refreshVaultDialog();
     vaultDialog.showModal();
     (vaultUnlock.disabled?document.querySelector("#castle-vault-return"):vaultUnlock)?.focus();
@@ -169,7 +172,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     enterVaultChamber();
   });
   vaultDialog.addEventListener("close",()=>{
-    walkKeys.clear();
+    clearWalkInput();
     if(active&&viewMode==="walk")canvas.focus({preventScroll:true});
   });
   vaultUnlock.addEventListener("click",()=>{
@@ -432,7 +435,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       showStatus("☽ Hãy tiến gần cổ vật phát sáng trước khi mở câu đố.");
       return;
     }
-    walkKeys.clear();dragging=false;
+    clearWalkInput();dragging=false;
     refreshRelicRiddle();
     if(!riddleDialog.open)riddleDialog.showModal();
     const first=riddleChoices.querySelector("button:not(:disabled)")||document.querySelector("#castle-riddle-continue");
@@ -442,7 +445,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   document.querySelector("#castle-riddle-close").addEventListener("click",closeRelicRiddle);
   document.querySelector("#castle-riddle-continue").addEventListener("click",closeRelicRiddle);
   riddleDialog.addEventListener("close",()=>{
-    walkKeys.clear();
+    clearWalkInput();
     if(active&&viewMode==="walk"&&zone==="interior")canvas.focus({preventScroll:true});
   });
   document.addEventListener("keydown",e=>{
@@ -464,7 +467,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       showStatus("☽ Hãy bước đến gần Vương Miện Bí Ẩn trên ngai.");
       return;
     }
-    walkKeys.clear();
+    clearWalkInput();
     let wizard="Người Giữ Ravenhollow";
     try{
       const value=localStorage.getItem("ravenhollow-wizard");
@@ -478,7 +481,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   document.querySelector("#castle-crown-close").addEventListener("click",closeCrownDialog);
   document.querySelector("#castle-crown-continue").addEventListener("click",closeCrownDialog);
   crownDialog.addEventListener("close",()=>{
-    walkKeys.clear();
+    clearWalkInput();
     if(active&&viewMode==="walk")canvas.focus({preventScroll:true});
   });
   function enterVaultChamber(){
@@ -495,7 +498,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       interior=chamber;exteriorObjects=outside;outsidePosition=previous;
       zone="vault-chamber";root.dataset.tourZone=zone;root.dataset.interiorRoom="vault";
       walkX=0;walkZ=3.1;walkYaw=0;walkPitch=-.08;
-      walkKeys.clear();walkNear=null;walkLast=0;
+      clearWalkInput();walkNear=null;walkLast=0;
       interiorExit.hidden=false;interiorExit.textContent="↩ RỜI MẬT THẤT";
       updateWalkCamera();updateNearby();
       showStatus("♛ Đã bước vào mật thất. Tiến đến vương miện trên ngai và nhấn E.");
@@ -517,7 +520,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       zone="interior";root.dataset.tourZone=zone;root.dataset.interiorRoom=id;
       pickRoom(id,false);
       walkX=0;walkZ=3.15;walkYaw=0;walkPitch=-.08;
-      walkKeys.clear();walkNear=null;walkLast=0;
+      clearWalkInput();walkNear=null;walkLast=0;
       updateWalkCamera();updateNearby();
       interiorExit.hidden=false;
       // Match the existing expedition selection without revealing its answer.
@@ -537,7 +540,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     delete root.dataset.interiorRoom;
     const restore=outsidePosition||{x:0,z:11.5,yaw:0,pitch:-.08};
     walkX=restore.x;walkZ=restore.z;walkYaw=restore.yaw;walkPitch=restore.pitch;
-    outsidePosition=null;walkKeys.clear();walkNear=null;
+    outsidePosition=null;clearWalkInput();walkNear=null;
     interiorExit.hidden=true;interiorExit.textContent="↩ RỜI PHÒNG";
     wayfinder.reset();
     updateWalkCamera();updateNearby();
@@ -598,14 +601,21 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     updateWalkCamera();updateNearby();
   }
   function updateWalkMovement(now){
-    if(riddleDialog.open||vaultDialog.open||crownDialog.open){walkKeys.clear();walkLast=now;return;}
+    if(riddleDialog.open||vaultDialog.open||crownDialog.open){clearWalkInput();walkLast=now;return;}
     const delta=Math.min(.065,Math.max(0,(now-walkLast)/1000));
     walkLast=now;
-    if(!walkKeys.size)return;
-    const forward=Number(walkKeys.has("w")||walkKeys.has("arrowup"))-Number(walkKeys.has("s")||walkKeys.has("arrowdown"));
-    const strafe=Number(walkKeys.has("d"))-Number(walkKeys.has("a"));
-    if(walkKeys.has("arrowleft"))walkYaw-=delta*1.6;
-    if(walkKeys.has("arrowright"))walkYaw+=delta*1.6;
+    if(!walkKeys.size&&!walkHeld.size)return;
+    // Hold a mobile direction pad for continuous movement; a quick tap stays a single step.
+    const pressed=action=>{
+      const press=walkHeld.get(action);
+      if(!press||now-press.started<HOLD_DELAY)return false;
+      press.moved=true;
+      return true;
+    };
+    const forward=Number(walkKeys.has("w")||walkKeys.has("arrowup")||pressed("forward"))-Number(walkKeys.has("s")||walkKeys.has("arrowdown")||pressed("back"));
+    const strafe=Number(walkKeys.has("d")||pressed("right"))-Number(walkKeys.has("a")||pressed("left"));
+    if(walkKeys.has("arrowleft")||pressed("turn-left"))walkYaw-=delta*1.6;
+    if(walkKeys.has("arrowright")||pressed("turn-right"))walkYaw+=delta*1.6;
     if(forward||strafe)walkMove(forward,strafe,delta*4.25);
     else updateWalkCamera();
   }
@@ -613,7 +623,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     if(!active)return;
     if(viewMode==="walk"&&(zone==="interior"||zone==="vault-chamber"))exitInterior();
     viewMode=viewMode==="walk"?"orbit":"walk";
-    walkKeys.clear();dragging=false;
+    clearWalkInput();dragging=false;
     if(viewMode==="walk"){
       walkX=0;walkZ=11.5;walkYaw=0;walkPitch=-.08;
       updateWalkCamera();updateNearby();
@@ -654,7 +664,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   }
   function stop(reason){
     closeVaultDialog();closeCrownDialog();
-    active=false;closeRelicRiddle();dragging=false;walkKeys.clear();walkNear=null;dispose();setMode("illustration");
+    active=false;closeRelicRiddle();dragging=false;clearWalkInput();walkNear=null;dispose();setMode("illustration");
     wayfinder.reset();
     if(reason)showStatus(reason);
   }
@@ -703,16 +713,45 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   }
   toggle.addEventListener("click",()=>{if(active)stop("Đã tắt WebGL để tiết kiệm tài nguyên. Vẫn chọn phòng bằng nút được.");else start();});
   viewToggle.addEventListener("click",switchView);
-  document.querySelectorAll("[data-walk-action]").forEach(button=>button.addEventListener("click",()=>{
-    if(!active||viewMode!=="walk")return;
-    const action=button.dataset.walkAction;
+  function walkStep(action){
+    if(!active||viewMode!=="walk"||riddleDialog.open||vaultDialog.open||crownDialog.open)return;
     if(action==="forward")walkMove(1,0,.7);
     if(action==="back")walkMove(-1,0,.7);
     if(action==="left")walkMove(0,-1,.7);
     if(action==="right")walkMove(0,1,.7);
-    if(action==="turn-left"){walkYaw-=.24;updateWalkCamera();}
-    if(action==="turn-right"){walkYaw+=.24;updateWalkCamera();}
-  }));
+    if(action==="turn-left"){walkYaw-=.24;updateWalkCamera();wayfinder.sync(true);}
+    if(action==="turn-right"){walkYaw+=.24;updateWalkCamera();wayfinder.sync(true);}
+  }
+  root.querySelectorAll("[data-walk-action]").forEach(button=>{
+    const action=button.dataset.walkAction;
+    let lastPress=null,ignoreNextPointerClick=false;
+    button.addEventListener("pointerdown",e=>{
+      if((e.pointerType==="mouse"&&e.button!==0)||!active||viewMode!=="walk"||riddleDialog.open||vaultDialog.open||crownDialog.open)return;
+      ignoreNextPointerClick=false;
+      lastPress={started:performance.now(),pointerId:e.pointerId,moved:false};
+      walkHeld.set(action,lastPress);
+      button.dataset.pressed="true";
+      button.setPointerCapture?.(e.pointerId);
+    });
+    button.addEventListener("pointerup",e=>{
+      if(!lastPress||lastPress.pointerId!==e.pointerId)return;
+      ignoreNextPointerClick=lastPress.moved;
+      if(walkHeld.get(action)===lastPress)walkHeld.delete(action);
+      delete button.dataset.pressed;
+      lastPress=null;
+    });
+    button.addEventListener("pointercancel",()=>{
+      if(walkHeld.get(action)===lastPress)walkHeld.delete(action);
+      delete button.dataset.pressed;lastPress=null;
+      ignoreNextPointerClick=true;
+    });
+    button.addEventListener("click",e=>{
+      // A long-press already moved continuously, so never add an extra tap step.
+      if(ignoreNextPointerClick&&e.detail!==0){ignoreNextPointerClick=false;return;}
+      ignoreNextPointerClick=false;
+      walkStep(action);
+    });
+  });
   function orbit(delta){theta+=delta;canvas.dataset.orbitYaw=theta.toFixed(3);if(active)updateCamera(.22);}
   function zoom(delta){radius=THREE.MathUtils.clamp(radius+delta,7.6,22);canvas.dataset.orbitZoom=radius.toFixed(2);if(active)updateCamera(.22);}
   document.querySelector("#castle-tour-left").addEventListener("click",()=>orbit(-.28));
@@ -736,8 +775,10 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     else phi=THREE.MathUtils.clamp(phi+deltas[e.key],.13,1.17);
   });
   canvas.addEventListener("keyup",e=>walkKeys.delete(e.key.toLowerCase()));
-  canvas.addEventListener("blur",()=>walkKeys.clear());
+  canvas.addEventListener("blur",()=>clearWalkInput());
   window.addEventListener("keyup",e=>walkKeys.delete(e.key.toLowerCase()));
+  window.addEventListener("blur",clearWalkInput);
+  document.addEventListener("visibilitychange",()=>{if(document.hidden)clearWalkInput();});
   canvas.addEventListener("wheel",e=>{if(!active)return;e.preventDefault();zoom(Math.sign(e.deltaY)*.85);},{passive:false});
   canvas.addEventListener("pointerdown",e=>{
     if(!active)return;

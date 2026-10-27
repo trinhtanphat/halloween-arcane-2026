@@ -190,3 +190,11 @@ The self-contained 2D renderer is independently throttled to about 10 frames per
 Browser tests cover map visibility, directional guidance, manual objective cycling, position tracking during WASD, room and chamber re-targeting, previously collected progress, WebGL-fallback invisibility, old relic quests and all existing minigames.
 
 When an additional relic is collected, the compass automatically clears an earlier manual destination and recommends the next incomplete room; after all 4/4 relics it points to the vault. Players can still manually cycle to previously visited rooms after completion.
+
+## Chapter XVIII — Mobile controls & reliability hardening (release readiness)
+
+The mobile direction pad now supports **press-and-hold** to walk or turn continuously. A quick tap still moves exactly one 0.7-unit step; held movement begins only after a short 170 ms threshold, uses the same collision limits as keyboard WASD, and does not add a duplicate step when the pointer releases. Multiple touch pointers can combine forward/strafe actions. Buttons show a visible pressed state, disable default touch scrolling while held, and respect reduced-motion preferences.
+
+Keyboard and touch states are cleared on zone transitions, modal openings, view-mode changes, 3D shutdown, window blur and visibility loss, preventing stuck movement after interruptions. If a pointer is cancelled, its held input is removed; a new press resets its click-suppression state. Neither the canonical quests nor localStorage progression is modified.
+
+Regression tests exercise long press, release (must stop), single-step taps, loss-of-focus cancellation, collision limits, all four 3D interiors, crown chamber, responsive viewports, WebGL loss fallback and offline PWA. Cache v17 refreshes the bundled controls and CSS.

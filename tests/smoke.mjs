@@ -163,6 +163,38 @@ try {
     for(let i=0;i<15;i++)await page.locator('[data-walk-action="forward"]').click();
     const boundaryZ=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
     assert.ok(boundaryZ>=4.75 && boundaryZ<=14.2,"walking remains in the courtyard");
+    // Regression: mobile direction pad supports tap, continuous hold and release.
+    const backControl=page.locator('[data-walk-action="back"]');
+    await backControl.scrollIntoViewIfNeeded();
+    const hit=await backControl.boundingBox();
+    assert.ok(hit&&hit.width>=35&&hit.height>=35,"mobile movement button has a usable hit target");
+    const centerX=hit.x+hit.width/2,centerY=hit.y+hit.height/2;
+    assert.equal(await backControl.evaluate(el=>getComputedStyle(el).touchAction),"none");
+    const heldStart=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    await page.mouse.move(centerX,centerY);
+    await page.mouse.down();
+    await page.waitForTimeout(640);
+    const heldZ=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    assert.ok(heldZ>heldStart+1.1&&heldZ<heldStart+3.3,"holding back must walk continuously, without teleporting");
+    await page.mouse.up();
+    assert.equal(await backControl.getAttribute("data-pressed"),null);
+    const releasedZ=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    await page.waitForTimeout(190);
+    assert.ok(Math.abs(Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"))-releasedZ)<.07,"movement stops after release");
+    const tappedZ=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    await backControl.click();
+    const tapStep=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"))-tappedZ;
+    assert.ok(tapStep>.63&&tapStep<.77,"single tap moves exactly one step");
+    const blurStart=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    await page.mouse.move(centerX,centerY);
+    await page.mouse.down();
+    await page.waitForTimeout(320);
+    await page.evaluate(()=>window.dispatchEvent(new Event("blur")));
+    const blurStopped=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    assert.ok(blurStopped>blurStart+.2,"pointer hold moves until focus is lost");
+    await page.waitForTimeout(150);
+    assert.ok(Math.abs(Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"))-blurStopped)<.07,"background focus loss cancels movement");
+    await page.mouse.up();
     await page.locator("#castle-tour-view").click();
     assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-view"),"orbit");
     assert.equal(await page.locator("#castle-walk-pad").isVisible(),false);
@@ -555,7 +587,7 @@ try {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,first_person_walk:castleMode==='webgl',castle_interiors:'4/4',castle_indoor_collision:true,immersive_relic_riddle:true,secret_crown_chamber:true,quest_wayfinder:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,touch_hold_controls:true,first_person_walk:castleMode==='webgl',castle_interiors:'4/4',castle_indoor_collision:true,immersive_relic_riddle:true,secret_crown_chamber:true,quest_wayfinder:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{console.error("SMOKE_CLEANUP_START");await browser?.close();console.error("SMOKE_BROWSER_CLOSED");server.closeAllConnections();await new Promise(resolve=>server.close(resolve));console.error("SMOKE_CLEANUP_DONE");}
