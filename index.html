@@ -24,11 +24,13 @@
   <link rel="stylesheet" href="./magic.css" />
   <link rel="stylesheet" href="./alchemy.css" />
   <link rel="stylesheet" href="./expedition.css" />
+  <link rel="stylesheet" href="./pumpkin.css" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <script defer type="module" src="./app.js"></script>
   <script defer type="module" src="./magic.js"></script>
   <script defer type="module" src="./alchemy.js"></script>
   <script defer type="module" src="./expedition.js"></script>
+  <script defer type="module" src="./soundscape.js"></script>
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -65,11 +67,20 @@
         <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="moon" aria-hidden="true"></div>
         <div class="floating-sigil sigil-a" aria-hidden="true">✧</div><div class="floating-sigil sigil-b" aria-hidden="true">☾</div><div class="floating-sigil sigil-c" aria-hidden="true">✶</div>
         <div class="castle" aria-hidden="true"><div class="tower t1"></div><div class="tower t2"></div><div class="tower t3"></div><div class="tower t4"></div><div class="castle-main"><i></i><i></i><i></i><i></i><i></i></div></div>
-        <canvas id="pumpkin-canvas" aria-label="Bí ngô 3D tương tác; kéo chuột để xoay"></canvas>
-        <div class="pumpkin-fallback" id="pumpkin-fallback" aria-hidden="true">🎃</div>
+        <canvas id="pumpkin-canvas" aria-label="Bí ngô 3D tương tác; kéo chuột hoặc dùng phím mũi tên để xoay" aria-description="Dùng các phím mũi tên để xoay bí ngô 3D" tabindex="0"></canvas>
+        <div class="pumpkin-fallback" id="pumpkin-fallback" role="img" aria-label="Minh họa bí ngô ma thuật màu cam phát sáng">
+          <div class="pumpkin-illustration" aria-hidden="true">
+            <span class="pumpkin-shadow"></span>
+            <span class="pumpkin-stem"></span><span class="pumpkin-leaf"></span>
+            <span class="pumpkin-rib rib-a"></span><span class="pumpkin-rib rib-b"></span><span class="pumpkin-rib rib-c"></span>
+            <span class="pumpkin-eye eye-left"></span><span class="pumpkin-eye eye-right"></span>
+            <span class="pumpkin-nose"></span><span class="pumpkin-mouth"></span>
+            <span class="pumpkin-spark spark-a">✧</span><span class="pumpkin-spark spark-b">✦</span>
+          </div>
+        </div>
         <div class="hero-floor" aria-hidden="true"></div>
         <div class="art-caption"><span class="diamond">◆</span><div><strong>THE ENCHANTED PUMPKIN</strong><span>CHẠM & KÉO ĐỂ XOAY BÍ NGÔ 3D</span></div></div>
-        <div class="scene-badge"><span>✺</span> REAL-TIME WEBGL</div>
+        <div class="scene-badge" id="scene-badge" aria-live="polite"><span>✺</span> ĐANG KHỞI TẠO 3D</div>
       </div>
       <div class="scroll-indicator">SCROLL TO DISCOVER <span>↓</span></div>
     </section>
@@ -276,7 +287,7 @@
 
     <section class="invitation-section shell" id="invitation"><div class="invitation-card"><div class="invitation-seal">✦ <span>R</span> ✦</div><span class="kicker">A LETTER FROM RAVENHOLLOW</span><h2>THƯ MỜI ĐANG<br><em>CHỜ BẠN.</em></h2><p>Để lại bí danh phù thủy của bạn để nhận thư mời ngay trong trải nghiệm này. Dữ liệu chỉ được lưu trong trình duyệt của bạn.</p><form id="invitation-form" class="invitation-form"><label for="wizard-name" class="sr-only">Bí danh phù thủy</label><input id="wizard-name" name="wizard-name" type="text" maxlength="32" autocomplete="nickname" placeholder="Bí danh phù thủy của bạn..." required /><button type="submit">NHẬN THƯ MỜI ✦</button></form><p id="invitation-response" class="invitation-response" aria-live="polite"></p><small>DEMO ONLY · KHÔNG GỬI EMAIL · KHÔNG THU THẬP DỮ LIỆU MÁY CHỦ</small></div></section>
   </main>
-  <footer class="site-footer"><div class="shell"><div class="footer-top"><div class="footer-brand"><span class="brand-mark">✦<small>R</small>✦</span><div><strong>RAVENHOLLOW</strong><span>THE ENCHANTED HALLOWEEN 2026</span></div></div><p>Where midnight meets magic.<br>Một đêm huyền bí do bạn tạo nên.</p><a href="#top">TRỞ VỀ ĐẦU TRANG ↑</a></div><div class="footer-bottom"><span>© 2026 RAVENHOLLOW · FAN-INSPIRED ORIGINAL EXPERIENCE</span><span>INSPIRED BY COMMUNITY OPEN-SOURCE CREATORS · <a href="./CREDITS.md">CREDITS & LICENSES</a></span><button id="effects-toggle" type="button" aria-pressed="true">✨ HIỆU ỨNG: BẬT</button></div></div></footer>
+  <footer class="site-footer"><div class="shell"><div class="footer-top"><div class="footer-brand"><span class="brand-mark">✦<small>R</small>✦</span><div><strong>RAVENHOLLOW</strong><span>THE ENCHANTED HALLOWEEN 2026</span></div></div><p>Where midnight meets magic.<br>Một đêm huyền bí do bạn tạo nên.</p><a href="#top">TRỞ VỀ ĐẦU TRANG ↑</a></div><div class="footer-bottom"><span>© 2026 RAVENHOLLOW · FAN-INSPIRED ORIGINAL EXPERIENCE</span><span>INSPIRED BY COMMUNITY OPEN-SOURCE CREATORS · <a href="./CREDITS.md">CREDITS & LICENSES</a></span><button id="sound-toggle" type="button" aria-pressed="false" title="Bật/tắt nhạc nền được tổng hợp trực tiếp trong trình duyệt">♫ ÂM THANH: TẮT</button><button id="effects-toggle" type="button" aria-pressed="true">✨ HIỆU ỨNG: BẬT</button></div></div></footer>
   <dialog id="portal-dialog" aria-labelledby="dialog-title"><div class="dialog-shell"><button type="button" id="close-portal" class="close-dialog" aria-label="Đóng">✕</button><span class="kicker">✦ TRIAL OF THE ARCANE ✦</span><div class="challenge-status" id="challenge-status">THỬ THÁCH 1 / 3</div><h2 id="dialog-title">THE ARCANE TRIALS</h2><div class="dialog-rune" id="dialog-rune">☾</div><p id="question-text">Bạn đã sẵn sàng?</p><div class="answer-list" id="answer-list"></div><div class="quiz-message" id="quiz-message" aria-live="polite"></div><button class="btn btn-outline quiz-next" id="quiz-next" type="button" hidden>TIẾP TỤC →</button><p class="quiz-note">Không yêu cầu tài khoản · Không lưu dữ liệu máy chủ</p></div></dialog>
   <div id="toast" class="toast" aria-live="polite"></div>
 </body>

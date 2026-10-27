@@ -1,0 +1,24 @@
+/* WebGL-safe illustrated pumpkin: only revealed when a real 3D context is unavailable. */
+.pumpkin-fallback{display:none;width:min(80%,410px);height:400px;top:48%;left:50%;z-index:2;font-size:initial;filter:none;pointer-events:none;overflow:visible}
+.pumpkin-fallback .pumpkin-illustration{position:relative;width:100%;height:100%;filter:drop-shadow(0 12px 38px #ff7d2b55)}
+.pumpkin-illustration:before{content:"";position:absolute;left:10%;top:19%;width:80%;height:69%;border-radius:43% 45% 42% 41%/47% 48% 51% 52%;background:radial-gradient(ellipse at 34% 25%,#ffe19a 0%,#e98529 19%,#b6470c 68%,#602206 100%);box-shadow:inset -28px -18px 35px #4c170ed1,inset 17px 8px 25px #f8b04a80,0 0 100px #c65b2880;border:3px solid #a34d14;z-index:1}
+.pumpkin-shadow{position:absolute;width:91%;height:18%;bottom:4%;left:5%;border-radius:50%;background:radial-gradient(ellipse,#cc641a5e,transparent 75%);filter:blur(18px);z-index:0}
+.pumpkin-stem{position:absolute;top:3%;left:47%;width:12%;height:25%;z-index:4;border-radius:35% 55% 20% 5%;transform:rotate(-11deg);background:linear-gradient(90deg,#344e27,#849154 43%,#324b24 80%);box-shadow:inset -7px 0 9px #22351a}
+.pumpkin-leaf{position:absolute;top:8%;left:49%;width:33%;height:13%;background:linear-gradient(130deg,#7da45a,#284927);border-radius:2% 100% 3% 100%;z-index:5;transform:rotate(-18deg);box-shadow:inset 0 0 14px #1a4621}
+.pumpkin-rib{position:absolute;top:19%;height:69%;z-index:2;border-radius:50%;box-shadow:inset 12px 0 12px #e3742836,inset -9px 0 13px #54210864}
+.pumpkin-rib.rib-a{left:18%;width:25%;border-left:3px solid #6b270e64;transform:rotate(4deg)}
+.pumpkin-rib.rib-b{left:39%;width:27%;border-left:3px solid #66250d73;border-right:2px solid #ec873c50}
+.pumpkin-rib.rib-c{left:63%;width:19%;border-right:3px solid #5f260e62;transform:rotate(-4deg)}
+.pumpkin-eye{position:absolute;top:43%;width:22%;height:15%;background:linear-gradient(180deg,#fff6c3,#ffb64b 55%,#e46e11);clip-path:polygon(2% 8%,100% 35%,48% 100%);z-index:6;filter:drop-shadow(0 0 25px #ffd36a)}
+.pumpkin-eye.eye-left{left:24%;transform:rotate(-12deg)}
+.pumpkin-eye.eye-right{right:24%;transform:scaleX(-1) rotate(-12deg)}
+.pumpkin-nose{position:absolute;top:57%;left:46%;height:11%;width:9%;z-index:6;background:#ffd075;clip-path:polygon(50% 0,0 100%,100% 100%);filter:drop-shadow(0 0 20px #ffab49)}
+.pumpkin-mouth{position:absolute;left:22%;right:22%;bottom:24%;height:17%;z-index:6;background:linear-gradient(#ffe1a4,#e17c16);clip-path:polygon(0 12%,12% 22%,27% 40%,33% 33%,42% 53%,48% 32%,57% 50%,66% 26%,82% 25%,100% 12%,89% 80%,75% 95%,62% 90%,50% 72%,39% 94%,24% 93%,10% 73%);filter:drop-shadow(0 0 15px #ffae42)}
+.pumpkin-spark{position:absolute;color:#ffe7b7;text-shadow:0 0 18px #efa95c;font-size:42px;z-index:6;animation:float 5s ease-in-out infinite}
+.pumpkin-spark.spark-a{top:17%;left:0}
+.pumpkin-spark.spark-b{top:23%;right:0;font-size:23px;animation-delay:-2s}
+.hero-art[data-render-mode="fallback"] .art-caption div span{font-size:9px}
+@media(max-width:650px){.pumpkin-fallback{width:min(82%,320px);height:290px;top:44%}.pumpkin-illustration .pumpkin-spark{font-size:23px}}
+@media(max-width:390px){.pumpkin-fallback{height:255px}}
+@media(prefers-reduced-motion:reduce){.pumpkin-spark{animation:none}}
+.effects-off .pumpkin-spark{animation:none}

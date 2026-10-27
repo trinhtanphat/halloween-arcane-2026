@@ -178,10 +178,25 @@ dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(
 function createPumpkinScene() {
   const canvas = $("#pumpkin-canvas");
   const fallback = $("#pumpkin-fallback");
-  if (!canvas || !window.WebGLRenderingContext) { fallback.style.display = "block"; return; }
+  const heroArt = canvas?.closest(".hero-art");
+  const badge = $("#scene-badge");
+  const caption = $(".art-caption div span");
+  function setRenderMode(mode) {
+    if (!canvas || !fallback) return;
+    const available=mode==="webgl";
+    heroArt?.setAttribute("data-render-mode",mode);
+    canvas.dataset.renderMode=mode;
+    canvas.style.display=available?"block":"none";
+    fallback.style.display=available?"none":"block";
+    fallback.setAttribute("aria-hidden",String(available));
+    canvas.setAttribute("aria-hidden",String(!available));
+    if(badge) badge.innerHTML=available?'<span>✺</span> REAL-TIME WEBGL':'<span>✦</span> 2D FALLBACK';
+    if(caption) caption.textContent=available?"CHẠM & KÉO ĐỂ XOAY BÍ NGÔ 3D":"HÌNH MINH HỌA DỰ PHÒNG · KHÔNG CẦN GPU";
+  }
+  if(!canvas || !window.WebGLRenderingContext){setRenderMode("fallback");return;}
   let renderer;
   try { renderer = new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:"default"}); }
-  catch (error) { console.warn("WebGL fallback:", error); fallback.style.display = "block"; canvas.style.display = "none"; return; }
+  catch(error){console.info("Using illustration instead of WebGL:",error?.message||error);setRenderMode("fallback");return;}
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(34, 1, .1, 100);
   camera.position.set(0, .3, 8.25);
@@ -284,7 +299,7 @@ function createPumpkinScene() {
     transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
     uniforms:{uTime:{value:0}},
     vertexShader:"attribute float aSize; uniform float uTime; varying float vGlow; void main(){vec3 p=position; p.y+=sin(uTime*0.7+p.x*3.0)*0.12; p.x+=cos(uTime*0.5+p.y)*0.08; vec4 mvPosition=modelViewMatrix*vec4(p,1.0); gl_PointSize=min(14.0,aSize*(34.0/-mvPosition.z)); gl_Position=projectionMatrix*mvPosition; vGlow=0.6+0.4*sin(uTime*1.8+p.z*6.0); }",
-    fragmentShader:"varying float vGlow; void main(){float d=length(gl_PointCoord-vec2(0.5));float glow=smoothstep(0.5,0.0,d); gl_FragColor=vec4(1.0,0.65+0.23*vGlow,0.32,glow*glow*0.85);}"
+    fragmentShader:"varying float vGlow; void main(){float d=length(gl_PointCoord-vec2(0.5));float glow=1.0-smoothstep(0.0,0.5,d); gl_FragColor=vec4(1.0,0.65+0.23*vGlow,0.32,glow*glow*0.85);}"
   });
   const sparkles=new THREE.Points(sparkGeo,sparkMat);
   scene.add(sparkles);
@@ -294,7 +309,7 @@ function createPumpkinScene() {
     const w=Math.max(1,Math.round(rect.width)), h=Math.max(1,Math.round(rect.height));
     if(w===width && h===height)return;
     width=w;height=h;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,window.matchMedia("(max-width: 650px)").matches?1.25:1.5));
     renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
   }
   const observer=typeof ResizeObserver!=="undefined"?new ResizeObserver(resize):null;
@@ -325,17 +340,32 @@ function createPumpkinScene() {
   const stopDrag=()=>drag=false;
   canvas.addEventListener("pointerup",stopDrag);
   canvas.addEventListener("pointercancel",stopDrag);
-  canvas.addEventListener("webglcontextlost",(e)=>{
-    e.preventDefault();
-    canvas.style.display="none";fallback.style.display="block";
+  let running=true,inView=true,lastFrame=0;
+  const visibilityObserver=typeof IntersectionObserver!=="undefined"
+    ?new IntersectionObserver((entries)=>{inView=entries[0]?.isIntersecting??true;},{threshold:0}):null;
+  visibilityObserver?.observe(canvas);
+  function stopScene(reason){
+    if(!running)return;
+    running=false;
+    observer?.disconnect();
+    visibilityObserver?.disconnect();
+    window.removeEventListener("resize",resize);
+    setRenderMode("fallback");
+    if(reason)console.info("WebGL scene switched to illustration:",reason);
+  }
+  canvas.addEventListener("webglcontextlost",(event)=>{
+    event.preventDefault();
+    stopScene("graphics context unavailable");
   });
   const clock=new THREE.Clock();
-  function animate(){
+  const frameInterval=1000/(window.matchMedia("(max-width: 650px)").matches?30:50);
+  function animate(now=0){
+    if(!running)return;
     requestAnimationFrame(animate);
-    if(document.hidden)return;
-    resize();
+    if(document.hidden||!inView||now-lastFrame<frameInterval)return;
+    lastFrame=now;
     const t=clock.getElapsedTime();
-    if(effects && !drag) rotationY+=.0009;
+    if(effects&&!drag)rotationY+=.001;
     group.rotation.y=THREE.MathUtils.lerp(group.rotation.y,rotationY,.12);
     group.rotation.x=THREE.MathUtils.lerp(group.rotation.x,rotationX,.12);
     if(effects){
@@ -344,9 +374,13 @@ function createPumpkinScene() {
       sparkMat.uniforms.uTime.value=t;
       lantern.intensity=22+Math.sin(t*3.2)*5;
     }
-    renderer.render(scene,camera);
+    try{renderer.render(scene,camera);}catch(error){stopScene(error?.message||"render unavailable");}
   }
-  try{resize();fallback.style.display="none";animate();}
-  catch(e){console.warn("Pumpkin 3D unavailable:",e);canvas.style.display="none";fallback.style.display="block";}
+  try{
+    resize();
+    renderer.render(scene,camera);
+    setRenderMode("webgl");
+    animate();
+  }catch(error){stopScene(error?.message||"initial render unavailable");}
 }
 createPumpkinScene();

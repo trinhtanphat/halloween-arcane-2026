@@ -36,7 +36,7 @@ try {
   assert.match(await page.locator("#hero-title").innerText(),/MAGIC/);
   assert.equal(await page.locator(".realm-card").count(),3);
   assert.equal(await page.locator(".timeline-item").count(),4);
-  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css","expedition.js","expedition.css"];
+  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css","expedition.js","expedition.css","pumpkin.css","soundscape.js"];
   for(const asset of assets){
     const response=await page.request.get(base+"/"+asset);
     assert.equal(response.status(),200,"asset missing: "+asset);
@@ -118,6 +118,53 @@ try {
   assert.match(await page.locator("#potion-step").innerText(),/01 \/ 03/);
   assert.equal(await page.locator("#passport-count").innerText(),"5/5");
   assert.equal((JSON.parse(await page.evaluate(()=>localStorage.getItem("ravenhollow-spells")))).length,4);
+  const sound=page.locator("#sound-toggle");
+  assert.equal(await sound.getAttribute("aria-pressed"),"false");
+  await sound.click();
+  assert.equal(await sound.getAttribute("aria-pressed"),"true");
+  await sound.click();
+  assert.equal(await sound.getAttribute("aria-pressed"),"false");
+  const effect=page.locator("#effects-toggle");
+  await effect.click();
+  assert.equal(await effect.getAttribute("aria-pressed"),"false");
+  await effect.click();
+  assert.equal(await effect.getAttribute("aria-pressed"),"true");
+  const mode = await page.locator("#pumpkin-canvas").getAttribute("data-render-mode");
+  assert.ok(["webgl","fallback"].includes(mode),"Must report actual rendering mode: "+mode);
+  if (mode==="webgl") assert.match(await page.locator("#scene-badge").innerText(),/WEBGL/);
+  if (mode==="fallback") assert.match(await page.locator("#scene-badge").innerText(),/2D FALLBACK/);
+  const forcedFallback = await context.newPage();
+  await forcedFallback.addInitScript(() => {
+    Object.defineProperty(window,"WebGLRenderingContext",{value:undefined,configurable:true});
+  });
+  await forcedFallback.goto(base,{waitUntil:"domcontentloaded",timeout:30000});
+  await forcedFallback.waitForFunction(()=>document.querySelector("#pumpkin-canvas")?.dataset.renderMode==="fallback",{timeout:15000});
+  assert.equal(await forcedFallback.locator("#pumpkin-fallback").isVisible(),true);
+  assert.equal(await forcedFallback.locator("#pumpkin-canvas").isVisible(),false);
+  assert.match(await forcedFallback.locator("#scene-badge").innerText(),/2D FALLBACK/);
+  assert.equal(await forcedFallback.locator(".pumpkin-eye").count(),2);
+  await forcedFallback.close();
+  // Simulate GPU context loss in an isolated Chrome tab; keep the main tab untouched.
+  const lossPage=await context.newPage();
+  await lossPage.goto(base,{waitUntil:"domcontentloaded",timeout:30000});
+  await lossPage.waitForFunction(()=>["webgl","fallback"].includes(document.querySelector("#pumpkin-canvas")?.dataset.renderMode),{timeout:15000});
+  let contextLossChecked=false;
+  if(await lossPage.locator("#pumpkin-canvas").getAttribute("data-render-mode")==="webgl"){
+    const extensionAvailable=await lossPage.evaluate(()=>{
+      const canvas=document.querySelector("#pumpkin-canvas");
+      const gl=canvas.getContext("webgl2")||canvas.getContext("webgl");
+      const ext=gl?.getExtension("WEBGL_lose_context");
+      if(!ext)return false;
+      ext.loseContext();
+      return true;
+    });
+    if(extensionAvailable){
+      await lossPage.waitForFunction(()=>document.querySelector("#pumpkin-canvas")?.dataset.renderMode==="fallback",{timeout:10000});
+      assert.equal(await lossPage.locator("#pumpkin-fallback").isVisible(),true);
+      contextLossChecked=true;
+    }
+  }
+  await lossPage.close();
   const scene = await page.locator("#pumpkin-canvas").evaluate(e=>{
     const style=getComputedStyle(e);
     return {visible:style.display!=="none",width:e.clientWidth,height:e.clientHeight};
@@ -177,7 +224,7 @@ try {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,passport:"5/5",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,passport:"5/5",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

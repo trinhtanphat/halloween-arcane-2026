@@ -79,3 +79,15 @@ A new original, independent mystery adventure complements the party, academy, po
 - **Browser smoke tests:** wrong-answer recovery, four-room treasure unlock, five achievements, service-worker offline reload and responsive layouts. No GitHub Actions needed.
 
 These are fictional story scenarios, not real Halloween event bookings or licensed Harry Potter locations.
+
+## Resilient 3D pumpkin and opt-in soundscape
+
+- Accurate renderer state: the hero reports real WebGL or GPU-free 2D fallback. The fallback is an original CSS pumpkin illustration, not a generic emoji.
+- WebGL failure protection: if the graphics context cannot be created or is lost, the page continues in 2D with an accurate status label.
+- Better performance: device pixel ratio capped at 1.25 on small screens and 1.5 otherwise, frame pacing at 30/50 FPS, and offscreen/hidden-tab frame skipping. Correct GLSL smoothstep edge ordering.
+- Accessible controls: arrow-key rotation for 3D pumpkin, image description for fallback, existing reduced-motion handling.
+- Opt-in audio ambience: footer button starts a quiet original synth soundscape after a user click using WebAudio; no automatic audio, downloads, login or tracking.
+- Smoke tests check renderer mode, forced WebGL unavailability, optional WebGL context-loss extension, sound/effects switches, offline use, quizzes and mobile widths.
+- Offline cache v6 includes CSS fallback and soundscape JS.
+
+Graphics acceleration is browser/device-specific; passing headless Chromium WebGL tests does not verify all physical GPUs.
