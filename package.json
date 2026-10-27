@@ -5,12 +5,14 @@
   "description": "Original magical Halloween 2026 experience inspired by three community showcases",
   "scripts": {
     "build": "esbuild src/main.js --bundle --format=esm --target=es2020 --minify --outfile=app.js",
-    "check": "node --check src/main.js"
+    "check": "node --check src/main.js",
+    "test": "node tests/smoke.mjs"
   },
   "dependencies": {
     "three": "0.170.0"
   },
   "devDependencies": {
-    "esbuild": "0.25.12"
+    "esbuild": "0.25.12",
+    "playwright-core": "^1.56.1"
   }
 }

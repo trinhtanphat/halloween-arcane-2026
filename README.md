@@ -35,3 +35,12 @@ GitHub Pages: serve main branch `/ (root)`; direct static site, no build workflo
 
 ## Privacy & performance
 The demo is static. The nickname (if submitted) and visual-effects preference remain in browser localStorage. Fonts are served via Google Fonts. The scene uses `requestAnimationFrame` and stops rendering when the tab is hidden; graphics fall back to emoji if WebGL cannot initialize.
+
+## Public demo and smoke tests
+
+- **Live GitHub Pages:** https://trinhtanphat.github.io/halloween-arcane-2026/
+- **Source:** https://github.com/trinhtanphat/halloween-arcane-2026
+- `npm test` launches a separate headless Chrome using Playwright Core, serves the site temporarily on localhost, verifies the 3/3 challenge, invitation, ghosts, assets and overflow across 320–1440 px, and stores desktop/mobile screenshots under ignored `tests/artifacts/`.
+- To smoke-test the public deployment in PowerShell: `$env:SMOKE_URL='https://trinhtanphat.github.io/halloween-arcane-2026/'; npm test; Remove-Item Env:SMOKE_URL`.
+
+No existing interactive Chrome tabs or desktop sessions are modified by the smoke tests.
