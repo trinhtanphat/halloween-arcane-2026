@@ -78,12 +78,24 @@ try {
     await page.locator("#castle-tour-view").click();
     assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-view"),"walk");
     assert.equal(await page.locator("#castle-walk-pad").isVisible(),true);
+    assert.equal(await page.locator("#castle-wayfinder").isVisible(),true);
+    assert.equal(await page.locator("#castle-wayfinder").getAttribute("data-zone"),"courtyard");
+    assert.equal(await page.locator("#castle-wayfinder").getAttribute("data-objective"),"library");
+    assert.match(await page.locator("#castle-wayfinder-progress").innerText(),/0 \/ 4 CỔ VẬT/);
+    assert.match(await page.locator("#castle-wayfinder-direction").innerText(),/PHÍA TRƯỚC|CHÉO|BÊN/);
+    assert.equal(await page.locator("#castle-wayfinder-map").evaluate(el=>el.getContext("2d")!==null),true);
+    await page.locator("#castle-wayfinder-next").click();
+    assert.equal(await page.locator("#castle-wayfinder").getAttribute("data-objective"),"tower");
+    assert.match(await page.locator("#castle-wayfinder-target").innerText(),/THÁP THIÊN VĂN/);
+    await page.locator('[data-castle-room="hall"]').click();
+    assert.equal(await page.locator("#castle-wayfinder").getAttribute("data-objective"),"hall");
     const initialZ=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
     await page.locator("#castle-tour-canvas").focus();
     await page.keyboard.down("w");
     await page.waitForTimeout(450);
     await page.keyboard.up("w");
     assert.ok(Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"))<initialZ-.3,"W moves forward");
+    assert.ok(Number(await page.locator("#castle-wayfinder-map").getAttribute("data-player-z"))<initialZ-.3,"minimap tracks WASD position");
     const yaw0=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-yaw"));
     await page.locator('[data-walk-action="turn-left"]').click();
     assert.notEqual(Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-yaw")),yaw0);
@@ -96,6 +108,10 @@ try {
     await page.locator("#castle-tour-canvas").focus();
     await page.keyboard.press("e");
     assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"interior","E at a gateway enters the real indoor 3D scene");
+    assert.equal(await page.locator("#castle-wayfinder").getAttribute("data-zone"),"interior");
+    assert.equal(await page.locator("#castle-wayfinder").getAttribute("data-objective"),"relic");
+    assert.match(await page.locator("#castle-wayfinder-target").innerText(),/CỔ VẬT/);
+    assert.equal(await page.locator("#castle-wayfinder-next").isDisabled(),true);
     const firstInterior=await page.locator("#castle-tour").getAttribute("data-interior-room");
     assert.ok(["tower","library"].includes(firstInterior));
     assert.equal(await page.locator("#expedition-scene").getAttribute("data-room-scene"),firstInterior);
@@ -126,6 +142,7 @@ try {
     const castleRooms=["hall","library","tower","crypt"];
     await page.locator("#castle-interior-exit").click();
     assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"courtyard");
+    assert.equal(await page.locator("#castle-wayfinder").getAttribute("data-zone"),"courtyard");
     assert.ok(Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"))>=4.75);
     // Independently enter and leave all four distinct interior scenes.
     for(const room of castleRooms){
@@ -151,8 +168,10 @@ try {
     assert.equal(await page.locator("#castle-walk-pad").isVisible(),false);
     await page.locator("#castle-tour-start").click();
     assert.equal(await page.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
+    assert.equal(await page.locator("#castle-wayfinder").isVisible(),false);
   }else{
     assert.equal(await page.locator("#castle-tour-illustration").isVisible(),true);
+    assert.equal(await page.locator("#castle-wayfinder").isVisible(),false);
   }
   await page.locator('[data-castle-room="hall"]').click();
   await page.locator("#castle-tour-enter").click();
@@ -261,6 +280,8 @@ try {
   assert.equal(await page.locator("#castle-tour").getAttribute("data-render-mode"),"webgl");
   await page.locator("#castle-tour-view").click();
   assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-view"),"walk");
+  assert.equal(await page.locator("#castle-wayfinder").getAttribute("data-objective"),"vault");
+  assert.match(await page.locator("#castle-wayfinder-progress").innerText(),/4 \/ 4 CỔ VẬT/);
   assert.equal(await page.locator("#castle-walk-interact").isDisabled(),true);
   // The treasury altar is behind the courtyard spawn, reached by stepping back.
   await page.locator('[data-walk-action="back"]').click();
@@ -283,6 +304,8 @@ try {
   assert.equal(await page.locator("#castle-vault-dialog").isVisible(),false);
   assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-zone"),"vault-chamber");
   assert.equal(await page.locator("#castle-tour").getAttribute("data-interior-room"),"vault");
+  assert.equal(await page.locator("#castle-wayfinder").getAttribute("data-objective"),"crown");
+  assert.match(await page.locator("#castle-wayfinder-target").innerText(),/VƯƠNG MIỆN/);
   assert.equal(await page.locator("#castle-interior-exit").isVisible(),true);
   assert.match(await page.locator("#castle-interior-exit").innerText(),/MẬT THẤT/);
   assert.equal(await page.locator("#castle-walk-interact").isDisabled(),true);
@@ -419,6 +442,7 @@ try {
   await forcedFallback.locator("#castle-tour-start").click();
   assert.equal(await forcedFallback.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
   assert.equal(await forcedFallback.locator("#castle-tour-view").isDisabled(),true);
+  assert.equal(await forcedFallback.locator("#castle-wayfinder").isVisible(),false);
   assert.equal(await forcedFallback.locator("#castle-walk-pad").isVisible(),false);
   assert.equal(await forcedFallback.locator("#castle-tour-start").getAttribute("aria-pressed"),"false");
   await forcedFallback.locator('[data-castle-room="crypt"]').click();
@@ -479,6 +503,23 @@ try {
     }
     assert.ok(result.page<=result.viewport+3,"Horizontal overflow at "+width+"px: "+JSON.stringify(result));
   }
+  // Minimap must remain usable at the smallest supported phone viewport.
+  await page.setViewportSize({width:320,height:900});
+  await page.locator("#castle-tour-start").click();
+  if(await page.locator("#castle-tour").getAttribute("data-render-mode")==="webgl"){
+    await page.locator("#castle-tour-view").click();
+    assert.equal(await page.locator("#castle-wayfinder").isVisible(),true);
+    const mobileMap=await page.locator("#castle-wayfinder").evaluate(el=>{
+      const box=el.getBoundingClientRect();
+      const canvas=el.querySelector("canvas").getBoundingClientRect();
+      return {width:box.width,mapWidth:canvas.width,page:document.documentElement.scrollWidth,viewport:innerWidth};
+    });
+    assert.ok(mobileMap.mapWidth>=100&&mobileMap.mapWidth<180,"phone minimap size "+JSON.stringify(mobileMap));
+    assert.ok(mobileMap.width<=mobileMap.viewport,"minimap fits phone "+JSON.stringify(mobileMap));
+    assert.ok(mobileMap.page<=mobileMap.viewport+3,"no phone horizontal overflow while wayfinder is visible");
+    await page.locator("#castle-tour-view").click();
+    await page.locator("#castle-tour-start").click();
+  }
   const sw = await page.evaluate(async()=>{
     if (!("serviceWorker" in navigator)) return "unsupported";
     const controller = await Promise.race([
@@ -514,7 +555,7 @@ try {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,first_person_walk:castleMode==='webgl',castle_interiors:'4/4',castle_indoor_collision:true,immersive_relic_riddle:true,secret_crown_chamber:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,first_person_walk:castleMode==='webgl',castle_interiors:'4/4',castle_indoor_collision:true,immersive_relic_riddle:true,secret_crown_chamber:true,quest_wayfinder:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{console.error("SMOKE_CLEANUP_START");await browser?.close();console.error("SMOKE_BROWSER_CLOSED");server.closeAllConnections();await new Promise(resolve=>server.close(resolve));console.error("SMOKE_CLEANUP_DONE");}

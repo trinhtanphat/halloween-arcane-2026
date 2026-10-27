@@ -133,3 +133,22 @@
 #castle-crown-player{color:#e9d29c;font-weight:700}
 #castle-crown-continue{display:block;margin:21px 24px 25px;width:calc(100% - 48px);background:#e4bd83;border:1px solid #fff1be;padding:13px;color:#2f1d36;font:700 11px/1.6 var(--sans)}
 @media(max-width:500px){.castle-crown-symbol{font-size:80px}.castle-crown-dialog p{margin-inline:16px}}
+
+/* Chapter XVII: lightweight top-down minimap + mission wayfinder, active only in 3D walk mode. */
+.castle-wayfinder{display:grid;grid-template-columns:180px minmax(0,1fr);gap:19px;padding:17px;margin:0 0 18px;background:linear-gradient(115deg,#312542,#20192e);border:1px solid #d9b67e78;box-shadow:inset 0 0 20px #9977af13}
+.castle-wayfinder[hidden]{display:none!important}
+.castle-wayfinder-map-frame{position:relative;width:180px;height:180px;margin:auto;border:1px solid #d8b37b77;box-shadow:0 8px 26px #0006;overflow:hidden;background:#171426}
+#castle-wayfinder-map{display:block;width:100%;height:100%;object-fit:contain}
+.castle-wayfinder-north{position:absolute;top:6px;right:7px;padding:2px 5px;background:#23192ed9;border:1px solid #e0ba7994;color:#fae4ad;font:700 10px var(--sans);pointer-events:none}
+.castle-wayfinder-information{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:10px;min-width:0}
+.castle-wayfinder-kicker{font:700 9px var(--sans);color:#f3c989;letter-spacing:.16em}
+.castle-wayfinder-information strong{font:600 clamp(19px,2.7vw,29px)/1.25 var(--serif);color:#f7e9cc}
+.castle-wayfinder-information p{font:12px/1.8 var(--sans);color:#cbbbce;margin:0}
+.castle-wayfinder-stats{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.castle-wayfinder-stats span{padding:6px 8px;font:600 9px/1.3 var(--sans);letter-spacing:.04em;border:1px solid #d5a36c51;background:#281f34;color:#e3c699}
+#castle-wayfinder-direction{color:#dff6e4;border-color:#9ecaac85}
+#castle-wayfinder-next{min-height:40px;background:#44304e;color:#fbe7c8;border:1px solid #e1bd80a0;padding:9px 15px;font:700 10px var(--sans);letter-spacing:.07em}
+#castle-wayfinder-next:not(:disabled):hover,#castle-wayfinder-next:not(:disabled):focus-visible{background:#66466a;border-color:#ffe4b3}
+#castle-wayfinder-next:disabled{opacity:.57;cursor:default}
+@media(max-width:660px){.castle-wayfinder{grid-template-columns:122px minmax(0,1fr);gap:11px;padding:10px}.castle-wayfinder-map-frame{width:122px;height:122px}.castle-wayfinder-information{gap:6px}.castle-wayfinder-information strong{font-size:19px}.castle-wayfinder-information p{font-size:10px;line-height:1.6}.castle-wayfinder-stats{gap:4px}.castle-wayfinder-stats span{font-size:8px;padding:4px 5px}#castle-wayfinder-next{font-size:9px;min-height:33px;padding:5px 8px}}
+@media(max-width:390px){.castle-wayfinder{grid-template-columns:106px minmax(0,1fr)}.castle-wayfinder-map-frame{width:106px;height:106px}.castle-wayfinder-kicker{font-size:8px}.castle-wayfinder-information strong{font-size:16px}.castle-wayfinder-information p{font-size:9px}}

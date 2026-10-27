@@ -178,3 +178,15 @@ The opened courtyard treasure chest now unlocks a **walkable secret 3D throne ro
 Original offline geometry includes rune-inlaid stone floor, six gothic pillars, four relic shrines, a torchlit raised dais, and a rotating seven-spired crown. WASD, keyboard turning, touchscreen movement, collision handling and the "RỜI MẬT THẤT" exit all reuse the existing controls. Near the crown, press E or tap its mesh to open the accessible cinematic finale (personalized using the existing local invitation nickname; no new personal data storage). Escape returns to the 3D chamber. Exiting restores the prior courtyard position, and subsequent entry is supported.
 
 Chamber meshes/materials are disposed when leaving; no extra Three.js dependency or external files are downloaded. Existing seven Passport achievements and four relics are unchanged. WebGL disabled/fallback continues to show the original quest ending. Smoke tests cover locked/ready/unlocked gating, entry, crown proximity and E, finale, exit/re-entry, responsive screens and offline PWA cache v15.
+
+## Chapter XVII — Interactive Quest Compass / Minimap
+
+A live, top-down local Canvas minimap now accompanies first-person 3D castle exploration. It draws the player's world position and facing arrow, a dotted route to the current objective, available room gateways, collected room stamps, and the courtyard treasure chest. It displays a true relative orientation cue (front, behind, left, right or diagonals), approximate distance in **in-game units** (not meters), and current objective progress. No geolocation or map API is involved.
+
+On the courtyard, guidance automatically prioritizes uncollected relic rooms and then the vault. Players can click **ĐỔI MỤC TIÊU** to cycle among four rooms and the chest; choosing a named room also sets the objective. On entering a room, the destination becomes its relic. Entering the secret chamber redirects to the crown. The map updates to each zone's own bounded coordinate system, works with WASD, keyboard turning and touch controls, and automatically resets when leaving a room or switching to 2D. Already-earned relics get distinct marks. Quest state comes directly from the original expedition's DOM; no duplicate persistence or navigation data.
+
+The self-contained 2D renderer is independently throttled to about 10 frames per second and doesn't create another WebGL context or request any remote assets. PWA cache v16 updates the existing app.js bundle and castle-tour styles.
+
+Browser tests cover map visibility, directional guidance, manual objective cycling, position tracking during WASD, room and chamber re-targeting, previously collected progress, WebGL-fallback invisibility, old relic quests and all existing minigames.
+
+When an additional relic is collected, the compass automatically clears an earlier manual destination and recommends the next incomplete room; after all 4/4 relics it points to the vault. Players can still manually cycle to previously visited rooms after completion.

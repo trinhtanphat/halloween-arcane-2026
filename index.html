@@ -244,6 +244,23 @@
             </div>
           </div>
           <div class="castle-tour-footer">
+            <section class="castle-wayfinder" id="castle-wayfinder" hidden aria-label="Bản đồ và la bàn nhiệm vụ 3D">
+              <div class="castle-wayfinder-map-frame">
+                <canvas id="castle-wayfinder-map" width="180" height="180" role="img" aria-label="Sơ đồ nhìn từ trên cao, đánh dấu vị trí và hướng nhìn của người chơi, các cổng phòng và mục tiêu"></canvas>
+                <span class="castle-wayfinder-north" aria-hidden="true">N ↑</span>
+              </div>
+              <div class="castle-wayfinder-information">
+                <span class="castle-wayfinder-kicker">✦ ENCHANTED QUEST COMPASS</span>
+                <strong id="castle-wayfinder-target" aria-live="polite">ĐẠI SẢNH BÓNG ĐÊM</strong>
+                <p id="castle-wayfinder-guidance">Di chuyển đến cổng phát sáng để bắt đầu khám phá.</p>
+                <div class="castle-wayfinder-stats">
+                  <span id="castle-wayfinder-direction" aria-live="off">↑ PHÍA TRƯỚC</span>
+                  <span id="castle-wayfinder-distance" aria-live="off">— ĐƠN VỊ</span>
+                  <span id="castle-wayfinder-progress">0 / 4 CỔ VẬT</span>
+                </div>
+                <button type="button" id="castle-wayfinder-next">⌖ ĐỔI MỤC TIÊU</button>
+              </div>
+            </section>
             <div class="castle-tour-room-list" role="group" aria-label="Chọn một trong bốn cổng lâu đài">
               <button type="button" data-castle-room="hall" aria-pressed="true"><span>♜</span> ĐẠI SẢNH</button>
               <button type="button" data-castle-room="library" aria-pressed="false"><span>❖</span> THƯ VIỆN</button>

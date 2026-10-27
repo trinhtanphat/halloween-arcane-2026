@@ -1,5 +1,6 @@
 import { createCastleInterior } from "./castle-interiors.js";
 import { createVaultChamber } from "./vault-chamber.js";
+import { createCastleWayfinder } from "./castle-wayfinder.js";
 
 /**
  * Ravenhollow procedural castle (original geometry, no asset downloads).
@@ -39,6 +40,13 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   const target=new THREE.Vector3(0,2,0),wanted=new THREE.Vector3(0,2,0);
   const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
   const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const wayfinder=createCastleWayfinder({
+    root:document.querySelector("#castle-wayfinder"),
+    canvas:document.querySelector("#castle-wayfinder-map"),
+    roomNames,
+    getState:()=>({active,viewMode,zone,x:walkX,z:walkZ,yaw:walkYaw,
+      roomId:interior?.roomId,selected,collected:vaultProgress().collected,opened:vaultProgress().completed})
+  });
   function showStatus(text){message.textContent=text;}
   function setMode(mode){
     root.dataset.renderMode=mode;
@@ -57,6 +65,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     walkHud.hidden=mode!=="webgl"||viewMode!=="walk";
     walkPad.hidden=mode!=="webgl"||viewMode!=="walk";
     interiorExit.hidden=mode!=="webgl"||(zone!=="interior"&&zone!=="vault-chamber");
+    wayfinder.sync(true);
   }
   function pickRoom(id,notify=true){
     if(!Object.hasOwn(roomNames,id))return;
@@ -65,7 +74,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     const point=roomPoints[id];
     wanted.set(point[0]*.25,2+point[1]*.15,point[2]*.25);
     for(const sphere of hotspots)sphere.material.emissiveIntensity=sphere.userData.room===id?2.2:1.0;
-    if(notify)showStatus("✦ Đã chọn "+roomNames[id]+". Nhấn VÀO PHÒNG ĐÃ CHỌN để giải câu đố.");
+    if(notify){showStatus("✦ Đã chọn "+roomNames[id]+". Nhấn VÀO PHÒNG ĐÃ CHỌN để giải câu đố.");wayfinder.choose(id);}
   }
   function vaultProgress(){
     const collected=[...document.querySelectorAll("#expedition-map .expedition-room.found")]
@@ -125,6 +134,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       if(vaultLid)vaultLid.rotation.x=progress.completed?-1.12:0;
     }
     if(vaultDialog.open)refreshVaultDialog();
+    wayfinder.sync(true);
   }
   function closeVaultDialog(){
     if(vaultDialog.open)vaultDialog.close();
@@ -350,6 +360,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     canvas.dataset.walkYaw=walkYaw.toFixed(3);
     canvas.dataset.walkZone=zone;
     document.querySelector("#castle-walk-coords").textContent="X "+walkX.toFixed(1)+" · Z "+walkZ.toFixed(1);
+    wayfinder.sync();
   }
   function disposeInterior(){
     if(!interior||!scene)return;
@@ -528,6 +539,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     walkX=restore.x;walkZ=restore.z;walkYaw=restore.yaw;walkPitch=restore.pitch;
     outsidePosition=null;walkKeys.clear();walkNear=null;
     interiorExit.hidden=true;interiorExit.textContent="↩ RỜI PHÒNG";
+    wayfinder.reset();
     updateWalkCamera();updateNearby();
     showStatus("✦ Đã ra sân lâu đài. Đến gần cổng khác để khám phá phòng tiếp theo.");
   }
@@ -643,6 +655,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   function stop(reason){
     closeVaultDialog();closeCrownDialog();
     active=false;closeRelicRiddle();dragging=false;walkKeys.clear();walkNear=null;dispose();setMode("illustration");
+    wayfinder.reset();
     if(reason)showStatus(reason);
   }
   function renderFrame(now){
