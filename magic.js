@@ -30,7 +30,7 @@ const quizUI = {
   options:$("#order-options"),question:$("#order-question"),box:$("#order-question-box"),next:$("#order-next"),
   result:$("#order-result"),feedback:$("#order-feedback"),step:$("#order-step"),progress:$("#order-progress")
 };
-let index=0, selected=null, scores=[0,0,0,0];
+let index=0, selected=null, scores=[0,0,0,0], selections=[];
 function safeRead(key) {try{return localStorage.getItem(key);}catch{return null;}}
 function safeStore(key,value){try{localStorage.setItem(key,value);}catch{}}
 function renderQuestion(){
@@ -72,19 +72,22 @@ function showOrder(winner){
   quizUI.step.textContent="HUY HIỆU ĐÃ ĐƯỢC TRAO";
   quizUI.progress.style.width="100%";
   safeStore("ravenhollow-order",String(winner));
+  window.dispatchEvent(new Event("ravenhollow-progress"));
 }
 quizUI.next?.addEventListener("click",()=>{
   if(selected===null)return;
   scores[selected]++;
+  selections.push(selected);
   if(index<questions.length-1){index++;renderQuestion();return;}
   const highest=Math.max(...scores);
-  // Stable tie-breaker: earlier choice in quiz order wins.
-  const winner=scores.findIndex((score)=>score===highest);
+  // On a tie, prefer the group selected first during this quiz.
+  const winner=selections.find(choice=>scores[choice]===highest);
   showOrder(winner);
 });
 $("#restart-order")?.addEventListener("click",()=>{
-  index=0;scores=[0,0,0,0];selected=null;quizUI.result.hidden=true;quizUI.box.hidden=false;
+  index=0;scores=[0,0,0,0];selections=[];selected=null;quizUI.result.hidden=true;quizUI.box.hidden=false;
   safeStore("ravenhollow-order","");
+  window.dispatchEvent(new Event("ravenhollow-progress"));
   renderQuestion();
 });
 const savedOrder=safeRead("ravenhollow-order");
@@ -117,7 +120,7 @@ function populateMotes(name){
   }
   particles.appendChild(fragment);
 }
-function cast(name){
+function cast(name, track=true){
   if(!spellInfo[name])return;
   activeCast=name;
   const info=spellInfo[name];
@@ -133,11 +136,18 @@ function cast(name){
   void chamber.offsetWidth; // replay a one-shot rune burst for repeat clicks
   chamber.classList.add("cast");
   populateMotes(name);
+  if(track){
+    let previous=[];
+    try { const parsed=JSON.parse(safeRead("ravenhollow-spells")||"[]");if(Array.isArray(parsed))previous=parsed; } catch(_) {}
+    const names=Object.keys(spellInfo);
+    safeStore("ravenhollow-spells",JSON.stringify([...new Set([...previous,name])].filter(item=>names.includes(item))));
+    window.dispatchEvent(new Event("ravenhollow-progress"));
+  }
 }
 document.querySelectorAll("[data-cast]").forEach(button=>{
   button.addEventListener("click",()=>cast(button.dataset.cast));
 });
-cast(activeCast);
+cast(activeCast,false);
 
 // Safe, scoped offline support. No login state or personal data enters the cache.
 if ("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost" || location.hostname==="127.0.0.1")){

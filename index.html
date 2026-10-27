@@ -8,6 +8,12 @@
   <meta property="og:title" content="Ravenhollow — The Enchanted Halloween" />
   <meta property="og:description" content="Trăng lên. Phép thuật thức giấc. Bước vào Halloween 31/10/2026." />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://trinhtanphat.github.io/halloween-arcane-2026/" />
+  <meta property="og:image" content="https://trinhtanphat.github.io/halloween-arcane-2026/assets/party-hero.webp" />
+  <meta property="og:image:alt" content="Đêm hội Halloween huyền bí ở Ravenhollow" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://trinhtanphat.github.io/halloween-arcane-2026/" />
   <title>Ravenhollow | The Enchanted Halloween 2026</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="./icon-192.png" />
@@ -16,9 +22,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
   <link rel="stylesheet" href="./magic.css" />
+  <link rel="stylesheet" href="./alchemy.css" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <script defer type="module" src="./app.js"></script>
   <script defer type="module" src="./magic.js"></script>
+  <script defer type="module" src="./alchemy.js"></script>
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -34,7 +42,7 @@
       </a>
       <button class="menu-toggle" id="menu-toggle" aria-label="Mở menu" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
       <nav id="nav-links" aria-label="Điều hướng chính">
-        <a href="#about">Truyền thuyết</a><a href="#realms">Khám phá</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#schedule">Đêm hội</a>
+        <a href="#about">Truyền thuyết</a><a href="#realms">Khám phá</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#alchemy">Pha chế</a><a href="#schedule">Đêm hội</a>
       </nav>
       <a href="#invitation" class="nav-cta"><span>Nhận thư mời</span><span aria-hidden="true">↗</span></a>
     </div>
@@ -149,6 +157,66 @@
             <p class="spell-message" id="spell-message" aria-live="polite">✦ LUMINARA — Thắp sáng những bí ẩn ngủ quên.</p>
           </div>
         </div>
+      </div>
+    </section>
+
+
+    <section class="section alchemy-section" id="alchemy" aria-labelledby="alchemy-title">
+      <div class="shell">
+        <div class="section-heading center">
+          <span class="kicker">✦ THE POTION LABORATORY ✦</span>
+          <h2 id="alchemy-title">NGHỆ THUẬT <em>PHA CHẾ</em> HUYỀN BÍ</h2>
+          <p>Ba công thức cổ đang chờ được tái hiện. Chọn đúng ba nguyên liệu để pha chế, mở khóa danh hiệu Nhà Giả Kim Ravenhollow.</p>
+        </div>
+        <div class="alchemy-layout">
+          <div class="cauldron-stage" aria-label="Vạc phép thuật đang tỏa sáng với các hạt ma thuật">
+            <div class="cauldron-halo"></div>
+            <div class="cauldron-stars" aria-hidden="true">✧ <span>✦</span> ☽</div>
+            <div class="cauldron-bubbles" id="cauldron-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="cauldron-pot"><div class="cauldron-rim"></div><div class="cauldron-liquid" id="cauldron-liquid"></div><div class="cauldron-body"><span>✶</span></div><div class="cauldron-foot left"></div><div class="cauldron-foot right"></div></div>
+            <div class="cauldron-fire" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div class="cauldron-caption"><span>✧ ARCANE ALCHEMY ✧</span><strong id="potion-liquid-label">VẠC PHÉP ĐANG CHỜ NGUYÊN LIỆU</strong></div>
+          </div>
+          <div class="alchemy-control">
+            <div class="tiny-rule">CHAPTER V — THE ALCHEMIST'S JOURNEY</div>
+            <p class="alchemy-step" id="potion-step">CÔNG THỨC 01 / 03</p>
+            <h3 id="potion-title">Moonveil Elixir</h3>
+            <p id="potion-hint" class="alchemy-hint">Chọn đúng ba nguyên liệu được ghi trong cuốn sổ cổ.</p>
+            <div class="recipe-note"><span>📜 BẢN THẢO CÔNG THỨC</span><strong id="potion-recipe">Giọt Trăng • Muối Sao • Hoa Đêm</strong></div>
+            <div class="ingredient-grid" id="ingredient-grid" role="group" aria-label="Chọn nguyên liệu pha chế">
+              <button type="button" data-ingredient="moon" aria-pressed="false">☽ <span>Giọt Trăng</span></button>
+              <button type="button" data-ingredient="star" aria-pressed="false">✧ <span>Muối Sao</span></button>
+              <button type="button" data-ingredient="bloom" aria-pressed="false">❀ <span>Hoa Đêm</span></button>
+              <button type="button" data-ingredient="ember" aria-pressed="false">♨ <span>Than Rồng</span></button>
+              <button type="button" data-ingredient="tear" aria-pressed="false">✦ <span>Lệ Phượng</span></button>
+              <button type="button" data-ingredient="root" aria-pressed="false">❧ <span>Rễ Rừng</span></button>
+            </div>
+            <p class="alchemy-selection" id="potion-selection">NGUYÊN LIỆU: 0 / 3</p>
+            <p class="alchemy-feedback" id="potion-feedback" role="status" aria-live="polite">Mời chọn ba nguyên liệu trong công thức.</p>
+            <div class="alchemy-actions">
+              <button type="button" class="btn btn-outline" id="potion-clear">↺ ĐỔ VẠC</button>
+              <button type="button" class="btn btn-primary" id="potion-next" hidden>CÔNG THỨC TIẾP THEO →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="passport-section shell" id="passport" aria-labelledby="passport-title">
+      <div class="passport-panel">
+        <div class="passport-heading">
+          <div><span class="kicker">✧ YOUR ARCANE PASSPORT ✧</span><h2 id="passport-title">HÀNH TRÌNH <em>PHÁP SƯ</em></h2><p>Hoàn thành các thử thách trong trang web để mở khóa huy hiệu Đại Pháp Sư. Thành tích chỉ lưu trên trình duyệt hiện tại.</p></div>
+          <div class="passport-ring"><strong id="passport-count">0/4</strong><span>NHIỆM VỤ</span></div>
+        </div>
+        <div class="passport-progress"><div id="passport-progress-bar"></div></div>
+        <div class="passport-grid">
+          <div class="passport-stamp" id="stamp-order"><span>♜</span><strong>GIA NHẬP HỘI</strong><small>Hoàn thành trắc nghiệm</small></div>
+          <div class="passport-stamp" id="stamp-spells"><span>✧</span><strong>BẬC THẦY THẦN CHÚ</strong><small>Thi triển đủ 4 phép</small></div>
+          <div class="passport-stamp" id="stamp-portal"><span>☽</span><strong>VƯỢT CỔNG BÍ ẨN</strong><small>Giải xong ba câu đố</small></div>
+          <div class="passport-stamp" id="stamp-potion"><span>⚗</span><strong>NHÀ GIẢ KIM</strong><small>Pha đủ 3 loại thuốc</small></div>
+        </div>
+        <p class="passport-status" id="passport-status" aria-live="polite">Hành trình học viện của bạn đang bắt đầu.</p>
+        <button type="button" class="btn btn-outline passport-share" id="passport-share">✦ SAO CHÉP THÀNH TÍCH</button>
       </div>
     </section>
 

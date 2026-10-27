@@ -1,0 +1,79 @@
+
+/* Alchemist's Journey and Magic Passport — original Ravenhollow expansion */
+.alchemy-section{background:radial-gradient(ellipse at 30% 55%,rgba(69,75,52,.2),transparent 65%),#110e19;border-top:1px solid rgba(221,181,110,.13);border-bottom:1px solid rgba(221,181,110,.13)}
+.alchemy-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:60px;align-items:center}
+.cauldron-stage{height:460px;border:1px solid rgba(226,178,102,.37);position:relative;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 55%,rgba(61,111,79,.55),rgba(20,23,29,.9) 70%);display:flex;justify-content:center;align-items:center}
+.cauldron-stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 79px,rgba(233,189,109,.025) 80px);pointer-events:none}
+.cauldron-halo{position:absolute;width:300px;height:300px;top:25px;left:50%;transform:translateX(-50%);border-radius:50%;border:1px dashed rgba(237,185,104,.34);box-shadow:0 0 80px rgba(114,189,125,.09),inset 0 0 60px rgba(111,168,135,.09)}
+.cauldron-stars{position:absolute;inset:33px auto auto 35px;color:var(--gold);font-size:26px;letter-spacing:30px;opacity:.7}
+.cauldron-stars span{font-size:15px}
+.cauldron-pot{position:absolute;width:280px;height:235px;top:123px;left:50%;transform:translateX(-50%);z-index:4}
+.cauldron-rim{position:absolute;top:8px;left:9px;right:9px;height:55px;border-radius:50%;background:radial-gradient(ellipse at 50% 55%,#407b73 5%,#1d4044 58%,#b1a06d 61%,#34343b 73%,#171924 83%);border:8px ridge #6b6474;box-shadow:0 -8px 20px #b4eaae33;z-index:3}
+.cauldron-liquid{position:absolute;top:24px;left:30px;right:30px;height:34px;border-radius:50%;background:radial-gradient(ellipse,#bcffe3,#68bd98,#244f59);box-shadow:0 0 39px #80ffb777;z-index:4;transition:background .4s,box-shadow .4s}
+.cauldron-body{position:absolute;top:36px;left:0;right:0;height:180px;border-radius:18% 18% 47% 47%/25% 25% 65% 65%;background:radial-gradient(ellipse at 45% 22%,#63627a,#262936 55%,#0e131e);border:3px solid #6c6873;box-shadow:inset 0 -30px 40px #0d101a,inset 0 6px 21px #a5a3ac38,0 25px 33px #0009;text-align:center}
+.cauldron-body>span{display:block;margin-top:57px;font:64px var(--serif);color:#d3bb89;text-shadow:0 0 25px #deb8765c}
+.cauldron-foot{position:absolute;bottom:0;width:30px;height:46px;background:linear-gradient(90deg,#292b35,#0b0e18);z-index:-1}
+.cauldron-foot.left{left:55px;transform:rotate(16deg)}
+.cauldron-foot.right{right:55px;transform:rotate(-16deg)}
+.cauldron-fire{position:absolute;top:344px;height:75px;display:flex;gap:8px;align-items:end;justify-content:center;z-index:2}
+.cauldron-fire i{width:33px;height:65px;background:linear-gradient(#ffe1a4,#ff9351 45%,#bb3c22);border-radius:80% 10% 50% 50%;filter:drop-shadow(0 0 22px #ff7c35);transform:rotate(-8deg);animation:alchemy-flicker .9s ease-in-out infinite alternate}
+.cauldron-fire i:nth-child(2){height:79px;transform:rotate(8deg);animation-delay:-.3s}
+.cauldron-fire i:nth-child(3){height:56px;animation-delay:-.6s}
+.cauldron-bubbles{position:absolute;top:45px;left:50%;width:260px;height:220px;transform:translateX(-50%);pointer-events:none;z-index:5}
+.cauldron-bubbles i{position:absolute;bottom:15px;width:12px;height:12px;border-radius:50%;border:1px solid #deffdc;background:#c5ffe777;box-shadow:0 0 15px #9efad5;animation:alchemy-bubble 3s linear infinite;left:calc(8% + var(--bubble-x,20%))}
+.cauldron-bubbles i:nth-child(1){--bubble-x:4%;animation-delay:-.1s}
+.cauldron-bubbles i:nth-child(2){--bubble-x:16%;animation-delay:-1.5s;width:9px;height:9px}
+.cauldron-bubbles i:nth-child(3){--bubble-x:30%;animation-delay:-2.1s;width:19px;height:19px}
+.cauldron-bubbles i:nth-child(4){--bubble-x:44%;animation-delay:-.7s}
+.cauldron-bubbles i:nth-child(5){--bubble-x:56%;animation-delay:-1.1s;width:7px;height:7px}
+.cauldron-bubbles i:nth-child(6){--bubble-x:65%;animation-delay:-2.7s}
+.cauldron-bubbles i:nth-child(7){--bubble-x:72%;animation-delay:-1.9s;width:17px;height:17px}
+.cauldron-bubbles i:nth-child(8){--bubble-x:83%;animation-delay:-.3s;width:7px;height:7px}
+.cauldron-stage[data-potion="success"] .cauldron-liquid{background:radial-gradient(ellipse,#ffffd3,#efc16c,#7959bc);box-shadow:0 0 70px #ffde9d}
+.cauldron-stage[data-potion="failure"] .cauldron-liquid{background:radial-gradient(ellipse,#c3abd0,#c97283,#60374e);box-shadow:0 0 40px #e26a8a}
+.cauldron-stage[data-potion="success"] .cauldron-halo{border-color:#eecf94;box-shadow:0 0 100px #dfae6644,inset 0 0 60px #ffd58022}
+.cauldron-caption{position:absolute;bottom:17px;left:15px;right:15px;z-index:6;text-align:center;display:flex;flex-direction:column;gap:7px}
+.cauldron-caption>span{color:var(--gold);letter-spacing:.2em;font-size:9px}
+.cauldron-caption>strong{font:500 10px var(--serif);letter-spacing:.1em}
+.alchemy-step{font:600 10px var(--sans);color:var(--gold);letter-spacing:.21em;margin:27px 0 8px}
+.alchemy-control h3{font:600 clamp(25px,3vw,42px) var(--serif);margin:0 0 11px;color:var(--cream)}
+.alchemy-hint{font-size:13px;color:var(--muted);line-height:1.8;margin:0 0 17px}
+.recipe-note{border-left:2px solid #e4be85;background:#33253b80;padding:15px 16px;margin:0 0 19px;display:flex;flex-direction:column;gap:9px}
+.recipe-note span{color:var(--gold);font-size:9px;letter-spacing:.17em}
+.recipe-note strong{font:600 13px var(--sans);line-height:1.7}
+.ingredient-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.ingredient-grid button{border:1px solid #dfb97e4d;background:#291e32;color:#efc88c;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;min-height:83px;padding:10px 5px;font-size:24px;transition:background .2s,border-color .2s}
+.ingredient-grid button span{color:#f0dfeb;font-size:11px}
+.ingredient-grid button[aria-pressed="true"]{background:#534462;border-color:var(--gold);box-shadow:inset 0 0 18px #e3a86725}
+.ingredient-grid button:disabled{opacity:.62;cursor:not-allowed}
+.alchemy-selection{font:600 11px var(--sans);letter-spacing:.15em;color:var(--gold);margin:18px 0 9px}
+.alchemy-feedback{font-size:12px;line-height:1.8;color:#cfbfda;min-height:26px;margin:0 0 11px}
+.alchemy-actions{display:flex;gap:11px;flex-wrap:wrap}
+.alchemy-actions .btn{font-size:10px;min-height:45px}
+.alchemy-actions [hidden]{display:none}
+.passport-section{padding-block:85px 100px}
+.passport-panel{padding:45px;border:1px solid #dab27a8a;background:radial-gradient(ellipse at 95% 0%,#3926479a,transparent 66%),#1a1226;box-shadow:inset 0 0 0 8px #100c18}
+.passport-heading{display:flex;justify-content:space-between;gap:25px;align-items:center}
+.passport-heading .kicker{margin-bottom:13px}
+.passport-heading h2{font:600 clamp(28px,3.5vw,43px) var(--serif);margin:0 0 10px}
+.passport-heading h2 em{font-style:normal;color:var(--gold)}
+.passport-heading p{color:var(--muted);font-size:13px;line-height:1.8;max-width:570px}
+.passport-ring{border:1px solid var(--gold);min-width:118px;width:118px;height:118px;border-radius:50%;display:flex;justify-content:center;align-items:center;flex-direction:column;gap:8px;box-shadow:0 0 35px #d3a5612c,inset 0 0 22px #d3a56120}
+.passport-ring strong{font:600 27px var(--serif);color:var(--gold)}
+.passport-ring span{font-size:9px;letter-spacing:.13em;color:#d2bad8}
+.passport-progress{height:4px;background:#5b4258;margin:26px 0}
+.passport-progress>div{height:100%;width:0;background:linear-gradient(90deg,#a879db,#ffe3a2);transition:width .4s}
+.passport-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.passport-stamp{border:1px solid #ddba8a45;padding:17px 11px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;background:#251b2c90;opacity:.54;transition:opacity .25s,border-color .25s}
+.passport-stamp.unlocked{opacity:1;border-color:var(--gold);background:#4a30403b}
+.passport-stamp>span{color:#e5c78f;font-size:38px;line-height:1}
+.passport-stamp>strong{font-size:10px;letter-spacing:.08em}
+.passport-stamp>small{color:var(--muted);font-size:10px;line-height:1.5}
+.passport-status{margin:22px 0 15px;color:#e6c58a;font-size:13px;line-height:1.8}
+.passport-share{min-height:42px}
+@keyframes alchemy-bubble{0%{transform:translateY(0) scale(.7);opacity:0}15%{opacity:.9}80%{opacity:.7}100%{transform:translateY(-225px) scale(1.5);opacity:0}}
+@keyframes alchemy-flicker{0%{transform:scale(.9) rotate(-7deg)}100%{transform:scale(1.07) rotate(10deg)}}
+@media(max-width:950px){.alchemy-layout{grid-template-columns:minmax(0,1fr);gap:34px}.cauldron-stage{height:400px;width:min(100%,610px);margin:auto}.alchemy-control{width:min(100%,650px);margin:auto}.passport-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.cauldron-stage{height:350px}.cauldron-pot{transform:translateX(-50%) scale(.76);transform-origin:top center;top:95px}.cauldron-halo{width:250px;height:250px;top:15px}.cauldron-fire{top:260px}.cauldron-bubbles{top:22px}.cauldron-caption{bottom:11px}.alchemy-control h3{font-size:26px}.ingredient-grid{gap:6px}.ingredient-grid button{min-height:78px;font-size:20px}.ingredient-grid button span{font-size:10px}.passport-panel{padding:27px 18px}.passport-heading{align-items:flex-start;flex-direction:column}.passport-ring{align-self:center}.passport-stamp{padding:15px 5px}.passport-stamp strong{font-size:9px}.passport-stamp small{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.cauldron-bubbles i,.cauldron-fire i{animation:none!important}}
+.effects-off .cauldron-bubbles i,.effects-off .cauldron-fire i{animation:none!important}

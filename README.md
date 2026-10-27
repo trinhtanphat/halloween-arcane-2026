@@ -55,3 +55,15 @@ No existing interactive Chrome tabs or desktop sessions are modified by the smok
 - **Smoke tests:** include new quiz and spells, 12 public/static resources, viewport tests, service-worker readiness, and offline navigation. Automated tests launch an isolated headless Chrome process; never control existing browser tabs.
 
 Commands: \`npm ci\`, \`npm run build\`, then \`npm test\`. The deployed \`app.js\` is compiled from \`src/main.js\`; the new \`magic.js\` is a separate dependency-free browser module. GitHub Pages serves both from the repository root without GitHub Actions.
+
+## Alchemist's Journey, Passport and discoverability
+
+- **Potion Laboratory:** Three original recipes, six selectable ingredients, wrong-recipe reset, success/failure feedback, replay and local-only alchemist achievement.
+- **Arcane Passport:** Four achievements from the Sorting Ceremony, all four spells, the 3-question portal challenge and all three potion recipes. Shared progress is refreshed using in-page `ravenhollow-progress` events and read from browser localStorage; no backend, analytics or account required.
+- **Share progress:** One click copies a plain-text achievement summary if the Clipboard API is available, otherwise a clear browser-specific fallback message appears.
+- **Accessibility:** Clearly labeled ingredient controls, toggle states, live puzzle feedback, responsive grids, keyboard-friendly buttons and reduced motion support.
+- **SEO:** Canonical URL, Open Graph/Twitter metadata and a repository-scoped XML sitemap. GitHub Pages serves this site at a subpath; robots.txt rules require host-root control to govern crawlers site-wide.
+- **Offline cache:** `sw.js` cache version v4 includes the Potion Laboratory CSS/JS. Core files are available offline after an initial successful install. When online, network responses take priority so new site versions can update.
+- **Automated checks:** `npm run build` and `npm test`; smoke tests cover incorrect and correct recipes, progress 4/4, offline reload, public resources and five mobile-to-desktop widths.
+
+Open the public demo: https://trinhtanphat.github.io/halloween-arcane-2026/ .

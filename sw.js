@@ -1,6 +1,6 @@
-const CACHE_NAME = "ravenhollow-static-20261027-v3";
+const CACHE_NAME = "ravenhollow-static-20261027-v4";
 const ROOT = new URL("./", self.location.href);
-const CORE = ["./", "./index.html", "./style.css", "./magic.css", "./app.js", "./magic.js", "./favicon.svg", "./icon-192.png", "./icon-512.png", "./manifest.webmanifest", "./assets/haunted-hero.jpg", "./assets/haunted-origins.jpg", "./assets/party-hero.webp", "./assets/party-location.webp"];
+const CORE = ["./", "./index.html", "./style.css", "./magic.css", "./alchemy.css", "./app.js", "./magic.js", "./alchemy.js", "./favicon.svg", "./icon-192.png", "./icon-512.png", "./manifest.webmanifest", "./assets/haunted-hero.jpg", "./assets/haunted-origins.jpg", "./assets/party-hero.webp", "./assets/party-location.webp"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE.map(asset=>new URL(asset,ROOT).href))).then(()=>self.skipWaiting()));
 });

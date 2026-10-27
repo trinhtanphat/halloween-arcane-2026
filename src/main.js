@@ -158,6 +158,8 @@ $("#quiz-next").addEventListener("click", () => {
   if (completed) { trialIndex = 0; score = 0; renderTrial(); return; }
   if (trialIndex < trials.length - 1) { trialIndex++; renderTrial(); return; }
   completed = true;
+  try { localStorage.setItem("ravenhollow-portal-finished","1"); } catch(_) {}
+  window.dispatchEvent(new Event("ravenhollow-progress"));
   $("#challenge-status").textContent = "ĐÃ HOÀN THÀNH 3 THỬ THÁCH";
   $("#dialog-title").textContent = "WIZARD OF RAVENHOLLOW";
   $("#dialog-rune").textContent = "✦";
