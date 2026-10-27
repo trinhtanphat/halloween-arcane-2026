@@ -226,3 +226,16 @@ The existing cross-tab storage event synchronizes live tabs, but browsers can su
 The regression suite now simulates delayed storage events on two same-origin tabs, validates that both independent relics survive, verifies a reset cannot resurrect relics from a suspended tab, and reruns the existing normal cross-tab sync, corrupt save, valid reload, WebGL lifecycle, actual touch events and 2D fallback checks. Cache v20 refreshes expedition.js for offline visitors.
 
 No new account system, external data transfer, browser security policy change or GitHub Actions workflow is required. The separate two-tab state is not a substitute for an atomic multiuser server, but robustly handles ordered browser storage writes even when event delivery is delayed.
+
+## Bonus Chapter XXI — The Ghost Rhythm Spell Duel
+
+An original optional rhythm-reaction minigame now appears after the Rune Memory chapter and before Alchemy, with its own "Đấu nhịp" navigation link.
+
+- Four mystical rune lanes and a fully original CSS-illustrated ghost, magical gates, hit effects, life bar, score, combo and best score.
+- Accessible real-button controls: keyboard 1–4 or pointer/touch. In **Practice**, twelve rune inputs can be attempted at a comfortable speed with no clock; in **Rhythm Duel**, sixteen runes arrive about every 880 ms, with forgiving good/perfect timing windows. Five misses defeat the player; landing all the runes banishes the ghost. The score awards a combo multiplier.
+- An optional, low-volume, original Web Audio oscillator synthesizes short tones. Audio is **off by default** and uses no prerecorded or third-party music. The separate audio toggle and reduced-motion CSS make the game usable in quiet or low-motion contexts.
+- Pause/resume and auto-pause on tab visibility/focus loss avoid losing lives when interrupted; replay clears current game state. Best scores for Practice and Rhythm are persisted independently with guarded localStorage access.
+- The challenge is a **bonus game** and does not add an eighth Arcane Passport stamp or alter existing 7/7 completion. No accounts, network scoring, camera or server-side tracking.
+- PWA static cache v21 includes spell-duel.js and spell-duel.css for offline play. Browser smoke checks the twelve-hit practice victory, combo arithmetic, keyboard/click input, separate best scores, pause behavior, loss/replay, unchanged Passport achievements, and gameplay while offline.
+
+The synthesized audio is an original sound effect, not a copyrighted song.

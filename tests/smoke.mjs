@@ -36,7 +36,7 @@ try {
   assert.match(await page.locator("#hero-title").innerText(),/MAGIC/);
   assert.equal(await page.locator(".realm-card").count(),3);
   assert.equal(await page.locator(".timeline-item").count(),4);
-  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css","expedition.js","expedition.css","castle-tour.css","pumpkin.css","soundscape.js","candy.js","candy.css","poster.js","poster.css","runes.js","runes.css"];
+  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css","expedition.js","expedition.css","castle-tour.css","pumpkin.css","soundscape.js","candy.js","candy.css","poster.js","poster.css","runes.js","runes.css","spell-duel.js","spell-duel.css"];
   for(const asset of assets){
     const response=await page.request.get(base+"/"+asset);
     assert.equal(response.status(),200,"asset missing: "+asset);
@@ -446,6 +446,51 @@ try {
   await page.locator("#rune-restart").click();
   assert.equal(await page.locator("#rune-best").innerText(),"8");
 
+  // Bonus Ghost Rhythm Duel — practice completion and timed challenge.
+  const duel=page.locator("#duel-game");
+  assert.equal(await duel.getAttribute("data-state"),"idle");
+  assert.equal(await page.locator("#duel-sound").getAttribute("aria-pressed"),"false","audio is opt-in");
+  await page.locator("#duel-start").click();
+  assert.equal(await duel.getAttribute("data-state"),"running");
+  assert.equal(await page.locator("[data-duel-lane]").count(),4);
+  for(let step=0;step<12;step++){
+    const lane=Number(await duel.getAttribute("data-current-lane"));
+    assert.ok(lane>=0&&lane<=3);
+    if(step%2===0)await page.locator('[data-duel-lane="'+lane+'"]').click();
+    else {await page.locator('[data-duel-lane="'+lane+'"]').focus();await page.keyboard.press(String(lane+1));}
+  }
+  assert.equal(await duel.getAttribute("data-state"),"finished");
+  assert.equal(await duel.getAttribute("data-result"),"won");
+  assert.equal(await duel.getAttribute("data-hits"),"12");
+  assert.equal(await duel.getAttribute("data-misses"),"0");
+  assert.equal(await page.locator("#duel-score").innerText(),"1860");
+  assert.equal(await page.locator("#duel-best").innerText(),"1860");
+  assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-duel-best-practice")),"1860");
+  assert.equal(await page.locator("#passport-count").innerText(),"7/7","bonus must not alter original stamps");
+  await page.locator('[data-duel-mode="duel"]').click();
+  assert.equal(await duel.getAttribute("data-mode"),"duel");
+  await page.locator("#duel-start").click();
+  assert.equal(await duel.getAttribute("data-state"),"running");
+  await page.locator("#duel-pause").click();
+  assert.equal(await duel.getAttribute("data-state"),"paused");
+  const frozen=await duel.getAttribute("data-index");
+  await page.waitForTimeout(1000);
+  assert.equal(await duel.getAttribute("data-index"),frozen,"pause freezes the ghost duel");
+  await page.locator("#duel-pause").click();
+  assert.equal(await duel.getAttribute("data-state"),"running");
+  for(let mistake=0;mistake<5;mistake++){
+    const lane=Number(await duel.getAttribute("data-current-lane"));
+    await page.locator('[data-duel-lane="'+(lane+1)%4+'"]').click();
+  }
+  assert.equal(await duel.getAttribute("data-result"),"lost");
+  assert.equal(await duel.getAttribute("data-health"),"0");
+  assert.equal(await page.locator("#duel-result").isVisible(),true);
+  await page.locator("#duel-restart").click();
+  assert.equal(await duel.getAttribute("data-state"),"idle");
+  assert.equal(await page.locator("#duel-best").innerText(),"0","timed best is separate from practice");
+  await page.locator('[data-duel-mode="practice"]').click();
+  assert.equal(await page.locator("#duel-best").innerText(),"1860","practice record retained");
+  assert.equal(await page.locator("#passport-count").innerText(),"7/7");
   const sound=page.locator("#sound-toggle");
   assert.equal(await sound.getAttribute("aria-pressed"),"false");
   await sound.click();
@@ -575,6 +620,10 @@ try {
     assert.equal(await offlineTab.locator("#candy-road [data-lane]").count(),5);
     assert.equal(await offlineTab.locator("#candy-best").innerText(),"9");
     assert.equal(await offlineTab.locator("#rune-board .rune-card").count(),12);
+    assert.equal(await offlineTab.locator("#duel-game [data-duel-lane]").count(),4);
+    await offlineTab.locator("#duel-start").click();
+    assert.equal(await offlineTab.locator("#duel-game").getAttribute("data-state"),"running");
+    await offlineTab.locator("#duel-restart").click();
     assert.equal(await offlineTab.locator("#rune-best").innerText(),"7");
     assert.equal(await offlineTab.evaluate(()=>localStorage.getItem("ravenhollow-runes-best-hard")),"8");
     assert.equal(await offlineTab.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
@@ -587,7 +636,7 @@ try {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,touch_hold_controls:true,first_person_walk:castleMode==='webgl',castle_interiors:'4/4',castle_indoor_collision:true,immersive_relic_riddle:true,secret_crown_chamber:true,quest_wayfinder:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,touch_hold_controls:true,first_person_walk:castleMode==='webgl',castle_interiors:'4/4',castle_indoor_collision:true,immersive_relic_riddle:true,secret_crown_chamber:true,quest_wayfinder:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,spell_rhythm_duel:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{console.error("SMOKE_CLEANUP_START");await browser?.close();console.error("SMOKE_BROWSER_CLOSED");server.closeAllConnections();await new Promise(resolve=>server.close(resolve));console.error("SMOKE_CLEANUP_DONE");}

@@ -1,6 +1,6 @@
-const CACHE_NAME = "ravenhollow-static-20261028-v20";
+const CACHE_NAME = "ravenhollow-static-20261028-v21";
 const ROOT = new URL("./", self.location.href);
-const CORE = ["./", "./index.html", "./style.css", "./magic.css", "./alchemy.css", "./expedition.css", "./castle-tour.css", "./pumpkin.css", "./candy.css", "./poster.css", "./runes.css", "./app.js", "./magic.js", "./alchemy.js", "./expedition.js", "./soundscape.js", "./candy.js", "./poster.js", "./runes.js", "./favicon.svg", "./icon-192.png", "./icon-512.png", "./manifest.webmanifest", "./assets/haunted-hero.jpg", "./assets/haunted-origins.jpg", "./assets/party-hero.webp", "./assets/party-location.webp"];
+const CORE = ["./", "./index.html", "./style.css", "./magic.css", "./alchemy.css", "./expedition.css", "./castle-tour.css", "./pumpkin.css", "./candy.css", "./poster.css", "./runes.css", "./spell-duel.css", "./app.js", "./magic.js", "./alchemy.js", "./expedition.js", "./soundscape.js", "./candy.js", "./poster.js", "./runes.js", "./spell-duel.js", "./favicon.svg", "./icon-192.png", "./icon-512.png", "./manifest.webmanifest", "./assets/haunted-hero.jpg", "./assets/haunted-origins.jpg", "./assets/party-hero.webp", "./assets/party-location.webp"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE.map(asset=>new URL(asset,ROOT).href))).then(()=>self.skipWaiting()));
 });

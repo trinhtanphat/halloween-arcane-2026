@@ -1,0 +1,63 @@
+/* Ghost Rhythm Spell Duel — original fantasy arcade presentation. */
+.duel-section{background:radial-gradient(ellipse at 75% 20%,#633b7d38,transparent 55%),radial-gradient(ellipse at 0 85%,#a2674240,transparent 40%),#131020;border-block:1px solid #c89f7966}
+.duel-layout{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:37px;align-items:center}
+.duel-arena{min-width:0;background:radial-gradient(ellipse at 48% 25%,#4c315e,#21182d 72%);border:1px solid #d3aa7799;box-shadow:inset 0 0 25px #e7c09516,0 25px 70px #0007;padding:15px;position:relative;overflow:hidden}
+.duel-arena::before{content:"";position:absolute;pointer-events:none;inset:7px;border:1px solid #b78fa93b}
+.duel-arena-head,.duel-arena-foot{display:flex;justify-content:space-between;gap:10px;font:700 9px/1.6 var(--sans);letter-spacing:.13em;color:#edc79a}
+.duel-arena-foot{margin-top:18px;color:#bdadc8}
+#duel-status{color:#d1bbff}
+.duel-ghost-stage{height:335px;max-height:40vw;min-height:275px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;margin-top:17px;background:radial-gradient(circle at 50% 22%,#795ba44d,transparent 49%)}
+.duel-sparkles{position:absolute;top:0;left:0;right:0;text-align:center;color:#eac485;font-size:27px;letter-spacing:35px;opacity:.7}
+.duel-sparkles span{color:#cfafea}
+.duel-ghost{margin-top:29px;position:relative;width:110px;height:116px;background:linear-gradient(160deg,#ecddf6 15%,#ad93d1 70%,#8774ab);border-radius:48% 48% 32% 32%;filter:drop-shadow(0 0 30px #c7a5ff65);box-shadow:inset 14px 5px 24px #ffffff80;transform:translateY(0);transition:filter .2s}
+.duel-ghost::after{content:"";position:absolute;bottom:-11px;left:0;right:0;height:29px;background:linear-gradient(135deg,#ae97d4,#e8dafa);clip-path:polygon(0 0,20% 45%,42% 0,65% 46%,85% 0,100% 42%,100% 0)}
+.duel-ghost-eyes{position:absolute;top:43px;left:25px;right:25px;display:flex;justify-content:space-between}
+.duel-ghost-eyes i{background:#231833;border-radius:50%;width:17px;height:22px;box-shadow:0 0 0 4px #fff8;transform:rotate(-9deg)}
+.duel-ghost-eyes i:last-child{transform:rotate(9deg)}
+.duel-ghost-mouth{position:absolute;top:73px;left:49px;width:13px;height:19px;background:#51345f;border-radius:45% 45% 55% 55%}
+.duel-ghost-bar{height:7px;width:160px;background:#3c2947;border:1px solid #a27daa;overflow:hidden;margin-top:24px;border-radius:8px}
+.duel-ghost-bar span{display:block;width:100%;height:100%;background:linear-gradient(90deg,#e5a56e,#dc84c0);transition:width .25s}
+.duel-target-rune{position:absolute;top:175px;left:50%;font:600 52px Georgia,serif;color:#f7dcaa;text-shadow:0 0 24px #e4b781;margin-left:-33px;width:66px;text-align:center;z-index:2}
+.duel-flight-track{position:absolute;left:15%;right:15%;bottom:3px;height:78px;border:1px solid #d4aa8459;border-radius:48% 48% 0 0;background:linear-gradient(0deg,#b88b6950,transparent)}
+.duel-comet{position:absolute;width:21px;height:21px;border-radius:50%;background:#fff2c9;left:calc(var(--duel-flight,0%));bottom:42px;box-shadow:0 0 12px #fff2b7,0 0 33px #be93fb;transform:translateX(-50%)}
+.duel-gate{position:absolute;bottom:10px;left:0;right:0;text-align:center;font:700 9px var(--sans);color:#e9b983;letter-spacing:.14em}
+.duel-pads{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.duel-pads button{min-width:0;min-height:104px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;color:#d9bced;border:1px solid #9475a06e;background:linear-gradient(170deg,#51375c,#2c2039);cursor:pointer;touch-action:manipulation}
+.duel-pads button span{font:600 clamp(27px,4vw,45px) Georgia,serif}
+.duel-pads button small{font:700 9px/1.4 var(--sans);letter-spacing:.04em;color:#debb9c}
+.duel-pads button.duel-target{background:linear-gradient(160deg,#82628f,#433053);border-color:#ffe0a4;box-shadow:0 0 20px #e4ad7070,inset 0 0 20px #f4d89e17}
+.duel-pads button:focus-visible,.duel-actions button:focus-visible,.duel-modes button:focus-visible,#duel-sound:focus-visible{outline:3px solid #fff0bc;outline-offset:3px}
+.duel-pads button:disabled{opacity:.5;cursor:not-allowed}
+.duel-panel{min-width:0}
+.duel-panel .tiny-rule{margin-bottom:13px}
+.duel-panel h3{font:600 clamp(25px,3vw,39px)/1.35 var(--serif);margin:0 0 17px}
+.duel-panel h3 em{font:400 1.25em "Great Vibes",cursive;color:var(--gold)}
+.duel-panel>p:not(.duel-feedback){color:#cbbdd2;font:13px/1.9 var(--sans);margin-bottom:18px}
+.duel-modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.duel-modes button{min-height:50px;padding:10px 6px;background:#392940;border:1px solid #b7937354;color:#e8d9e3;font:700 10px var(--sans)}
+.duel-modes button[aria-pressed=true]{background:#604567;border-color:#efc38e;color:#fff2d8}
+.duel-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:17px 0}
+.duel-stats>div{text-align:center;padding:12px 5px;border:1px solid #d2aa7449;background:#2a2036;display:flex;flex-direction:column;gap:8px}
+.duel-stats small{font:700 9px var(--sans);letter-spacing:.1em;color:#dcbb8f}
+.duel-stats strong{font:600 29px var(--serif)}
+.duel-health-line,.duel-round{display:flex;justify-content:space-between;gap:12px;align-items:center;color:#dcb989;font:700 10px/1.5 var(--sans);letter-spacing:.04em;margin:13px 0}
+.duel-health-line strong{color:#e8a4a1;letter-spacing:4px;font-size:19px}
+.duel-round{color:#c5b0d7}
+.duel-feedback{font:12px/1.7 var(--sans);min-height:44px;color:#f8d6ab;margin:13px 0}
+.duel-result{background:#4c513b55;border:1px solid #a5d7a86f;padding:13px;margin-bottom:12px}
+.duel-result[hidden]{display:none}
+.duel-result strong{font:600 14px var(--serif);color:#dff5b5}
+.duel-result p{font:12px/1.7 var(--sans);color:#eddfca;margin:5px 0 0}
+.duel-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.duel-actions button{min-height:46px;padding:10px 6px;font:700 10px/1.4 var(--sans);background:#3d2e49;border:1px solid #ddba8a6c;color:#fff0d7}
+.duel-actions #duel-start{grid-column:1/-1;background:#dfb879;color:#241b32;border-color:#f1ce98}
+.duel-actions button:disabled{opacity:.48;cursor:not-allowed}
+#duel-sound{min-height:40px;padding:8px 15px;margin:13px 0 9px;background:#34283f;border:1px solid #b995836c;color:#dcd0df;font:700 10px var(--sans)}
+.duel-note{font:9px/1.7 var(--sans);color:#ad9bae;display:block}
+#duel-game.duel-hit .duel-ghost{filter:drop-shadow(0 0 30px #f1cd8e);transform:rotate(4deg)}
+#duel-game.duel-miss .duel-ghost{filter:drop-shadow(0 0 18px #d96d94);transform:rotate(-5deg)}
+#duel-game[data-result=won] .duel-ghost{opacity:.32;filter:blur(3px)}
+@media(max-width:970px){.duel-layout{grid-template-columns:1fr;gap:32px}.duel-arena{max-width:660px;width:100%;margin-inline:auto}.duel-panel{max-width:660px;width:100%;margin:auto}.duel-ghost-stage{max-height:none;height:320px}}
+@media(max-width:530px){.duel-arena{padding:10px}.duel-ghost-stage{height:265px;min-height:265px}.duel-ghost{transform:scale(.82);transform-origin:center top;margin-top:15px}.duel-ghost-bar{margin-top:5px}.duel-target-rune{top:153px;font-size:45px}.duel-pads{gap:5px}.duel-pads button{min-height:77px;gap:4px}.duel-pads button span{font-size:30px}.duel-pads button small{font-size:7px}.duel-arena-head,.duel-arena-foot{font-size:8px}.duel-stats strong{font-size:25px}.duel-panel h3{font-size:30px}}
+@media(prefers-reduced-motion:reduce){.duel-ghost,.duel-ghost-bar span{transition:none!important}}
+.effects-off .duel-ghost,.effects-off .duel-ghost-bar span{transition:none!important}

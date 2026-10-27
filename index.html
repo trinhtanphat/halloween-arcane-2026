@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="./candy.css" />
   <link rel="stylesheet" href="./poster.css" />
   <link rel="stylesheet" href="./runes.css" />
+  <link rel="stylesheet" href="./spell-duel.css" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <script defer type="module" src="./app.js"></script>
   <script defer type="module" src="./magic.js"></script>
@@ -38,6 +39,7 @@
   <script defer type="module" src="./candy.js"></script>
   <script defer type="module" src="./poster.js"></script>
   <script defer type="module" src="./runes.js"></script>
+  <script defer type="module" src="./spell-duel.js"></script>
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -53,7 +55,7 @@
       </a>
       <button class="menu-toggle" id="menu-toggle" aria-label="Mở menu" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
       <nav id="nav-links" aria-label="Điều hướng chính">
-        <a href="#about">Truyền thuyết</a><a href="#realms">Thế giới</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#expedition">Lâu đài</a><a href="#candy-hunt">Săn kẹo</a><a href="#rune-memory">Ghép cặp</a><a href="#alchemy">Pha chế</a><a href="#schedule">Đêm hội</a><a href="#poster-studio">Tạo thiệp</a>
+        <a href="#about">Truyền thuyết</a><a href="#realms">Thế giới</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#expedition">Lâu đài</a><a href="#candy-hunt">Săn kẹo</a><a href="#rune-memory">Ghép cặp</a><a href="#spell-duel">Đấu nhịp</a><a href="#alchemy">Pha chế</a><a href="#schedule">Đêm hội</a><a href="#poster-studio">Tạo thiệp</a>
       </nav>
       <a href="#invitation" class="nav-cta"><span>Nhận thư mời</span><span aria-hidden="true">↗</span></a>
     </div>
@@ -409,6 +411,62 @@
             <div class="rune-victory" id="rune-victory" hidden><span>✶</span><div><strong>MEMORY KEEPER · HOÀN THÀNH</strong><p id="rune-win-message">Bạn đã giải mã toàn bộ cổ ngữ!</p></div></div>
             <button type="button" class="btn btn-outline" id="rune-restart">↺ XÁO BÀI & CHƠI LẠI</button>
             <small class="rune-note">HỖ TRỢ ENTER / SPACE / TAB · CHƠI OFFLINE · LƯU KỶ LỤC TRÊN THIẾT BỊ</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section duel-section" id="spell-duel" aria-labelledby="duel-title">
+      <div class="shell">
+        <div class="section-heading center">
+          <span class="kicker">✦ THE GHOST RHYTHM ARENA ✦</span>
+          <h2 id="duel-title">ĐẤU TRƯỜNG <em>NHỊP PHÉP</em></h2>
+          <p>Một hồn ma nghịch ngợm thách đấu bốn ấn chú. Chạm hoặc bấm các phím 1–4 đúng nhịp, duy trì combo và giải phong ấn! Không cần tài khoản và không ảnh hưởng huy hiệu 7/7.</p>
+        </div>
+        <div class="duel-layout" id="duel-game" data-state="idle" data-mode="practice">
+          <div class="duel-arena" aria-label="Sân đấu phép thuật gồm bốn làn phản xạ">
+            <div class="duel-arena-head"><span>✧ RAVENHOLLOW SPELL STAGE</span><span id="duel-status" role="status">SẴN SÀNG</span></div>
+            <div class="duel-ghost-stage">
+              <div class="duel-sparkles" aria-hidden="true">✧ <span>✦</span> ✧</div>
+              <div class="duel-ghost" aria-hidden="true"><span class="duel-ghost-eyes"><i></i><i></i></span><span class="duel-ghost-mouth"></span></div>
+              <div class="duel-ghost-bar"><span id="duel-ghost-health" role="progressbar" aria-label="Sức mạnh hồn ma còn lại" aria-valuemin="0" aria-valuemax="16" aria-valuenow="16"></span></div>
+              <div class="duel-target-rune" id="duel-relic" aria-hidden="true">✦</div>
+              <div class="duel-flight-track" aria-hidden="true"><span class="duel-comet"></span><span class="duel-gate">✧ CỔNG PHÉP ✧</span></div>
+            </div>
+            <div class="duel-pads" role="group" aria-label="Bốn ấn chú để đấu nhịp">
+              <button type="button" data-duel-lane="0" aria-label="Ấn chú số 1: Trăng" disabled><span>☾</span><small>1 · TRĂNG</small></button>
+              <button type="button" data-duel-lane="1" aria-label="Ấn chú số 2: Sao" disabled><span>✦</span><small>2 · SAO</small></button>
+              <button type="button" data-duel-lane="2" aria-label="Ấn chú số 3: Pha lê" disabled><span>❖</span><small>3 · PHA LÊ</small></button>
+              <button type="button" data-duel-lane="3" aria-label="Ấn chú số 4: Pháp trận" disabled><span>✶</span><small>4 · PHÁP TRẬN</small></button>
+            </div>
+            <div class="duel-arena-foot"><span>1–4 · CHẠM ẤN CHÚ</span><span>DUEL • COMBO • MAGIC</span></div>
+          </div>
+          <div class="duel-panel">
+            <div class="tiny-rule">BONUS CHAPTER — THE RHYTHM SPELL DUEL</div>
+            <h3>Đấu với <em>hồn ma nhí.</em></h3>
+            <p>Chọn <strong>Luyện tập</strong> để học bốn ấn chú không giới hạn thời gian, hoặc <strong>Đấu nhịp</strong> để phản xạ khi phép bay tới cổng. Bấm đúng liên tiếp để tăng combo!</p>
+            <div class="duel-modes" role="group" aria-label="Chọn chế độ đấu trường">
+              <button type="button" data-duel-mode="practice" aria-pressed="true">✧ LUYỆN TẬP</button>
+              <button type="button" data-duel-mode="duel" aria-pressed="false">✶ ĐẤU NHỊP</button>
+            </div>
+            <div class="duel-stats">
+              <div><small>ĐIỂM</small><strong id="duel-score">0</strong></div>
+              <div><small>COMBO</small><strong id="duel-combo">0</strong></div>
+              <div><small>KỶ LỤC</small><strong id="duel-best">0</strong></div>
+            </div>
+            <div class="duel-health-line"><span>SỨC MẠNH PHÁP SƯ</span><strong id="duel-health" aria-label="Năm lượt sinh lực">❤❤❤❤❤</strong></div>
+            <div class="duel-round"><span id="duel-mode-note">LUYỆN TẬP · 12 ẤN CHÚ</span><strong id="duel-progress">0/0</strong></div>
+            <p class="duel-feedback" id="duel-feedback" role="status" aria-live="polite">✦ Chọn chế độ và bắt đầu!</p>
+            <div class="duel-result" id="duel-result" hidden>
+              <strong id="duel-result-title">✦ KẾT THÚC!</strong><p id="duel-result-text"></p>
+            </div>
+            <div class="duel-actions">
+              <button type="button" id="duel-start" class="btn btn-primary">✦ BẮT ĐẦU ĐẤU PHÉP</button>
+              <button type="button" id="duel-pause" disabled>Ⅱ TẠM DỪNG</button>
+              <button type="button" id="duel-restart">↺ CHƠI LẠI</button>
+            </div>
+            <button type="button" id="duel-sound" aria-pressed="false">♫ ÂM PHÉP: TẮT</button>
+            <small class="duel-note">ÂM THANH TỔNG HỢP GỐC · TẮT ÂM MẶC ĐỊNH · HỖ TRỢ 1–4, CẢM ỨNG, GIẢM CHUYỂN ĐỘNG · KỶ LỤC LƯU TRÊN THIẾT BỊ</small>
           </div>
         </div>
       </div>
