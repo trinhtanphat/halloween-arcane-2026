@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="./expedition.css" />
   <link rel="stylesheet" href="./pumpkin.css" />
   <link rel="stylesheet" href="./candy.css" />
+  <link rel="stylesheet" href="./poster.css" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <script defer type="module" src="./app.js"></script>
   <script defer type="module" src="./magic.js"></script>
@@ -33,6 +34,7 @@
   <script defer type="module" src="./expedition.js"></script>
   <script defer type="module" src="./soundscape.js"></script>
   <script defer type="module" src="./candy.js"></script>
+  <script defer type="module" src="./poster.js"></script>
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -48,7 +50,7 @@
       </a>
       <button class="menu-toggle" id="menu-toggle" aria-label="Mở menu" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
       <nav id="nav-links" aria-label="Điều hướng chính">
-        <a href="#about">Truyền thuyết</a><a href="#realms">Khám phá</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#expedition">Khám phá</a><a href="#candy-hunt">Săn kẹo</a><a href="#alchemy">Pha chế</a><a href="#schedule">Đêm hội</a>
+        <a href="#about">Truyền thuyết</a><a href="#realms">Thế giới</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#expedition">Lâu đài</a><a href="#candy-hunt">Săn kẹo</a><a href="#alchemy">Pha chế</a><a href="#schedule">Đêm hội</a><a href="#poster-studio">Tạo thiệp</a>
       </nav>
       <a href="#invitation" class="nav-cta"><span>Nhận thư mời</span><span aria-hidden="true">↗</span></a>
     </div>
@@ -328,6 +330,45 @@
     </section>
 
     <section class="section schedule-section shell" id="schedule"><div class="section-heading center"><span class="kicker">☾ MARK YOUR CALENDAR ☾</span><h2>THE NIGHT OF <em>WONDERS</em></h2><p>Lịch trình tưởng tượng trong trải nghiệm web Halloween ngày 31/10/2026. Không phải sự kiện bán vé ngoài đời thực.</p></div><div class="event-header"><div><span>ONE NIGHT ONLY</span><strong>31 <small>OCT</small> 2026</strong></div><div><span>ĐÊM PHÉP THUẬT</span><strong>RAVENHOLLOW ACADEMY</strong></div><div><span>ONLINE EXPERIENCE</span><strong>OPEN ALL NIGHT</strong></div></div><div class="timeline"><div class="timeline-item"><time>18:00</time><span class="tl-marker">✦</span><div><h3>THE GATES OPEN</h3><p>Cổng học viện đón những pháp sư đầu tiên.</p></div><b>01</b></div><div class="timeline-item"><time>19:30</time><span class="tl-marker">☽</span><div><h3>THE HAUNTED MASQUERADE</h3><p>Dạ tiệc hóa trang dưới ánh trăng tím.</p></div><b>02</b></div><div class="timeline-item"><time>21:00</time><span class="tl-marker">✧</span><div><h3>THE ARCANE TRIALS</h3><p>Giải mã những mật thư và câu đố phép thuật.</p></div><b>03</b></div><div class="timeline-item"><time>00:00</time><span class="tl-marker">✶</span><div><h3>THE MIDNIGHT AWAKENING</h3><p>Khoảnh khắc huyền bí nhất của đêm Halloween.</p></div><b>04</b></div></div></section>
+
+
+    <section class="section poster-section" id="poster-studio" aria-labelledby="poster-title">
+      <div class="shell">
+        <div class="section-heading center">
+          <span class="kicker">✦ THE ARCANE INVITATION ATELIER ✦</span>
+          <h2 id="poster-title">XƯỞNG THIỆP <em>PHÉP THUẬT</em></h2>
+          <p>Tạo thiệp mời Halloween mang tên bạn, chọn phong cách huyền bí và lưu ảnh PNG sắc nét để chia sẻ. Mọi thao tác đều thực hiện ngay trên thiết bị.</p>
+        </div>
+        <div class="poster-layout">
+          <div class="poster-preview-wrap">
+            <div class="poster-preview-top"><span>✧ INSTANT PREVIEW</span><span>900 × 1200 PX</span></div>
+            <canvas id="poster-canvas" width="900" height="1200" role="img" aria-label="Bản xem trước thiệp Halloween cá nhân hóa theo bí danh và phong cách đã chọn">Trình duyệt của bạn không hỗ trợ xem trước thiệp bằng Canvas.</canvas>
+            <div class="poster-preview-bottom">A PERSONAL INVITATION • HALLOWEEN 2026</div>
+          </div>
+          <div class="poster-editor">
+            <div class="tiny-rule">CHAPTER XI — AN ENCHANTED LETTER</div>
+            <h3>Một lời mời <em>chỉ dành cho bạn.</em></h3>
+            <p>Thiệp phong cách Ravenhollow được vẽ bằng đồ họa vector, không sử dụng ảnh bên ngoài. Bạn có thể lưu về thiết bị và chia sẻ bằng ứng dụng yêu thích.</p>
+            <label class="poster-field-label" for="poster-name">01 / BÍ DANH TRÊN THIỆP</label>
+            <input id="poster-name" class="poster-name" type="text" maxlength="32" autocomplete="nickname" placeholder="Nhập tên pháp sư..." value="WIZARD OF RAVENHOLLOW" aria-describedby="poster-name-help"/>
+            <small id="poster-name-help" class="poster-field-help">2–32 ký tự. Tên được đồng bộ với thư mời trong trình duyệt này.</small>
+            <div class="poster-field-label" id="poster-theme-title">02 / CHỌN PHONG CÁCH</div>
+            <div class="poster-themes" role="group" aria-labelledby="poster-theme-title">
+              <button type="button" data-poster-theme="moon" aria-pressed="true"><span class="poster-swatch moon"></span><strong>TRĂNG TÍM</strong><small>MOONLIT</small></button>
+              <button type="button" data-poster-theme="ember" aria-pressed="false"><span class="poster-swatch ember"></span><strong>LỬA BÍ NGÔ</strong><small>EMBER</small></button>
+              <button type="button" data-poster-theme="forest" aria-pressed="false"><span class="poster-swatch forest"></span><strong>RỪNG BÍ ẨN</strong><small>ENCHANTED</small></button>
+            </div>
+            <div class="poster-note"><span>☾</span><p><strong>31 THÁNG 10, 2026 · 18:00 GMT+7</strong><span>Trải nghiệm Halloween trực tuyến, không phải vé tham gia sự kiện ngoài đời thực.</span></p></div>
+            <div class="poster-actions">
+              <button type="button" class="btn btn-primary" id="poster-download"><span>✦</span> TẢI THIỆP PNG <span>↓</span></button>
+              <button type="button" class="btn btn-outline" id="poster-copy">SAO CHÉP LỜI MỜI ↗</button>
+            </div>
+            <p class="poster-status" id="poster-status" role="status" aria-live="polite">Thiệp sẵn sàng để lưu. Chọn một phong cách hoặc đổi bí danh!</p>
+            <small class="poster-privacy">HOÀN TOÀN MIỄN PHÍ · KHÔNG TẢI TÊN/ẢNH LÊN MÁY CHỦ · DÙNG ĐƯỢC OFFLINE</small>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="invitation-section shell" id="invitation"><div class="invitation-card"><div class="invitation-seal">✦ <span>R</span> ✦</div><span class="kicker">A LETTER FROM RAVENHOLLOW</span><h2>THƯ MỜI ĐANG<br><em>CHỜ BẠN.</em></h2><p>Để lại bí danh phù thủy của bạn để nhận thư mời ngay trong trải nghiệm này. Dữ liệu chỉ được lưu trong trình duyệt của bạn.</p><form id="invitation-form" class="invitation-form"><label for="wizard-name" class="sr-only">Bí danh phù thủy</label><input id="wizard-name" name="wizard-name" type="text" maxlength="32" autocomplete="nickname" placeholder="Bí danh phù thủy của bạn..." required /><button type="submit">NHẬN THƯ MỜI ✦</button></form><p id="invitation-response" class="invitation-response" aria-live="polite"></p><small>DEMO ONLY · KHÔNG GỬI EMAIL · KHÔNG THU THẬP DỮ LIỆU MÁY CHỦ</small></div></section>
   </main>

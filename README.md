@@ -101,3 +101,16 @@ Graphics acceleration is browser/device-specific; passing headless Chromium WebG
 - **QA:** Browser tests cover ghost collision, ArrowLeft/Space input, ten-turn victory, 6/6 badge, high-score replay, 20 static resources, offline reload and regressions.
 
 The game is original, fictional and browser-only; no login, purchases or analytics.
+
+## Halloween Invitation Atelier — personalized PNG cards
+
+- **Three original invitation themes:** Moonlit Purple, Pumpkin Ember, Enchanted Forest.
+- **Client-side vector artwork:** A canvas renders a detailed 900×1200 card containing the Ravenhollow castle, moon, magical framing, pumpkins, event date and visitor nickname; no images are fetched by the renderer.
+- **PNG export:** Download your own invitation as a 900×1200 PNG with a sanitized filename; the app verifies the nickname is at least two characters before downloading.
+- **Name synchronization:** The original invitation input and poster designer share the same browser-local nickname. The selected palette is saved to localStorage.
+- **Sharing:** Copy a human-readable invitation and link using Clipboard API where browser permissions allow.
+- **No signups or hosting costs:** Drawing, preview and exporting are entirely on the user's device, with no backend upload, telemetry, accounts or ticket sales.
+- **Offline PWA v8:** Pre-caches poster.js and poster.css alongside the existing site.
+- **Automated QA:** Verify each design palette changes pixels, nickname synchronization, invalid input, actual downloadable PNG magic bytes and dimensions, offline preview, all previous minigames and 320–1440px responsive views.
+
+The virtual Halloween date is 31 October 2026, 18:00 in GMT+7; the website is a fictional online experience, not a real-world ticketed gathering.

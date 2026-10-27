@@ -1,0 +1,36 @@
+/* Ravenhollow Invitation Atelier — original vector PNG card designer */
+.poster-section{background:radial-gradient(ellipse at 85% 25%,#53326249,transparent 66%),#100c19;border-block:1px solid #dfb37252}
+.poster-layout{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:56px;align-items:center}
+.poster-preview-wrap{width:min(100%,520px);justify-self:center;border:1px solid #dfba8a75;background:linear-gradient(125deg,#261a32,#120d21);padding:16px;box-shadow:0 30px 80px #0400089c}
+.poster-preview-top,.poster-preview-bottom{font-size:9px;letter-spacing:.17em;color:#d8b982;text-align:center}
+.poster-preview-top{display:flex;justify-content:space-between;gap:14px;margin-bottom:15px}.poster-preview-bottom{margin-top:14px}
+#poster-canvas{display:block;width:100%;height:auto;aspect-ratio:3/4;box-shadow:0 0 40px #080312d7;background:#24152f}
+.poster-editor>.tiny-rule{margin-bottom:15px}
+.poster-editor h3{font:600 clamp(26px,3vw,40px)/1.35 var(--serif);margin:0 0 12px}
+.poster-editor h3 em{font:400 1.24em "Great Vibes",cursive;color:var(--gold)}
+.poster-editor>p:not(.poster-status){font:13px/1.9 var(--sans);color:#c8b5d1;margin:0 0 24px}
+.poster-field-label{display:block;margin:20px 0 10px;color:var(--gold);letter-spacing:.14em;font:600 10px var(--sans)}
+.poster-name{width:100%;max-width:100%;padding:16px 17px;min-height:50px;background:#31253c;color:var(--cream);border:1px solid #d3aa6e6e;border-radius:0;outline-offset:3px;font:600 15px var(--sans)}
+.poster-name:focus{border-color:#ffe0ab}
+.poster-field-help{display:block;font:11px/1.7 var(--sans);color:#b7a6bd;margin-top:9px}
+.poster-themes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:22px}
+.poster-themes button{border:1px solid #d6aa7855;background:#24182f;color:var(--cream);padding:13px 6px;display:flex;align-items:center;flex-direction:column;gap:7px;min-width:0;min-height:106px}
+.poster-themes button[aria-pressed="true"]{border-color:var(--gold);background:#463250;box-shadow:inset 0 0 19px #d8ae6830}
+.poster-themes button:hover{border-color:#f8c88b}
+.poster-themes strong{font:600 10px var(--sans);letter-spacing:.02em}
+.poster-themes small{font-size:9px;letter-spacing:.1em;color:#c2afc9}
+.poster-swatch{display:block;width:30px;height:30px;border-radius:50%;border:2px solid #fff6;box-shadow:0 0 20px #ce9c9461}
+.poster-swatch.moon{background:linear-gradient(130deg,#c39eff,#251254)}
+.poster-swatch.ember{background:linear-gradient(130deg,#ffe09a,#8d2c13)}
+.poster-swatch.forest{background:linear-gradient(130deg,#a5eec5,#103d35)}
+.poster-note{display:flex;align-items:center;gap:13px;border:1px solid #d5a66f55;padding:14px;background:#372a3c78}
+.poster-note>span{font:33px var(--serif);color:var(--gold)}
+.poster-note p{margin:0;display:flex;flex-direction:column;gap:6px}
+.poster-note strong{font:600 11px var(--sans);color:#f2d2a2}
+.poster-note p span{font:10px/1.7 var(--sans);color:#bfb0c8}
+.poster-actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:25px}
+.poster-actions .btn{font-size:10px;min-height:48px}
+.poster-status{font:12px/1.8 var(--sans);color:#ebcda0;min-height:25px;margin:16px 0}
+.poster-privacy{display:block;font-size:9px;letter-spacing:.08em;line-height:1.7;color:#a79aaa}
+@media(max-width:950px){.poster-layout{grid-template-columns:1fr;gap:35px}.poster-editor{width:min(100%,650px);margin:auto}.poster-preview-wrap{width:min(100%,480px)}}
+@media(max-width:550px){.poster-preview-wrap{padding:10px}.poster-preview-top,.poster-preview-bottom{font-size:8px}.poster-editor h3{font-size:27px}.poster-themes{gap:6px}.poster-themes strong{font-size:9px}.poster-actions{display:grid;grid-template-columns:1fr}.poster-actions .btn{width:100%}}

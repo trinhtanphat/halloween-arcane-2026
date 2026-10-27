@@ -36,7 +36,7 @@ try {
   assert.match(await page.locator("#hero-title").innerText(),/MAGIC/);
   assert.equal(await page.locator(".realm-card").count(),3);
   assert.equal(await page.locator(".timeline-item").count(),4);
-  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css","expedition.js","expedition.css","pumpkin.css","soundscape.js","candy.js","candy.css"];
+  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css","expedition.js","expedition.css","pumpkin.css","soundscape.js","candy.js","candy.css","poster.js","poster.css"];
   for(const asset of assets){
     const response=await page.request.get(base+"/"+asset);
     assert.equal(response.status(),200,"asset missing: "+asset);
@@ -48,6 +48,37 @@ try {
   await page.locator("#invitation-response").waitFor();
   assert.match(await page.locator("#invitation-response").innerText(),/Merlin Demo/);
   assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-wizard")),"Merlin Demo");
+  // The original invitation and the shareable 900x1200 poster stay in sync.
+  assert.equal(await page.locator("#poster-name").inputValue(),"Merlin Demo");
+  assert.equal(await page.locator("[data-poster-theme]").count(),3);
+  const canvasDimensions=await page.locator("#poster-canvas").evaluate(canvas=>({width:canvas.width,height:canvas.height,loaded:!!canvas.getContext("2d")}));
+  assert.deepEqual(canvasDimensions,{width:900,height:1200,loaded:true});
+  const samplePixel=()=>page.locator("#poster-canvas").evaluate(canvas=>[...canvas.getContext("2d").getImageData(80,180,1,1).data]);
+  const initialColor=await samplePixel();
+  await page.locator('[data-poster-theme="ember"]').click();
+  assert.equal(await page.locator('[data-poster-theme="ember"]').getAttribute("aria-pressed"),"true");
+  assert.notDeepEqual(await samplePixel(),initialColor,"switching poster themes must redraw the canvas");
+  await page.locator('[data-poster-theme="forest"]').click();
+  assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-poster-theme")),"forest");
+  await page.locator("#poster-name").fill("Luna Pháp Sư");
+  assert.equal(await page.locator("#wizard-name").inputValue(),"Luna Pháp Sư");
+  assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-wizard")),"Luna Pháp Sư");
+  // Invalid short names must not trigger a PNG download.
+  await page.locator("#poster-name").fill("X");
+  await page.locator("#poster-download").click();
+  assert.match(await page.locator("#poster-status").innerText(),/tối thiểu 2 ký tự/);
+  await page.locator("#poster-name").fill("Luna Pháp Sư");
+  const downloadPromise=page.waitForEvent("download",{timeout:20000});
+  await page.locator("#poster-download").click();
+  const png=await downloadPromise;
+  assert.match(png.suggestedFilename(),/ravenhollow-halloween-2026-.*\.png$/);
+  const bytes=await readFile(await png.path());
+  assert.deepEqual([...bytes.subarray(0,8)],[137,80,78,71,13,10,26,10],"PNG header");
+  assert.ok(bytes.byteLength>25000,"PNG should contain a complete illustration");
+  const pngSize={width:bytes.readUInt32BE(16),height:bytes.readUInt32BE(20)};
+  assert.deepEqual(pngSize,{width:900,height:1200},"Exported PNG resolution");
+  assert.match(await page.locator("#poster-status").innerText(),/Đã tạo thiệp PNG/);
+
   assert.equal(await page.locator("#order-options button").count(),4);
   for (let i=0;i<3;i++) {
     await page.locator("#order-options button").first().click();
@@ -250,13 +281,15 @@ try {
     assert.equal(await offlineTab.locator("#passport-count").innerText(),"6/6");
     assert.equal(await offlineTab.locator("#candy-road [data-lane]").count(),5);
     assert.equal(await offlineTab.locator("#candy-best").innerText(),"9");
+    assert.equal(await offlineTab.locator("#poster-canvas").evaluate(canvas=>canvas.width),900);
+    assert.equal(await offlineTab.locator("#poster-name").inputValue(),"Luna Pháp Sư");
     assert.equal(await offlineTab.locator("[data-room]").count(),4);
     assert.equal(await offlineTab.locator("#expedition-final").isVisible(),true);
   } finally {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,candy_hunt:true,passport:"6/6",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",passport:"6/6",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
