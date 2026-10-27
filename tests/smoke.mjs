@@ -36,7 +36,7 @@ try {
   assert.match(await page.locator("#hero-title").innerText(),/MAGIC/);
   assert.equal(await page.locator(".realm-card").count(),3);
   assert.equal(await page.locator(".timeline-item").count(),4);
-  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css"];
+  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css","expedition.js","expedition.css"];
   for(const asset of assets){
     const response=await page.request.get(base+"/"+asset);
     assert.equal(response.status(),200,"asset missing: "+asset);
@@ -94,12 +94,29 @@ try {
     if(i<potionRecipes.length-1) await page.locator("#potion-next").click();
   }
   assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-potion-finished")),"1");
-  assert.equal(await page.locator("#passport-count").innerText(),"4/4");
+  assert.equal(await page.locator("#passport-count").innerText(),"4/5");
   assert.equal(await page.locator(".passport-stamp.unlocked").count(),4);
+  assert.equal(await page.locator("#vault-open").isDisabled(),true);
+  await page.locator('[data-room="hall"]').click();
+  await page.locator('#expedition-answers [data-answer="0"]').click();
+  assert.match(await page.locator("#expedition-feedback").innerText(),/Chưa đúng/);
+  const riddles = [["hall",1],["library",0],["tower",2],["crypt",0]];
+  for(const [room,correct] of riddles) {
+    await page.locator('[data-room="'+room+'"]').click();
+    await page.locator('#expedition-answers [data-answer="'+correct+'"]').click();
+    assert.equal(await page.locator("#expedition-relic").isVisible(),true);
+    assert.equal(await page.locator('[data-room="'+room+'"] .room-check').innerText(),"✓");
+  }
+  assert.equal(await page.locator("#vault-open").isEnabled(),true);
+  await page.locator("#vault-open").click();
+  assert.equal(await page.locator("#expedition-final").isVisible(),true);
+  assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-vault-finished")),"1");
+  assert.equal(await page.locator("#passport-count").innerText(),"5/5");
+  assert.equal(await page.locator(".passport-stamp.unlocked").count(),5);
   assert.match(await page.locator("#passport-status").innerText(),/ĐẠI PHÁP SƯ/);
   await page.locator("#potion-next").click();
   assert.match(await page.locator("#potion-step").innerText(),/01 \/ 03/);
-  assert.equal(await page.locator("#passport-count").innerText(),"4/4");
+  assert.equal(await page.locator("#passport-count").innerText(),"5/5");
   assert.equal((JSON.parse(await page.evaluate(()=>localStorage.getItem("ravenhollow-spells")))).length,4);
   const scene = await page.locator("#pumpkin-canvas").evaluate(e=>{
     const style=getComputedStyle(e);
@@ -153,12 +170,14 @@ try {
     assert.match(await offlineTab.locator("#hero-title").innerText(),/MAGIC/);
     assert.equal(await offlineTab.locator(".order-emblem").count(),4);
     assert.equal(await offlineTab.locator("[data-ingredient]").count(),6);
-    assert.equal(await offlineTab.locator("#passport-count").innerText(),"4/4");
+    assert.equal(await offlineTab.locator("#passport-count").innerText(),"5/5");
+    assert.equal(await offlineTab.locator("[data-room]").count(),4);
+    assert.equal(await offlineTab.locator("#expedition-final").isVisible(),true);
   } finally {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,arcane_orders:true,spellbook:true,potions:true,passport:"4/4",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,passport:"5/5",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

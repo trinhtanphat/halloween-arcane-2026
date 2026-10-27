@@ -1,0 +1,67 @@
+
+/* Castle Expedition: 4 explorable rooms, locally stored relic hunt */
+.expedition-section{background:radial-gradient(ellipse at 50% 40%,#261932,#100c17 75%);border-block:1px solid rgba(233,184,104,.16)}
+.expedition-shell{display:grid;grid-template-columns:minmax(285px,.76fr) minmax(0,1.24fr);gap:22px;align-items:start}
+.expedition-sidebar,.expedition-main{border:1px solid rgba(232,185,107,.3);background:#1a1227;overflow:hidden}
+.expedition-sidebar{padding:22px}.expedition-caption{display:flex;justify-content:space-between;align-items:center;color:var(--gold);letter-spacing:.19em;font-size:10px;margin-bottom:18px}.expedition-caption span{font-size:20px}
+.expedition-map{display:grid;gap:10px}
+.expedition-room{min-height:84px;width:100%;text-align:left;padding:11px 10px;display:flex;gap:13px;align-items:center;background:#2b2035;color:var(--cream);border:1px solid #bb965b38;transition:background .2s,border-color .2s}
+.expedition-room:hover,.expedition-room.active{background:#44304c;border-color:var(--gold)}
+.expedition-room .room-icon{font:38px var(--serif);min-width:45px;text-align:center;color:#e6b779;text-shadow:0 0 19px #dea16c48}
+.expedition-room>span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.expedition-room strong{font:600 10px var(--serif);line-height:1.5;letter-spacing:.04em}
+.expedition-room small{font-size:9px;letter-spacing:.1em;color:#b9a7be}
+.room-check{color:#b89a68;font-size:17px;font-weight:400}
+.expedition-room.found .room-check{color:#b5e5b1}
+.expedition-vault{border:1px solid #b999633b;background:linear-gradient(130deg,#362440,#22182f);margin-top:20px;padding:17px 12px;display:grid;grid-template-columns:45px 1fr;gap:8px;align-items:center}
+.vault-sigil{font:43px var(--serif);color:var(--gold);text-shadow:0 0 24px #ecc17d}
+.expedition-vault>span:nth-child(2){display:flex;flex-direction:column;gap:9px;min-width:0}
+.expedition-vault strong{font:600 10px var(--serif);color:var(--gold)}
+.expedition-vault small{font-size:9px;color:#c8b7ce;line-height:1.5}
+.expedition-vault button{grid-column:1/-1;min-height:34px;border:1px solid #d1a46683;background:#7e684428;color:var(--gold);font-size:10px;letter-spacing:.09em}
+.expedition-vault button:not(:disabled){background:#e8b976;color:#201326;font-weight:700}
+.expedition-vault button:disabled{opacity:.55;cursor:not-allowed}
+.expedition-progress-label{margin:22px 0 10px;letter-spacing:.12em;font-size:9px;color:#d8c2d9}
+.expedition-progress{height:4px;background:#58415d}.expedition-progress>div{width:0;height:100%;background:linear-gradient(90deg,#8e6ec6,#e5bd71);transition:width .25s}
+.expedition-scene{position:relative;min-height:307px;overflow:hidden;isolation:isolate;background-color:#1c1524;background-position:center;background-size:cover}
+.expedition-scene[data-room-scene=hall]{background-image:linear-gradient(0deg,#110c1be9,transparent 83%),linear-gradient(135deg,#38244283,#1316298a),url('./assets/party-location.webp')}
+.expedition-scene[data-room-scene=library]{background-image:linear-gradient(0deg,#110c1be9,transparent 83%),linear-gradient(135deg,#693d267d,#1d163575),url('./assets/haunted-origins.jpg')}
+.expedition-scene[data-room-scene=tower]{background-image:linear-gradient(0deg,#110c1be9,transparent 83%),linear-gradient(135deg,#34407a77,#27144199),url('./assets/party-hero.webp')}
+.expedition-scene[data-room-scene=crypt]{background-image:linear-gradient(0deg,#110c1be9,transparent 83%),linear-gradient(135deg,#1a354280,#151221a8),url('./assets/haunted-hero.jpg')}
+.expedition-scene-glow{position:absolute;top:10%;left:50%;width:290px;height:290px;border:1px solid #e9c48740;border-radius:50%;transform:translateX(-50%);box-shadow:0 0 70px #a477bc55,inset 0 0 50px #d9ad6d17}
+.expedition-scene-glow:before{content:"";position:absolute;inset:27px;border:1px dashed #efc59049;border-radius:50%;animation:expedition-spin 32s linear infinite}
+.expedition-scene-stars{position:absolute;inset:12px 30px auto;display:flex;justify-content:space-between;letter-spacing:2em;font-size:19px;color:#f7deb3;text-shadow:0 0 15px #ffca7d}
+.expedition-scene-emblem{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);font:130px var(--serif);color:#f1c887;text-shadow:0 0 40px #e9b871b5,0 0 82px #9a70e66b;filter:drop-shadow(0 14px 20px #120a15);animation:expedition-float 4.6s ease-in-out infinite}
+.expedition-scene-title{position:absolute;inset:auto 20px 22px;text-align:center;display:flex;flex-direction:column;gap:9px;text-shadow:0 2px 15px #000}
+.expedition-scene-title span{color:var(--gold);font:600 10px var(--sans);letter-spacing:.19em}
+.expedition-scene-title strong{font:600 clamp(18px,2vw,25px) var(--serif);letter-spacing:.1em}
+.expedition-riddle{padding:27px}
+.expedition-riddle-top{display:flex;justify-content:space-between;gap:20px;color:var(--gold);font:600 10px var(--sans);letter-spacing:.15em}
+.expedition-riddle h3{font:600 clamp(18px,2vw,26px)/1.55 var(--serif);margin:22px 0 11px}
+.expedition-riddle>p:not(.expedition-feedback){font:13px/1.9 var(--sans);color:var(--muted)}
+.expedition-answers{display:grid;gap:9px;margin-top:19px}
+.expedition-answers button{border:1px solid #c2a47957;background:#302137;color:var(--cream);padding:12px 14px;text-align:left;min-height:42px;font-size:12px;line-height:1.5;display:flex;gap:12px;align-items:center}
+.expedition-answers button span{font:600 16px var(--serif);color:var(--gold)}
+.expedition-answers button:hover:not(:disabled){border-color:var(--gold);background:#47314e}
+.expedition-answers button.correct{background:#2d4937;border-color:#89c292}
+.expedition-answers button.wrong{background:#532c3d;border-color:#df8189}
+.expedition-answers button:disabled{cursor:default;opacity:.7}
+.expedition-feedback{min-height:22px;margin:15px 0 4px;font-size:12px;line-height:1.7;color:#ecc68a}
+.expedition-relic{margin-top:16px;display:flex;align-items:center;gap:17px;border:1px solid #d8ae7393;background:#614b463b;padding:12px 15px}
+.expedition-relic[hidden],.expedition-final[hidden]{display:none}
+.expedition-relic>span{font:38px var(--serif);color:var(--gold)}
+.expedition-relic>div{display:flex;flex-direction:column;gap:6px}
+.expedition-relic strong{font:600 12px var(--serif);letter-spacing:.09em}
+.expedition-relic small{font-size:9px;color:#baaaba}
+.expedition-final{margin-top:24px;border:1px solid #d6ac6c9c;display:flex;gap:25px;align-items:center;padding:26px 33px;background:radial-gradient(ellipse at 13% 40%,#66448099,transparent 60%),#2b2035}
+.expedition-final .final-glow{font:88px var(--serif);color:#f3ca85;text-shadow:0 0 37px #eeaa76}
+.expedition-final .kicker{margin-bottom:11px}
+.expedition-final h3{font:600 25px var(--serif);margin:0 0 12px}
+.expedition-final h3 em{font-style:normal;color:var(--gold)}
+.expedition-final p{font:13px/1.8 var(--sans);color:#d2bed6}
+@keyframes expedition-spin{to{transform:rotate(360deg)}}
+@keyframes expedition-float{50%{transform:translate(-50%,-55%) scale(1.06)}}
+@media(max-width:950px){.expedition-shell{grid-template-columns:1fr}.expedition-sidebar{order:1}.expedition-main{order:0}.expedition-map{grid-template-columns:repeat(2,minmax(0,1fr))}.expedition-vault{grid-template-columns:45px minmax(0,1fr) auto}.expedition-vault button{grid-column:auto;min-width:115px}}
+@media(max-width:580px){.expedition-map{grid-template-columns:1fr}.expedition-room{min-height:65px}.expedition-sidebar{padding:15px}.expedition-riddle{padding:22px 17px}.expedition-vault{grid-template-columns:40px 1fr}.expedition-vault button{grid-column:1/-1}.expedition-scene{min-height:250px}.expedition-scene-emblem{font-size:100px}.expedition-final{padding:20px;flex-direction:column;text-align:center;gap:3px}.expedition-final .final-glow{font-size:54px}}
+@media(prefers-reduced-motion:reduce){.expedition-scene-glow:before,.expedition-scene-emblem{animation:none!important}}
+.effects-off .expedition-scene-glow:before,.effects-off .expedition-scene-emblem{animation:none!important}

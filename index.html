@@ -23,10 +23,12 @@
   <link rel="stylesheet" href="./style.css" />
   <link rel="stylesheet" href="./magic.css" />
   <link rel="stylesheet" href="./alchemy.css" />
+  <link rel="stylesheet" href="./expedition.css" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <script defer type="module" src="./app.js"></script>
   <script defer type="module" src="./magic.js"></script>
   <script defer type="module" src="./alchemy.js"></script>
+  <script defer type="module" src="./expedition.js"></script>
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -42,7 +44,7 @@
       </a>
       <button class="menu-toggle" id="menu-toggle" aria-label="Mở menu" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
       <nav id="nav-links" aria-label="Điều hướng chính">
-        <a href="#about">Truyền thuyết</a><a href="#realms">Khám phá</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#alchemy">Pha chế</a><a href="#schedule">Đêm hội</a>
+        <a href="#about">Truyền thuyết</a><a href="#realms">Khám phá</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#expedition">Khám phá</a><a href="#alchemy">Pha chế</a><a href="#schedule">Đêm hội</a>
       </nav>
       <a href="#invitation" class="nav-cta"><span>Nhận thư mời</span><span aria-hidden="true">↗</span></a>
     </div>
@@ -161,6 +163,55 @@
     </section>
 
 
+
+    <section class="section expedition-section" id="expedition" aria-labelledby="expedition-heading">
+      <div class="shell">
+        <div class="section-heading center">
+          <span class="kicker">✦ THE RAVENHOLLOW EXPEDITION ✦</span>
+          <h2 id="expedition-heading">KHÁM PHÁ <em>LÂU ĐÀI MA ÁM</em></h2>
+          <p>Bốn căn phòng, bốn cổ vật và một kho báu bị phong ấn. Theo dấu những mật thư của học viện, giải câu đố và mở căn hầm cuối cùng.</p>
+        </div>
+        <div class="expedition-shell">
+          <div class="expedition-sidebar">
+            <div class="expedition-caption">ANCIENT CASTLE MAP <span>✧</span></div>
+            <div class="expedition-map" id="expedition-map" role="group" aria-label="Bản đồ bốn căn phòng">
+              <button type="button" class="expedition-room active" data-room="hall" aria-pressed="true"><span class="room-icon">♜</span><span><strong>ĐẠI SẢNH BÓNG ĐÊM</strong><small>THE GREAT HALL</small></span><b class="room-check">○</b></button>
+              <button type="button" class="expedition-room" data-room="library" aria-pressed="false"><span class="room-icon">▤</span><span><strong>THƯ VIỆN BÍ ẨN</strong><small>THE LOST LIBRARY</small></span><b class="room-check">○</b></button>
+              <button type="button" class="expedition-room" data-room="tower" aria-pressed="false"><span class="room-icon">☽</span><span><strong>THÁP THIÊN VĂN</strong><small>THE MOON TOWER</small></span><b class="room-check">○</b></button>
+              <button type="button" class="expedition-room" data-room="crypt" aria-pressed="false"><span class="room-icon">✝</span><span><strong>HẦM MỘ CỔ</strong><small>THE ANCIENT CRYPT</small></span><b class="room-check">○</b></button>
+            </div>
+            <div class="expedition-vault">
+              <span class="vault-sigil" id="vault-sigil">⌑</span>
+              <span><strong>THE FORGOTTEN VAULT</strong><small id="vault-hint">THU THẬP 4 CỔ VẬT ĐỂ MỞ KHÓA</small></span>
+              <button id="vault-open" type="button" disabled>ĐÃ KHÓA <span>⊘</span></button>
+            </div>
+            <p class="expedition-progress-label" id="expedition-progress-label">CỔ VẬT ĐÃ THU THẬP · 0 / 4</p>
+            <div class="expedition-progress"><div id="expedition-progress-bar"></div></div>
+          </div>
+          <div class="expedition-main">
+            <div class="expedition-scene" id="expedition-scene" data-room-scene="hall">
+              <div class="expedition-scene-glow"></div>
+              <div class="expedition-scene-stars" aria-hidden="true">✧ <span>✦</span> ✧</div>
+              <div class="expedition-scene-emblem" id="expedition-emblem" aria-hidden="true">♜</div>
+              <div class="expedition-scene-title"><span id="expedition-scene-label">CHAPTER VI — THE GREAT HALL</span><strong id="expedition-scene-title">ĐẠI SẢNH BÓNG ĐÊM</strong></div>
+            </div>
+            <div class="expedition-riddle">
+              <div class="expedition-riddle-top"><span>✧ AN ANCIENT RIDDLE</span><span id="expedition-chapter">01 / 04</span></div>
+              <h3 id="expedition-question">Những bức tường đá cũ cất giấu lời thì thầm bí ẩn...</h3>
+              <p id="expedition-room-story">Một mật mã đang chờ được khám phá.</p>
+              <div class="expedition-answers" id="expedition-answers" role="group" aria-label="Chọn lời giải"></div>
+              <p class="expedition-feedback" id="expedition-feedback" role="status" aria-live="polite">Chọn lời giải để tìm cổ vật.</p>
+              <div class="expedition-relic" id="expedition-relic" hidden><span id="expedition-relic-symbol">✧</span><div><strong id="expedition-relic-name">CỔ VẬT</strong><small>CỔ VẬT ĐÃ ĐƯỢC NIÊM PHONG TRONG RƯƠNG</small></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="expedition-final" id="expedition-final" hidden aria-live="polite">
+          <div class="final-glow">✶</div>
+          <div><span class="kicker">THE FORGOTTEN VAULT IS OPEN</span><h3>HÃY NHẬN <em>VƯƠNG MIỆN BÍ ẨN</em></h3><p>Bốn cổ vật đã thức tỉnh. Bạn tìm thấy trái tim của Ravenhollow và trở thành người giữ kho báu cổ xưa.</p><button type="button" class="btn btn-outline" id="expedition-replay">↺ KHÁM PHÁ LẠI LÂU ĐÀI</button></div>
+        </div>
+      </div>
+    </section>
+
     <section class="section alchemy-section" id="alchemy" aria-labelledby="alchemy-title">
       <div class="shell">
         <div class="section-heading center">
@@ -206,7 +257,7 @@
       <div class="passport-panel">
         <div class="passport-heading">
           <div><span class="kicker">✧ YOUR ARCANE PASSPORT ✧</span><h2 id="passport-title">HÀNH TRÌNH <em>PHÁP SƯ</em></h2><p>Hoàn thành các thử thách trong trang web để mở khóa huy hiệu Đại Pháp Sư. Thành tích chỉ lưu trên trình duyệt hiện tại.</p></div>
-          <div class="passport-ring"><strong id="passport-count">0/4</strong><span>NHIỆM VỤ</span></div>
+          <div class="passport-ring"><strong id="passport-count">0/5</strong><span>NHIỆM VỤ</span></div>
         </div>
         <div class="passport-progress"><div id="passport-progress-bar"></div></div>
         <div class="passport-grid">
@@ -214,6 +265,7 @@
           <div class="passport-stamp" id="stamp-spells"><span>✧</span><strong>BẬC THẦY THẦN CHÚ</strong><small>Thi triển đủ 4 phép</small></div>
           <div class="passport-stamp" id="stamp-portal"><span>☽</span><strong>VƯỢT CỔNG BÍ ẨN</strong><small>Giải xong ba câu đố</small></div>
           <div class="passport-stamp" id="stamp-potion"><span>⚗</span><strong>NHÀ GIẢ KIM</strong><small>Pha đủ 3 loại thuốc</small></div>
+          <div class="passport-stamp" id="stamp-vault"><span>✶</span><strong>NGƯỜI GIỮ KHO BÁU</strong><small>Khám phá 4 căn phòng</small></div>
         </div>
         <p class="passport-status" id="passport-status" aria-live="polite">Hành trình học viện của bạn đang bắt đầu.</p>
         <button type="button" class="btn btn-outline passport-share" id="passport-share">✦ SAO CHÉP THÀNH TÍCH</button>

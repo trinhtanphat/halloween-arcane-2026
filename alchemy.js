@@ -101,7 +101,7 @@ nextButton?.addEventListener("click",()=>{
 loadRecipe();
 
 // Achievements are intentionally checked from local state, never inferred from UI alone.
-const stampIds = ["order","spells","portal","potion"];
+const stampIds = ["order","spells","portal","potion","vault"];
 function completed(){
   const rawOrder=read("ravenhollow-order");
   let spellList=[];
@@ -111,23 +111,24 @@ function completed(){
     order: rawOrder!==null && /^[0-3]$/.test(rawOrder),
     spells: allSpells,
     portal: read("ravenhollow-portal-finished")==="1",
-    potion: read("ravenhollow-potion-finished")==="1"
+    potion: read("ravenhollow-potion-finished")==="1",
+    vault: read("ravenhollow-vault-finished")==="1"
   };
 }
 function updatePassport(){
   const progress=completed();
   const count=stampIds.filter(id=>progress[id]).length;
-  $("#passport-count").textContent=count+"/4";
-  $("#passport-progress-bar").style.width=(count*25)+"%";
+  $("#passport-count").textContent=count+"/"+stampIds.length;
+  $("#passport-progress-bar").style.width=(count/stampIds.length*100)+"%";
   stampIds.forEach(id=>{
     const item=$("#stamp-"+id);
     const ok=progress[id];
     item.classList.toggle("unlocked",ok);
     item.dataset.complete=String(ok);
   });
-  const message=count===4
+  const message=count===stampIds.length
     ? "✦ CHÚC MỪNG! Bạn đã nhận danh hiệu ĐẠI PHÁP SƯ RAVENHOLLOW."
-    : "Bạn đã hoàn thành "+count+"/4 nhiệm vụ. Tiếp tục khám phá để nhận huy hiệu Đại Pháp Sư.";
+    : "Bạn đã hoàn thành "+count+"/"+stampIds.length+" nhiệm vụ. Tiếp tục khám phá để nhận huy hiệu Đại Pháp Sư.";
   $("#passport-status").textContent=message;
   return {count,progress};
 }
@@ -139,9 +140,9 @@ $("#passport-share")?.addEventListener("click",async ()=>{
   const {count,progress}=updatePassport();
   const rows=[
     "✧ RAVENHOLLOW — THE ENCHANTED HALLOWEEN 2026",
-    "Hộ chiếu pháp sư: "+count+"/4 nhiệm vụ",
+    "Hộ chiếu pháp sư: "+count+"/"+stampIds.length+" nhiệm vụ",
     ...stampIds.map((id,i)=>(progress[id]?"✓ ":"○ ")+[
-      "Gia nhập hội pháp sư","Thi triển 4 thần chú","Vượt cổng bí ẩn","Pha chế 3 thuốc phép"
+      "Gia nhập hội pháp sư","Thi triển 4 thần chú","Vượt cổng bí ẩn","Pha chế 3 thuốc phép","Giải phong ấn kho báu"
     ][i]),
     "https://trinhtanphat.github.io/halloween-arcane-2026/"
   ];

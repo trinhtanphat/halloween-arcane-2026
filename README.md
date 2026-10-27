@@ -67,3 +67,15 @@ Commands: \`npm ci\`, \`npm run build\`, then \`npm test\`. The deployed \`app.j
 - **Automated checks:** `npm run build` and `npm test`; smoke tests cover incorrect and correct recipes, progress 4/4, offline reload, public resources and five mobile-to-desktop widths.
 
 Open the public demo: https://trinhtanphat.github.io/halloween-arcane-2026/ .
+
+## The Ravenhollow Castle Expedition
+
+A new original, independent mystery adventure complements the party, academy, portal and alchemy:
+- **Four explorable castle rooms:** the Great Hall, Lost Library, Moon Tower and Ancient Crypt, each with a distinct visual scene, story, riddle and collectible.
+- **The Forgotten Vault:** answering each room's riddle adds one relic, and collecting all four unlocks the final treasure. Incorrect responses provide feedback and allow retries.
+- **Saved progress:** relics and vault completion stay in browser localStorage; replay clears only expedition progress, not the separate academy achievements.
+- **Arcane Passport now 5/5:** the optional treasure-hunter badge is awarded only when the vault itself opens; the existing four achievements are preserved.
+- **Offline v5:** includes the new expedition scripts, styles and previously licensed imagery.
+- **Browser smoke tests:** wrong-answer recovery, four-room treasure unlock, five achievements, service-worker offline reload and responsive layouts. No GitHub Actions needed.
+
+These are fictional story scenarios, not real Halloween event bookings or licensed Harry Potter locations.

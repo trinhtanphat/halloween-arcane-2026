@@ -23,3 +23,11 @@
 @media (max-width:390px){.mini-features{grid-template-columns:1fr}}
 
 #pumpkin-canvas:focus-visible{outline:2px solid #ffdf9e;outline-offset:-8px}
+
+/* Keep the expanded navigation compact on medium desktop layouts. */
+@media (min-width:901px) and (max-width:1199px){
+  #nav-links{gap:10px}
+  #nav-links a{font-size:10px;white-space:nowrap}
+  .brand-text strong{font-size:14px}
+  .brand-text span{letter-spacing:.22em}
+}
