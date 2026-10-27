@@ -21,3 +21,5 @@
 @media (min-width:901px){.about-layout{grid-template-columns:minmax(0,49fr) minmax(0,51fr)}}
 .mini-features{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:390px){.mini-features{grid-template-columns:1fr}}
+
+#pumpkin-canvas:focus-visible{outline:2px solid #ffdf9e;outline-offset:-8px}

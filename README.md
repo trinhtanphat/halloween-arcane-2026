@@ -44,3 +44,14 @@ The demo is static. The nickname (if submitted) and visual-effects preference re
 - To smoke-test the public deployment in PowerShell: `$env:SMOKE_URL='https://trinhtanphat.github.io/halloween-arcane-2026/'; npm test; Remove-Item Env:SMOKE_URL`.
 
 No existing interactive Chrome tabs or desktop sessions are modified by the smoke tests.
+
+## Expansion: The Four Orders, Spellbook and offline mode
+
+- **Four Arcane Orders:** 3-step personality game, four original magical groups (Solaris, Noctis, Aetheris, Verdantia), live result and replay. Result saved only in localStorage.
+- **Interactive Spellbook:** Luminara, Nebulora, Asterium and Florastra; original CSS chamber, animated particles, semantic button selection and accessible status text. Honors motion-reduction preference.
+- **Offline-first static content:** scoped PWA service worker caches core assets so the site works offline after a completed first load. Fonts may fall back while offline. Versioned cache is network-first and automatically replaces outdated app assets.
+- **Install support:** application manifest with 192×192 and 512×512 original app icons. Availability of the install prompt depends on the browser/platform.
+- **3D interactions:** arrow-key rotation and pointer dragging; WebGL-disabled environments automatically show an illustrated fallback instead.
+- **Smoke tests:** include new quiz and spells, 12 public/static resources, viewport tests, service-worker readiness, and offline navigation. Automated tests launch an isolated headless Chrome process; never control existing browser tabs.
+
+Commands: \`npm ci\`, \`npm run build\`, then \`npm test\`. The deployed \`app.js\` is compiled from \`src/main.js\`; the new \`magic.js\` is a separate dependency-free browser module. GitHub Pages serves both from the repository root without GitHub Actions.

@@ -298,15 +298,27 @@ function createPumpkinScene() {
   const observer=typeof ResizeObserver!=="undefined"?new ResizeObserver(resize):null;
   observer?.observe(canvas);
   window.addEventListener("resize",resize,{passive:true});
-  let drag=false,lastX=0,rotationY=-.1,rotationX=0;
+  let drag=false,lastX=0,lastY=0,rotationY=-.1,rotationX=0;
+  canvas.tabIndex=0;
+  canvas.setAttribute("aria-description","Dùng các phím mũi tên hoặc kéo chuột, chạm để xoay bí ngô");
   canvas.addEventListener("pointerdown",(event)=>{
-    drag=true;lastX=event.clientX;canvas.setPointerCapture?.(event.pointerId);
+    drag=true;
+    lastX=event.clientX;lastY=event.clientY;
+    canvas.setPointerCapture?.(event.pointerId);
   });
   canvas.addEventListener("pointermove",(event)=>{
     if(!drag)return;
-    rotationY+=(event.clientX-lastX)*.007;
-    rotationX=Math.max(-.35,Math.min(.35,rotationX));
-    lastX=event.clientX;
+    rotationY+=(event.clientX-lastX)*.008;
+    rotationX=Math.max(-.35,Math.min(.35,rotationX+(event.clientY-lastY)*.004));
+    lastX=event.clientX;lastY=event.clientY;
+  });
+  canvas.addEventListener("keydown",(event)=>{
+    const moves={ArrowLeft:[0,-.2],ArrowRight:[0,.2],ArrowUp:[-.12,0],ArrowDown:[.12,0]};
+    const move=moves[event.key];
+    if(!move)return;
+    event.preventDefault();
+    rotationX=Math.max(-.35,Math.min(.35,rotationX+move[0]));
+    rotationY+=move[1];
   });
   const stopDrag=()=>drag=false;
   canvas.addEventListener("pointerup",stopDrag);
@@ -321,10 +333,10 @@ function createPumpkinScene() {
     if(document.hidden)return;
     resize();
     const t=clock.getElapsedTime();
+    if(effects && !drag) rotationY+=.0009;
+    group.rotation.y=THREE.MathUtils.lerp(group.rotation.y,rotationY,.12);
+    group.rotation.x=THREE.MathUtils.lerp(group.rotation.x,rotationX,.12);
     if(effects){
-      group.rotation.y+=Math.min(.015,(rotationY-group.rotation.y)*.02)+.0009;
-      rotationY=group.rotation.y;
-      group.rotation.x=THREE.MathUtils.lerp(group.rotation.x,rotationX,.025);
       group.position.y=-.1+Math.sin(t*.9)*.065;
       rings.forEach((r,i)=>r.rotation.z+=.001*(i===0?1:-1));
       sparkMat.uniforms.uTime.value=t;

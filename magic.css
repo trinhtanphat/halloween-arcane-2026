@@ -1,0 +1,85 @@
+
+/* Ravenhollow Expansion — The Four Orders & The Spellbook */
+.order-section{background:radial-gradient(ellipse at 18% 58%,rgba(86,52,108,.22),transparent 55%),#120e1d;border-top:1px solid rgba(233,184,104,.11);border-bottom:1px solid rgba(233,184,104,.11)}
+.order-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.13fr);gap:48px;align-items:center}
+.order-showcase{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.order-emblem{min-height:236px;position:relative;padding:22px 14px;display:flex;align-items:center;justify-content:flex-end;flex-direction:column;text-align:center;gap:9px;border:1px solid rgba(227,191,133,.25);background:radial-gradient(circle at 50% 36%,var(--house-glow),transparent 58%),linear-gradient(130deg,rgba(60,40,68,.72),rgba(19,15,31,.95));overflow:hidden}
+.order-emblem:before,.order-emblem:after{content:"";position:absolute;inset:8px;border:1px solid rgba(230,196,127,.17);pointer-events:none}
+.order-emblem:after{inset:15px;border:0;border-top:1px solid rgba(230,196,127,.14);border-bottom:1px solid rgba(230,196,127,.14)}
+.order-emblem>span{font-size:65px;line-height:1.3;color:var(--house-color);filter:drop-shadow(0 0 27px var(--house-color));margin:auto 0 10px;transform:translateY(5px);transition:transform .35s}
+.order-emblem:hover>span{transform:translateY(-5px) scale(1.1)}
+.order-emblem strong{font:600 16px var(--serif);letter-spacing:.13em}
+.order-emblem small{font-size:9px;letter-spacing:.13em;color:#d9c4d6}
+.order-solar{--house-color:#f4b560;--house-glow:#c15e3633}
+.order-noctis{--house-color:#b58de0;--house-glow:#753fa73a}
+.order-aether{--house-color:#8ccce8;--house-glow:#2d8cb83a}
+.order-verdant{--house-color:#9acb95;--house-glow:#49834833}
+.order-quiz{border:1px solid rgba(229,184,104,.38);padding:34px 34px 28px;background:radial-gradient(ellipse at 50% 0%,rgba(84,49,114,.22),transparent 72%),#1b1427;box-shadow:0 20px 60px #0005;min-height:425px}
+.order-quiz .tiny-rule{font-size:9px}
+.quiz-progress{display:flex;gap:18px;align-items:center;margin:35px 0 24px;color:var(--gold);font:600 10px var(--sans);letter-spacing:.1em}
+.quiz-progress span{white-space:nowrap}
+.quiz-track{flex:1;height:3px;background:#67516a;overflow:hidden}
+#order-progress{width:33.3333%;height:100%;background:linear-gradient(90deg,var(--gold),#eedca9);transition:width .3s}
+.order-quiz h3{font:600 clamp(20px,2vw,27px)/1.5 var(--serif);margin:0 0 22px;min-height:68px}
+.order-options{display:grid;gap:9px}
+.order-option{position:relative;text-align:left;border:1px solid rgba(237,192,132,.25);background:#2a1b34;padding:12px 16px;color:#e9dce9;font:500 12px/1.5 var(--sans);display:flex;gap:13px;align-items:center;transition:background .2s,border-color .2s}
+.order-option:hover,.order-option[aria-pressed="true"]{background:#45304e;border-color:#d5a364}
+.order-option span{color:var(--gold);font:600 15px var(--serif)}
+.order-next{margin-top:6px;min-width:160px}
+.order-next:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+.order-feedback{min-height:23px;font-size:11px;color:var(--gold);margin:10px 0}
+.order-result{text-align:center;padding-top:20px}
+.order-result[hidden]{display:none}
+.order-result-symbol{font-size:95px;color:var(--gold);text-shadow:0 0 36px currentColor}
+.order-result h3{font:700 31px var(--serif);letter-spacing:.18em;color:var(--gold);margin:0 0 10px;min-height:auto}
+.order-result p{font-size:14px;line-height:1.8;color:#d6c6d6;max-width:440px;margin:14px auto 25px}
+.spells-section{background:radial-gradient(ellipse at 56% 35%,#29193588,#110c19 73%);overflow:hidden}
+.spell-layout{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);align-items:center;gap:60px}
+.spell-chamber{position:relative;height:450px;background:radial-gradient(ellipse at 50% 60%,#593973,#191121 70%);border:1px solid #a880516b;isolation:isolate;overflow:hidden;transition:background 1s}
+.spell-chamber:before,.spell-chamber:after{content:"";position:absolute;width:90px;height:120%;top:-10%;background:linear-gradient(90deg,#140d1d,#3e2947 28%,#1b1125);box-shadow:inset -8px 0 24px #0008;z-index:2}
+.spell-chamber:before{left:-60px}
+.spell-chamber:after{right:-60px;transform:scaleX(-1)}
+.chamber-window{position:absolute;width:180px;height:270px;border:15px ridge #655078;top:44px;left:50%;transform:translateX(-50%);border-radius:100px 100px 0 0;background:radial-gradient(ellipse at 52% 38%,#74458e,#2f1b45 65%,#150c20);box-shadow:0 0 55px #a46db358,inset 0 0 32px #a46eb557;z-index:1}
+.chamber-window:before{content:"";position:absolute;top:0;left:50%;height:100%;width:5px;background:#5e476d;transform:translateX(-50%)}
+.chamber-window:after{content:"";position:absolute;top:46%;left:0;right:0;height:5px;background:#5e476d}
+.chamber-moon{position:absolute;top:35px;left:48px;width:63px;height:63px;border-radius:50%;background:#ebc996;box-shadow:0 0 46px #ffe8ae88}
+.chamber-aura{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,#f0c47733,transparent 58%);opacity:1;transition:background .6s,opacity .6s}
+.chamber-glyph{position:absolute;z-index:4;top:41%;left:50%;transform:translate(-50%,-50%);font:normal 108px var(--serif);color:#ffe3ad;text-shadow:0 0 25px #f4af63,0 0 70px #f9bd53;transition:color .35s,text-shadow .35s;pointer-events:none}
+.chamber-label{position:absolute;bottom:18px;left:25px;right:25px;display:flex;flex-direction:column;gap:5px;text-align:center;z-index:4}
+.chamber-label span{font:600 9px var(--sans);letter-spacing:.23em;color:var(--gold)}
+.chamber-label strong{font:500 10px var(--serif);letter-spacing:.11em}
+.chamber-candle{position:absolute;bottom:75px;height:115px;width:16px;border-radius:3px;background:linear-gradient(90deg,#c19c65,#e8c897,#866c53);box-shadow:0 0 8px #e8d5a533;z-index:3}
+.candle-left{left:19%}
+.candle-right{right:19%;height:85px}
+.chamber-candle:before{content:"";position:absolute;left:5px;top:-19px;width:8px;height:22px;border-radius:60% 10% 55% 50%;background:#fff1bc;box-shadow:0 0 22px 10px #f2af645e;animation:rh-flicker 1.1s ease-in-out infinite alternate}
+.chamber-candle:after{content:"";position:absolute;left:-22px;right:-22px;height:11px;bottom:-7px;background:#3c2c3a}
+.chamber-particles{position:absolute;inset:0;z-index:3;pointer-events:none}
+.magic-mote{position:absolute;top:var(--start-y);left:var(--start-x);width:var(--size);height:var(--size);border-radius:50%;background:var(--mote-color);box-shadow:0 0 15px var(--mote-color);opacity:0;animation:rh-mote var(--duration) ease-in-out infinite;animation-delay:var(--delay)}
+.spell-chamber[data-spell="luminara"]{background:radial-gradient(ellipse at 50% 60%,#695139,#23172a 78%)}
+.spell-chamber[data-spell="nebulora"]{background:radial-gradient(ellipse at 50% 65%,#605080,#131225 75%)}
+.spell-chamber[data-spell="asterium"]{background:radial-gradient(ellipse at 50% 65%,#284b87,#0f102b 70%)}
+.spell-chamber[data-spell="florastra"]{background:radial-gradient(ellipse at 50% 65%,#3d6844,#111b1d 74%)}
+.spell-chamber[data-spell="nebulora"] .chamber-glyph{color:#c9a8f5;text-shadow:0 0 30px #b18be6,0 0 65px #a276e8}
+.spell-chamber[data-spell="asterium"] .chamber-glyph{color:#a9e6fd;text-shadow:0 0 30px #9dd9ff,0 0 65px #6596e7}
+.spell-chamber[data-spell="florastra"] .chamber-glyph{color:#b4f6b4;text-shadow:0 0 30px #7bf4a6,0 0 65px #5cae7e}
+.spell-chamber.cast .chamber-glyph{animation:rh-cast .7s cubic-bezier(.2,.7,.35,1)}
+.spell-control .tiny-rule{font-size:10px}
+.spell-control h3{font:600 clamp(25px,2.65vw,38px)/1.4 var(--serif);margin:21px 0 12px}
+.spell-control h3 em{font-family:"Great Vibes",cursive;font-weight:400;font-size:1.25em;color:var(--gold)}
+.spell-intro{color:var(--muted);line-height:1.9;font-size:13px;margin-bottom:22px}
+.spell-buttons{display:grid;gap:7px}
+.spell-button{min-height:69px;background:#261b3280;color:var(--cream);border:1px solid #d8aa7040;text-align:left;display:flex;align-items:center;gap:17px;padding:10px 15px;transition:background .2s,border-color .2s}
+.spell-button:hover,.spell-button.selected{border-color:var(--gold);background:#3c2a46}
+.spell-button>span:first-child{font-size:31px;color:var(--gold);min-width:40px;text-align:center}
+.spell-button>span:nth-child(2){display:flex;flex-direction:column;gap:7px}
+.spell-button strong{font:600 13px var(--serif);letter-spacing:.11em}
+.spell-button small{font-size:11px;color:var(--muted)}
+.spell-button>b{margin-left:auto;font-size:19px;font-weight:400;color:var(--gold)}
+.spell-message{min-height:36px;font-size:12px;line-height:1.8;color:var(--gold)}
+@keyframes rh-cast{0%{transform:translate(-50%,-50%) scale(.45) rotate(-25deg);opacity:.3}65%{transform:translate(-50%,-50%) scale(1.28) rotate(12deg);opacity:1}100%{transform:translate(-50%,-50%) scale(1) rotate(0)}}
+@keyframes rh-flicker{0%{transform:scale(.83) rotate(-9deg)}100%{transform:scale(1.12) rotate(9deg)}}
+@keyframes rh-mote{0%{opacity:0;transform:translate(0,45px) scale(.3)}20%{opacity:.9}80%{opacity:.6}100%{opacity:0;transform:translate(var(--drift),-150px) scale(.5)}}
+@media(max-width:950px){.order-layout,.spell-layout{grid-template-columns:minmax(0,1fr);gap:35px}.order-showcase{max-width:600px;margin:0 auto;width:100%}.order-quiz{max-width:650px;margin:0 auto;width:100%}.spell-chamber{height:395px}.spell-control{max-width:680px;margin:auto;width:100%}}
+@media(max-width:650px){.order-emblem{min-height:165px;padding:17px 8px}.order-emblem>span{font-size:44px}.order-emblem strong{font-size:11px}.order-emblem small{font-size:8px;letter-spacing:.03em}.order-showcase{gap:9px}.order-quiz{padding:25px 17px;min-height:400px}.order-quiz h3{font-size:20px;min-height:65px}.spell-chamber{height:330px}.chamber-window{transform:translateX(-50%) scale(.78);transform-origin:top center}.chamber-glyph{font-size:80px}.chamber-label strong{font-size:8px}.chamber-candle{transform:scale(.75);transform-origin:bottom}.spells-section .section-heading{margin-bottom:35px}}
+@media(prefers-reduced-motion:reduce){.magic-mote,.spell-chamber.cast .chamber-glyph,.chamber-candle:before{animation:none!important}}
+.effects-off .magic-mote,.effects-off .chamber-candle:before,.effects-off .spell-chamber.cast .chamber-glyph{animation:none!important}

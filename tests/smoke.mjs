@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PORT = 0;
-const MIME = { ".html":"text/html; charset=utf-8",".js":"text/javascript; charset=utf-8",".css":"text/css; charset=utf-8",".svg":"image/svg+xml",".json":"application/json",".png":"image/png",".jpg":"image/jpeg",".jpeg":"image/jpeg",".webp":"image/webp",".md":"text/markdown" };
+const MIME = { ".html":"text/html; charset=utf-8",".js":"text/javascript; charset=utf-8",".css":"text/css; charset=utf-8",".svg":"image/svg+xml",".json":"application/json",".png":"image/png",".jpg":"image/jpeg",".jpeg":"image/jpeg",".webp":"image/webp",".md":"text/markdown",".webmanifest":"application/manifest+json" };
 const server = createServer(async (req,res) => {
   try {
     let pathname = decodeURIComponent(new URL(req.url,"http://localhost").pathname);
@@ -36,7 +36,7 @@ try {
   assert.match(await page.locator("#hero-title").innerText(),/MAGIC/);
   assert.equal(await page.locator(".realm-card").count(),3);
   assert.equal(await page.locator(".timeline-item").count(),4);
-  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css"];
+  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png"];
   for(const asset of assets){
     const response=await page.request.get(base+"/"+asset);
     assert.equal(response.status(),200,"asset missing: "+asset);
@@ -48,6 +48,22 @@ try {
   await page.locator("#invitation-response").waitFor();
   assert.match(await page.locator("#invitation-response").innerText(),/Merlin Demo/);
   assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-wizard")),"Merlin Demo");
+  assert.equal(await page.locator("#order-options button").count(),4);
+  for (let i=0;i<3;i++) {
+    await page.locator("#order-options button").first().click();
+    assert.equal(await page.locator("#order-next").isEnabled(),true);
+    await page.locator("#order-next").click();
+  }
+  assert.match(await page.locator("#order-name").innerText(),/SOLARIS/);
+  assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-order")),"0");
+  await page.locator("#restart-order").click();
+  assert.equal(await page.locator("#order-options button").count(),4);
+  for (const spell of ["nebulora","asterium","florastra","luminara"]) {
+    await page.locator('[data-cast="'+spell+'"]').click();
+    assert.equal(await page.locator("#spell-chamber").getAttribute("data-spell"),spell);
+    assert.equal(await page.locator('[data-cast="'+spell+'"]').getAttribute("aria-pressed"),"true");
+    assert.equal(await page.locator(".magic-mote").count(),34);
+  }
   await page.locator("#open-portal").click();
   assert.equal(await page.locator("#portal-dialog").evaluate(e=>e.open),true);
   for(const correctIndex of [1,0,2]){
@@ -90,8 +106,29 @@ try {
     }
     assert.ok(result.page<=result.viewport+3,"Horizontal overflow at "+width+"px: "+JSON.stringify(result));
   }
+  const sw = await page.evaluate(async()=>{
+    if (!("serviceWorker" in navigator)) return "unsupported";
+    const controller = await Promise.race([
+      navigator.serviceWorker.ready.then(reg=>Boolean(reg.active)),
+      new Promise(resolve=>setTimeout(()=>resolve("timeout"),9000))
+    ]);
+    return controller;
+  });
+  assert.equal(sw,true,"Service worker should activate and cache the static site");
   assert.deepEqual(errors,[],"Browser JS/console errors");
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  const offlineTab = await context.newPage();
+  await offlineTab.goto(base,{waitUntil:"domcontentloaded",timeout:30000});
+  await offlineTab.waitForFunction(()=>Boolean(navigator.serviceWorker.controller),{timeout:10000});
+  await context.setOffline(true);
+  try {
+    await offlineTab.reload({waitUntil:"domcontentloaded",timeout:20000});
+    assert.match(await offlineTab.locator("#hero-title").innerText(),/MAGIC/);
+    assert.equal(await offlineTab.locator(".order-emblem").count(),4);
+  } finally {
+    await context.setOffline(false);
+    await offlineTab.close();
+  }
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,arcane_orders:true,spellbook:true,pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

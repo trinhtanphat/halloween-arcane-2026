@@ -10,11 +10,15 @@
   <meta property="og:type" content="website" />
   <title>Ravenhollow | The Enchanted Halloween 2026</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./magic.css" />
+  <link rel="manifest" href="./manifest.webmanifest" />
   <script defer type="module" src="./app.js"></script>
+  <script defer type="module" src="./magic.js"></script>
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -30,9 +34,9 @@
       </a>
       <button class="menu-toggle" id="menu-toggle" aria-label="Mở menu" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
       <nav id="nav-links" aria-label="Điều hướng chính">
-        <a href="#about">Truyền thuyết</a><a href="#realms">Khám phá</a><a href="#portal">Cổng phép thuật</a><a href="#schedule">Đêm hội</a>
+        <a href="#about">Truyền thuyết</a><a href="#realms">Khám phá</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#schedule">Đêm hội</a>
       </nav>
-      <a href="#portal" class="nav-cta"><span>Nhận thư mời</span><span aria-hidden="true">↗</span></a>
+      <a href="#invitation" class="nav-cta"><span>Nhận thư mời</span><span aria-hidden="true">↗</span></a>
     </div>
   </header>
 
@@ -82,6 +86,71 @@
     <section class="section graveyard-section" id="graveyard"><div class="shell graveyard-layout"><div class="graveyard-copy"><span class="kicker">✦ BEYOND THE VEIL ✦</span><h2>ĐÊM TỐI<br><em>CÓ NHỮNG BÍ MẬT.</em></h2><p>Đi ngang những bia mộ rêu phong, nghe tiếng dơi vỗ cánh và ngắm các linh hồn phát sáng trôi qua khu rừng cấm.</p><button class="btn btn-outline" id="summon-ghosts" type="button">✧ TRIỆU HỒI LINH HỒN</button><div id="ghost-message" class="ghost-message" aria-live="polite"></div></div><div class="cemetery" aria-label="Mô phỏng nghĩa địa với bia mộ, trăng tròn và các linh hồn"><div class="cemetery-moon"></div><div class="tree tree-left"></div><div class="tree tree-right"></div><div class="grave g1"><i>RIP</i></div><div class="grave g2"><i>✝</i></div><div class="grave g3"><i>RIP</i></div><div class="grave g4"><i>✦</i></div><div class="ghost gho1">✧</div><div class="ghost gho2">✧</div><div class="ghost gho3">✧</div><div class="grave-ground"></div></div></div></section>
 
     <section id="portal" class="section portal-section"><div class="shell"><div class="section-heading center"><span class="kicker">✧ THE INITIATION ✧</span><h2>CÁNH CỔNG <em>PHÉP THUẬT</em><br>ĐANG CHỜ BẠN</h2><p>Chỉ những người dũng cảm mới có thể vượt qua ba câu đố của học viện Ravenhollow.</p></div><div class="portal-stage"><div class="portal-stars" aria-hidden="true"></div><div class="portal-orbit po-one"></div><div class="portal-orbit po-two"></div><div class="portal-arch"><div class="arch-inside"><div class="portal-vortex"></div><div class="portal-center">✶</div></div><span class="arch-rune r1">ᚠ</span><span class="arch-rune r2">ᚹ</span><span class="arch-rune r3">ᛟ</span><span class="arch-rune r4">ᚷ</span></div><div class="portal-controls"><span>THE GATE IS OPEN</span><button type="button" class="btn btn-primary" id="open-portal">✦ BƯỚC QUA CỔNG PHÉP THUẬT ↗</button><small>MINIGAME · 3 CÂU ĐỐ · THÀNH TỰU PHÁP SƯ</small></div></div></div></section>
+
+
+    <section class="section order-section" id="orders" aria-labelledby="orders-title">
+      <div class="shell">
+        <div class="section-heading center">
+          <span class="kicker">✦ THE ACADEMY CALLS ✦</span>
+          <h2 id="orders-title">BẠN THUỘC <em>HỘI PHÁP SƯ</em> NÀO?</h2>
+          <p>Bốn hội phép thuật riêng của Ravenhollow đang tìm kiếm thành viên mới. Hãy trả lời ba câu hỏi để nhận huy hiệu của mình.</p>
+        </div>
+        <div class="order-layout">
+          <div class="order-showcase" aria-label="Bốn hội pháp sư Ravenhollow">
+            <div class="order-emblem order-solar"><span>☀</span><strong>SOLARIS</strong><small>DŨNG KHÍ · LỬA</small></div>
+            <div class="order-emblem order-noctis"><span>☽</span><strong>NOCTIS</strong><small>TRỰC GIÁC · BÓNG ĐÊM</small></div>
+            <div class="order-emblem order-aether"><span>✧</span><strong>AETHERIS</strong><small>TRÍ TUỆ · BẦU TRỜI</small></div>
+            <div class="order-emblem order-verdant"><span>❧</span><strong>VERDANTIA</strong><small>NHÂN ÁI · THIÊN NHIÊN</small></div>
+          </div>
+          <div class="order-quiz" id="order-quiz">
+            <div class="tiny-rule">THE RAVENHOLLOW SELECTION</div>
+            <div class="quiz-progress"><span id="order-step">CÂU HỎI 01 / 03</span><div class="quiz-track"><div id="order-progress"></div></div></div>
+            <div id="order-question-box">
+              <h3 id="order-question">Giả sử cánh cửa bí mật xuất hiện trước mặt, bạn sẽ...</h3>
+              <div class="order-options" id="order-options" role="group" aria-label="Chọn câu trả lời"></div>
+              <p id="order-feedback" class="order-feedback" aria-live="polite"></p>
+              <button type="button" class="btn btn-primary order-next" id="order-next" disabled>TIẾP TỤC →</button>
+            </div>
+            <div id="order-result" class="order-result" hidden aria-live="polite">
+              <div id="order-symbol" class="order-result-symbol">✧</div>
+              <span class="kicker">YOUR ARCANE ORDER</span>
+              <h3 id="order-name">AETHERIS</h3>
+              <p id="order-description"></p>
+              <button type="button" class="btn btn-outline" id="restart-order">✦ CHỌN LẠI HỘI</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section spells-section" id="spells" aria-labelledby="spells-title">
+      <div class="shell">
+        <div class="section-heading center"><span class="kicker">✧ THE SPELLBOOK ✧</span><h2 id="spells-title">THỬ SỨC VỚI <em>THẦN CHÚ</em></h2><p>Nhấn một thần chú để biến đổi căn phòng phép thuật — ánh sáng, tinh tú, màn sương và thiên nhiên đều đáp lại tiếng gọi của bạn.</p></div>
+        <div class="spell-layout">
+          <div class="spell-chamber" id="spell-chamber" data-spell="luminara" aria-label="Căn phòng phép thuật tương tác">
+            <div class="chamber-sky"></div><div class="chamber-aura"></div>
+            <div class="chamber-window"><span class="chamber-moon"></span></div>
+            <div class="chamber-candle candle-left"><span></span></div>
+            <div class="chamber-candle candle-right"><span></span></div>
+            <div class="chamber-glyph" id="chamber-glyph">✦</div>
+            <div class="chamber-particles" id="chamber-particles" aria-hidden="true"></div>
+            <div class="chamber-label"><span>RAVENHOLLOW / ROOM 07</span><strong>THE CHAMBER OF ENCHANTMENTS</strong></div>
+          </div>
+          <div class="spell-control">
+            <div class="tiny-rule">CHAPTER IV — THE SPELLBOOK</div>
+            <h3>Hãy chọn <em>một câu thần chú.</em></h3>
+            <p class="spell-intro">Bốn loại ma thuật nguyên bản của học viện Ravenhollow. Mỗi phép thuật có hiệu ứng và lời giải riêng.</p>
+            <div class="spell-buttons" id="spell-buttons" role="group" aria-label="Các thần chú">
+              <button type="button" class="spell-button selected" data-cast="luminara" aria-pressed="true"><span>☀</span><span><strong>LUMINARA</strong><small>Ánh sáng cổ đại</small></span><b>↗</b></button>
+              <button type="button" class="spell-button" data-cast="nebulora" aria-pressed="false"><span>☽</span><span><strong>NEBULORA</strong><small>Sương mù huyền bí</small></span><b>↗</b></button>
+              <button type="button" class="spell-button" data-cast="asterium" aria-pressed="false"><span>✧</span><span><strong>ASTERIUM</strong><small>Triệu hồi tinh tú</small></span><b>↗</b></button>
+              <button type="button" class="spell-button" data-cast="florastra" aria-pressed="false"><span>❧</span><span><strong>FLORASTRA</strong><small>Sức sống của rừng</small></span><b>↗</b></button>
+            </div>
+            <p class="spell-message" id="spell-message" aria-live="polite">✦ LUMINARA — Thắp sáng những bí ẩn ngủ quên.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="section schedule-section shell" id="schedule"><div class="section-heading center"><span class="kicker">☾ MARK YOUR CALENDAR ☾</span><h2>THE NIGHT OF <em>WONDERS</em></h2><p>Lịch trình tưởng tượng trong trải nghiệm web Halloween ngày 31/10/2026. Không phải sự kiện bán vé ngoài đời thực.</p></div><div class="event-header"><div><span>ONE NIGHT ONLY</span><strong>31 <small>OCT</small> 2026</strong></div><div><span>ĐÊM PHÉP THUẬT</span><strong>RAVENHOLLOW ACADEMY</strong></div><div><span>ONLINE EXPERIENCE</span><strong>OPEN ALL NIGHT</strong></div></div><div class="timeline"><div class="timeline-item"><time>18:00</time><span class="tl-marker">✦</span><div><h3>THE GATES OPEN</h3><p>Cổng học viện đón những pháp sư đầu tiên.</p></div><b>01</b></div><div class="timeline-item"><time>19:30</time><span class="tl-marker">☽</span><div><h3>THE HAUNTED MASQUERADE</h3><p>Dạ tiệc hóa trang dưới ánh trăng tím.</p></div><b>02</b></div><div class="timeline-item"><time>21:00</time><span class="tl-marker">✧</span><div><h3>THE ARCANE TRIALS</h3><p>Giải mã những mật thư và câu đố phép thuật.</p></div><b>03</b></div><div class="timeline-item"><time>00:00</time><span class="tl-marker">✶</span><div><h3>THE MIDNIGHT AWAKENING</h3><p>Khoảnh khắc huyền bí nhất của đêm Halloween.</p></div><b>04</b></div></div></section>
 
