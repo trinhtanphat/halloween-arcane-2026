@@ -8,13 +8,33 @@ const root=$("#duel-game");
 const laneButtons=[...root.querySelectorAll("[data-duel-lane]")];
 const symbols=["☾","✦","❖","✶"];
 const notesHz=[261.63,329.63,392.00,523.25];
-const settings={practice:{count:12,interval:0},duel:{count:16,interval:880}};
-const bestKey=mode=>"ravenhollow-duel-best-"+mode;
+const settings={practice:{count:12,interval:0},duel:{count:16,interval:880},daily:{count:16,interval:880}};
+const dailyDate=()=>{
+  const parts=new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Ho_Chi_Minh",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const find=type=>parts.find(part=>part.type===type).value;
+  return find("year")+"-"+find("month")+"-"+find("day");
+};
+let challengeDate=dailyDate();
+const bestKey=mode=>"ravenhollow-duel-best-"+(mode==="daily"?"daily-"+challengeDate:mode);
+function seededRunes(date,count){
+  // Versioned FNV-1a + xorshift32 seed. Everyone on the same VN calendar day
+  // gets the same rune order without any network, account or external service.
+  let state=2166136261;
+  for(const ch of "ravenhollow-daily-v1:"+date){state=Math.imul(state^ch.charCodeAt(0),16777619)>>>0;}
+  const output=[];
+  for(let i=0;i<count;i++){
+    state^=state<<13;state^=state>>>17;state^=state<<5;
+    let lane=(state>>>0)%4;
+    if(i>1&&output[i-1]===lane&&output[i-2]===lane)lane=(lane+1)%4;
+    output.push(lane);
+  }
+  return output;
+}
 let mode="practice",state="idle",sequence=[],index=0,score=0,combo=0,health=5,hits=0,misses=0,peak=0;
 let startAt=0,pausedAt=0,frame=0,lastCue=-1,audio=null,muted=true;
 const start=$("#duel-start"),pauseButton=$("#duel-pause"),resetButton=$("#duel-restart");
 const feedback=$("#duel-feedback"),status=$("#duel-status");
-const soundButton=$("#duel-sound");
+const soundButton=$("#duel-sound"),shareButton=$("#duel-share");
 const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function readBest(){
@@ -75,7 +95,10 @@ function paint(){
   pauseButton.disabled=state==="idle"||state==="finished";
   pauseButton.textContent=state==="paused"?"▶ TIẾP TỤC":"Ⅱ TẠM DỪNG";
   $("#duel-relic").textContent=active?symbols[sequence[index]]:"✦";
-  $("#duel-mode-note").textContent=mode==="duel"?"ĐẤU NHỊP · 16 ẤN CHÚ":"LUYỆN TẬP · 12 ẤN CHÚ";
+  $("#duel-mode-note").textContent=mode==="practice"?"LUYỆN TẬP · 12 ẤN CHÚ":mode==="daily"?"THỬ THÁCH NGÀY · 16 ẤN CHÚ":"ĐẤU NHỊP · 16 ẤN CHÚ";
+  $("#duel-daily-label").hidden=mode!=="daily";
+  $("#duel-daily-date").textContent=mode==="daily"?challengeDate:"—";
+  shareButton.hidden=!(mode==="daily"&&state==="finished");
   readStats();
 }
 function cancelLoop(){if(frame)cancelAnimationFrame(frame);frame=0;}
@@ -83,20 +106,30 @@ function reset(){
   cancelLoop();state="idle";sequence=[];index=score=combo=hits=misses=peak=0;health=5;startAt=pausedAt=0;lastCue=-1;
   root.style.setProperty("--duel-flight","0%");
   $("#duel-result").hidden=true;
+  $("#duel-share-preview").hidden=true;
   root.classList.remove("duel-hit","duel-miss");
+  root.dataset.challengePattern="";root.dataset.challengeDate="";
   say("✦ Chọn chế độ, bắt đầu rồi bấm đúng ấn chú bằng phím 1–4 hoặc chạm.");
   $("#duel-best").textContent=String(readBest());
   paint();
+}
+function shareSummary(){
+  const outcome=health>0&&index===sequence.length?"ĐÃ THẮNG":"CHƯA THẮNG";
+  return "☾ RAVENHOLLOW — THỬ THÁCH NHỊP PHÉP "+challengeDate+"\n"+
+    "✧ "+outcome+" · "+score+" ĐIỂM · "+hits+"/"+sequence.length+" PHÉP TRÚNG · COMBO "+peak+"\n"+
+    "Bạn thử vượt điểm mình nhé! https://trinhtanphat.github.io/halloween-arcane-2026/#spell-duel";
 }
 function end(){
   cancelLoop();state="finished";
   saveBest(score);
   $("#duel-result").hidden=false;
+  $("#duel-share-preview").hidden=mode!=="daily";
+  $("#duel-share-preview").textContent=mode==="daily"?shareSummary():"";
   const won=health>0&&index===sequence.length;
   root.dataset.result=won?"won":"lost";
   $("#duel-result-title").textContent=won?"✦ HỒN MA ĐÃ ĐƯỢC GIẢI PHONG ẤN!":"☽ PHÉP THUẬT BỊ GIÁN ĐOẠN";
   $("#duel-result-text").textContent=(won?"Bạn đã đánh bại hồn ma! ":"Hãy thử thêm một lần nữa! ")+
-    "Điểm "+score+" · "+hits+" ấn chú trúng · combo cao nhất "+peak+".";
+    "Điểm "+score+" · "+hits+" ấn chú trúng · combo cao nhất "+peak+"."+(mode==="daily"?" Thử thách ngày "+challengeDate+".":"");
   say(won?"✦ Xuất sắc! Vũ điệu pháp thuật đã hóa giải hồn ma.":"☾ Hồn ma vẫn đang chờ bạn thử sức lần nữa.");
   paint();
 }
@@ -129,9 +162,9 @@ function resolve(lane,judgment){
   next();
 }
 function gameTick(now){
-  if(state!=="running"||mode!=="duel")return;
+  if(state!=="running"||mode==="practice")return;
   if(index>=sequence.length){end();return;}
-  const beat=startAt+index*settings.duel.interval;
+  const beat=startAt+index*settings[mode].interval;
   const offset=now-beat;
   const progress=Math.max(0,Math.min(1,(offset+760)/1180));
   root.style.setProperty("--duel-flight",(progress*100).toFixed(1)+"%");
@@ -145,21 +178,25 @@ function gameTick(now){
 }
 function startGame(){
   cancelLoop();
-  sequence=[];
-  for(let i=0;i<settings[mode].count;i++){
+  challengeDate=dailyDate();
+  sequence=mode==="daily"?seededRunes(challengeDate,settings.daily.count):[];
+  if(mode!=="daily")for(let i=0;i<settings[mode].count;i++){
     let value=Math.floor(Math.random()*4);
     if(i>1&&sequence[i-1]===value&&sequence[i-2]===value)value=(value+1)%4;
     sequence.push(value);
   }
+  root.dataset.challengePattern=mode==="daily"?sequence.join(""):"";
+  root.dataset.challengeDate=mode==="daily"?challengeDate:"";
   $("#duel-ghost-health").setAttribute("aria-valuemax",String(sequence.length));
   state="running";score=combo=hits=misses=peak=index=0;health=5;lastCue=-1;
   startAt=performance.now()+1000;
   $("#duel-result").hidden=true;
+  $("#duel-share-preview").hidden=true;
   root.dataset.result="";
   say(mode==="practice"?"✦ Chạm ấn chú đang phát sáng. Không giới hạn thời gian!":
     "☾ Chuẩn bị! Ấn chú lao tới cổng. Chạm đúng nhịp để tạo combo.");
   paint();
-  if(mode==="duel")frame=requestAnimationFrame(gameTick);
+  if(mode!=="practice")frame=requestAnimationFrame(gameTick);
 }
 function pause(){
   if(state==="running"){
@@ -167,7 +204,7 @@ function pause(){
     say("Ⅱ Đã tạm dừng. Nhấn TIẾP TỤC để trở lại màn đấu.");
   }else if(state==="paused"){
     state="running";
-    if(mode==="duel"){startAt+=performance.now()-pausedAt;frame=requestAnimationFrame(gameTick);}
+    if(mode!=="practice"){startAt+=performance.now()-pausedAt;frame=requestAnimationFrame(gameTick);}
     say("▶ Pháp thuật tiếp tục! Hãy theo dõi ấn chú.");
   }
   paint();
@@ -176,7 +213,7 @@ function press(lane){
   if(state!=="running"||!Number.isInteger(lane)||lane<0||lane>3)return;
   if(lane!==sequence[index]){resolve(lane,"miss");return;}
   if(mode==="practice"){resolve(lane,"practice");return;}
-  const delta=performance.now()-(startAt+index*settings.duel.interval);
+  const delta=performance.now()-(startAt+index*settings[mode].interval);
   if(delta< -420){say("☾ Còn sớm! Chờ ấn chú tiến tới cổng phép thuật.");return;}
   if(delta>430){resolve(-1,"miss");return;}
   resolve(lane,Math.abs(delta)<=150?"perfect":"good");
@@ -184,6 +221,7 @@ function press(lane){
 root.querySelectorAll("[data-duel-mode]").forEach(button=>button.addEventListener("click",()=>{
   if(state==="running"||state==="paused")return;
   mode=button.dataset.duelMode;
+  challengeDate=dailyDate();
   root.querySelectorAll("[data-duel-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b===button)));
   reset();
 }));
@@ -191,6 +229,21 @@ laneButtons.forEach(button=>button.addEventListener("click",()=>press(Number(but
 start.addEventListener("click",startGame);
 pauseButton.addEventListener("click",pause);
 resetButton.addEventListener("click",reset);
+shareButton.addEventListener("click",async()=>{
+  if(mode!=="daily"||state!=="finished")return;
+  const text=shareSummary();
+  let copied=false;
+  try{await navigator.clipboard.writeText(text);copied=true;}catch(_){}
+  if(!copied){
+    const field=document.createElement("textarea");
+    field.value=text;field.readOnly=true;field.style.position="fixed";field.style.opacity="0";
+    document.body.appendChild(field);field.select();
+    try{copied=document.execCommand("copy");}catch(_){}
+    field.remove();
+  }
+  say(copied?"✦ Đã sao chép kết quả thử thách hôm nay! Gửi cho bạn bè để cùng thi đấu.":
+    "☾ Không thể tự sao chép. Hãy chọn đoạn kết quả hiển thị và sao chép thủ công nhé.");
+});
 soundButton.addEventListener("click",()=>{
   muted=!muted;soundButton.setAttribute("aria-pressed",String(!muted));
   soundButton.textContent=muted?"♫ ÂM PHÉP: TẮT":"♫ ÂM PHÉP: BẬT";

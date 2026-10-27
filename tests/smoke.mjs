@@ -491,6 +491,55 @@ try {
   await page.locator('[data-duel-mode="practice"]').click();
   assert.equal(await page.locator("#duel-best").innerText(),"1860","practice record retained");
   assert.equal(await page.locator("#passport-count").innerText(),"7/7");
+  // Bonus daily challenge: same date + same pattern, independent leaderboard and share.
+  await page.locator('[data-duel-mode="daily"]').click();
+  assert.equal(await duel.getAttribute("data-mode"),"daily");
+  assert.equal(await page.locator("#duel-daily-label").isVisible(),true);
+  await page.locator("#duel-start").click();
+  const dailyDate=await duel.getAttribute("data-challenge-date");
+  const dailyPattern=await duel.getAttribute("data-challenge-pattern");
+  assert.match(dailyDate,/^\d{4}-\d{2}-\d{2}$/);
+  assert.match(dailyPattern,/^[0-3]{16}$/);
+  assert.equal(await page.locator("#duel-progress").innerText(),"0/16");
+  await page.locator("#duel-pause").click();
+  assert.equal(await duel.getAttribute("data-state"),"paused");
+  const otherDaily=await context.newPage();
+  await otherDaily.goto(base,{waitUntil:"domcontentloaded"});
+  await otherDaily.locator('[data-duel-mode="daily"]').click();
+  await otherDaily.locator("#duel-start").click();
+  assert.equal(await otherDaily.locator("#duel-game").getAttribute("data-challenge-date"),dailyDate,"calendar date must be shared");
+  assert.equal(await otherDaily.locator("#duel-game").getAttribute("data-challenge-pattern"),dailyPattern,"daily challenge must be deterministic");
+  await otherDaily.close();
+  // The paused daily timer preserves its rune while another tab is active.
+  assert.equal(await duel.getAttribute("data-state"),"paused");
+  const savedRune=await duel.getAttribute("data-index");
+  await page.waitForTimeout(950);
+  assert.equal(await duel.getAttribute("data-index"),savedRune);
+  await page.locator("#duel-pause").click();
+  for(let mistake=0;mistake<5;mistake++){
+    const lane=Number(await duel.getAttribute("data-current-lane"));
+    await page.locator('[data-duel-lane="'+((lane+1)%4)+'"]').click();
+  }
+  assert.equal(await duel.getAttribute("data-result"),"lost");
+  assert.equal(await page.locator("#duel-share").isVisible(),true);
+  assert.match(await page.locator("#duel-share-preview").innerText(),new RegExp(dailyDate));
+  await page.evaluate(()=>Object.defineProperty(navigator,"clipboard",{configurable:true,value:{
+    writeText:async text=>{window.__testDuelShare=text;}
+  }}));
+  await page.locator("#duel-share").click();
+  const shared=await page.evaluate(()=>window.__testDuelShare);
+  assert.ok(shared.includes(dailyDate)&&shared.includes("#spell-duel"),"copy includes date and game link");
+  await page.locator("#duel-restart").click();
+  await page.locator("#duel-start").click();
+  assert.equal(await duel.getAttribute("data-challenge-pattern"),dailyPattern,"daily replay must use same pattern");
+  await page.locator("#duel-restart").click();
+  await page.evaluate(date=>localStorage.setItem("ravenhollow-duel-best-daily-"+date,"580"),dailyDate);
+  await page.locator("#duel-restart").click();
+  assert.equal(await page.locator("#duel-best").innerText(),"580","daily best saved by date");
+  await page.locator('[data-duel-mode="practice"]').click();
+  assert.equal(await page.locator("#duel-best").innerText(),"1860","daily mode must preserve existing practice high score");
+  assert.equal(await page.locator("#duel-share").isVisible(),false);
+  assert.equal(await page.locator("#passport-count").innerText(),"7/7");
   const sound=page.locator("#sound-toggle");
   assert.equal(await sound.getAttribute("aria-pressed"),"false");
   await sound.click();

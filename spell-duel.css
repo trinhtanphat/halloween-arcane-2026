@@ -61,3 +61,15 @@
 @media(max-width:530px){.duel-arena{padding:10px}.duel-ghost-stage{height:265px;min-height:265px}.duel-ghost{transform:scale(.82);transform-origin:center top;margin-top:15px}.duel-ghost-bar{margin-top:5px}.duel-target-rune{top:153px;font-size:45px}.duel-pads{gap:5px}.duel-pads button{min-height:77px;gap:4px}.duel-pads button span{font-size:30px}.duel-pads button small{font-size:7px}.duel-arena-head,.duel-arena-foot{font-size:8px}.duel-stats strong{font-size:25px}.duel-panel h3{font-size:30px}}
 @media(prefers-reduced-motion:reduce){.duel-ghost,.duel-ghost-bar span{transition:none!important}}
 .effects-off .duel-ghost,.effects-off .duel-ghost-bar span{transition:none!important}
+
+/* Daily Ghost Rhythm Challenge: fair offline seed + shareable result */
+.duel-modes{grid-template-columns:repeat(3,minmax(0,1fr))}
+.duel-modes button{min-width:0;padding:10px 4px;overflow-wrap:anywhere}
+.duel-daily-label{display:block;margin:12px 0 3px!important;padding:10px 12px;border:1px solid #d9bd865b;background:#392b4e;color:#f6dca8!important;font:700 10px/1.7 var(--sans)!important;letter-spacing:.02em}
+.duel-daily-label[hidden]{display:none!important}
+.duel-daily-label strong{color:#ffffff}
+.duel-share-preview{white-space:pre-line;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text;background:#1e1d2d;padding:10px;border:1px dashed #e2c09170;color:#d9f0df!important;line-height:1.8!important;margin-top:11px!important}
+.duel-share-preview[hidden]{display:none!important}
+.duel-actions #duel-share{grid-column:1/-1;background:#5b4470;border-color:#d9c18e;color:#fff0d9}
+.duel-actions #duel-share[hidden]{display:none!important}
+@media(max-width:390px){.duel-modes button{font-size:9px;letter-spacing:0;padding:8px 2px}.duel-daily-label{font-size:9px!important}}

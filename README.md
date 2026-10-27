@@ -239,3 +239,11 @@ An original optional rhythm-reaction minigame now appears after the Rune Memory 
 - PWA static cache v21 includes spell-duel.js and spell-duel.css for offline play. Browser smoke checks the twelve-hit practice victory, combo arithmetic, keyboard/click input, separate best scores, pause behavior, loss/replay, unchanged Passport achievements, and gameplay while offline.
 
 The synthesized audio is an original sound effect, not a copyrighted song.
+
+## Bonus Chapter XXII — Daily Ghost Rhythm Challenge
+
+The Ghost Rhythm Duel now includes a third mode, **"MỖI NGÀY"**, which generates the same 16-rune rhythm pattern on every device for a given Vietnamese calendar date (Asia/Ho_Chi_Minh). Pattern generation is purely local and deterministic using a versioned string hash and xorshift32 PRNG; no API, account, background synchronization or server-side leaderboard is involved. Replaying on the same date presents the same order. The sequence/date are fixed at the start of each run, so a midnight rollover does not corrupt a running game.
+
+A daily personal best is stored under a **date-scoped** localStorage key, separate from the permanent Practice and Rhythm records. Results have a copy/share control with score, hit count, max combo and challenge date, plus an invitation link to this section. Clipboard failures fall back to browser copy and a selectable on-page summary. Sound remains opt-in and synthesized, and all original 7/7 Passport stamps are unchanged.
+
+Browser tests assert deterministic patterns across independent pages and replay, 16-note count, paused daily timer, failed-round result, shareable text, distinct daily best, unchanged practice record, PWA offline and the existing gameplay regression suite. Service worker cache v22 refreshes both arcade files.

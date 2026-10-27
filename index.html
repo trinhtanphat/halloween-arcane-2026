@@ -448,7 +448,9 @@
             <div class="duel-modes" role="group" aria-label="Chọn chế độ đấu trường">
               <button type="button" data-duel-mode="practice" aria-pressed="true">✧ LUYỆN TẬP</button>
               <button type="button" data-duel-mode="duel" aria-pressed="false">✶ ĐẤU NHỊP</button>
+              <button type="button" data-duel-mode="daily" aria-pressed="false">☾ MỖI NGÀY</button>
             </div>
+            <p class="duel-daily-label" id="duel-daily-label" hidden>☾ THỬ THÁCH NGÀY <strong id="duel-daily-date">—</strong> · CÙNG CHUỖI PHÉP CHO TẤT CẢ NGƯỜI CHƠI</p>
             <div class="duel-stats">
               <div><small>ĐIỂM</small><strong id="duel-score">0</strong></div>
               <div><small>COMBO</small><strong id="duel-combo">0</strong></div>
@@ -459,14 +461,16 @@
             <p class="duel-feedback" id="duel-feedback" role="status" aria-live="polite">✦ Chọn chế độ và bắt đầu!</p>
             <div class="duel-result" id="duel-result" hidden>
               <strong id="duel-result-title">✦ KẾT THÚC!</strong><p id="duel-result-text"></p>
+              <p class="duel-share-preview" id="duel-share-preview" hidden></p>
             </div>
             <div class="duel-actions">
               <button type="button" id="duel-start" class="btn btn-primary">✦ BẮT ĐẦU ĐẤU PHÉP</button>
               <button type="button" id="duel-pause" disabled>Ⅱ TẠM DỪNG</button>
               <button type="button" id="duel-restart">↺ CHƠI LẠI</button>
+              <button type="button" id="duel-share" hidden>↗ CHIA SẺ KẾT QUẢ</button>
             </div>
             <button type="button" id="duel-sound" aria-pressed="false">♫ ÂM PHÉP: TẮT</button>
-            <small class="duel-note">ÂM THANH TỔNG HỢP GỐC · TẮT ÂM MẶC ĐỊNH · HỖ TRỢ 1–4, CẢM ỨNG, GIẢM CHUYỂN ĐỘNG · KỶ LỤC LƯU TRÊN THIẾT BỊ</small>
+            <small class="duel-note">THỬ THÁCH MỖI NGÀY THEO GIỜ VIỆT NAM · CHUỖI PHÉP GIỐNG NHAU TRÊN MỌI THIẾT BỊ · KỶ LỤC RIÊNG THEO NGÀY · KHÔNG CÓ BẢNG XẾP HẠNG MÁY CHỦ<br>ÂM THANH TỔNG HỢP GỐC · TẮT ÂM MẶC ĐỊNH · HỖ TRỢ 1–4, CẢM ỨNG, GIẢM CHUYỂN ĐỘNG · KỶ LỤC LƯU TRÊN THIẾT BỊ</small>
           </div>
         </div>
       </div>
