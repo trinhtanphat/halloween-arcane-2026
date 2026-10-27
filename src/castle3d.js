@@ -10,11 +10,17 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   const message=document.querySelector("#castle-tour-status");
   const modeLabel=document.querySelector("#castle-tour-mode");
   const toggle=document.querySelector("#castle-tour-start");
+  const viewToggle=document.querySelector("#castle-tour-view");
+  const walkHud=document.querySelector("#castle-walk-hud");
+  const walkPad=document.querySelector("#castle-walk-pad");
+  const walkInteract=document.querySelector("#castle-walk-interact");
   const roomButtons=[...root.querySelectorAll("[data-castle-room]")];
   const roomNames={hall:"Đại Sảnh Bóng Đêm",library:"Thư Viện Bí Ẩn",tower:"Tháp Thiên Văn",crypt:"Hầm Mộ Cổ"};
   const roomPoints={hall:[0,2.15,2.5],library:[-3.65,4.3,1.8],tower:[3.65,5.05,-1.1],crypt:[0,1.4,-4.45]};
   let selected="hall",renderer=null,scene=null,camera=null,hotspots=[],glowObjects=[],raf=0,active=false,inView=true;
   let theta=.58,phi=.43,radius=13.8,dragging=false,moved=false,lastX=0,lastY=0,lastFrame=0;
+  let viewMode="orbit",walkX=0,walkZ=11.5,walkYaw=0,walkPitch=-.08,walkNear=null,walkLast=0,walkPortals=[];
+  const walkKeys=new Set();
   const target=new THREE.Vector3(0,2,0),wanted=new THREE.Vector3(0,2,0);
   const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
   const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -27,6 +33,13 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     toggle.setAttribute("aria-pressed",String(mode==="webgl"));
     toggle.textContent=mode==="webgl"?"✧ TẮT 3D":"✦ KÍCH HOẠT 3D";
     canvas.style.display=mode==="webgl"?"block":"none";
+    if(mode!=="webgl"){viewMode="orbit";walkKeys.clear();}
+    root.dataset.tourView=viewMode;
+    viewToggle.disabled=mode!=="webgl";
+    viewToggle.setAttribute("aria-pressed",String(mode==="webgl"&&viewMode==="walk"));
+    viewToggle.textContent=viewMode==="walk"?"✧ TRỞ VỀ TOÀN CẢNH":"🚶 ĐI BỘ WASD";
+    walkHud.hidden=mode!=="webgl"||viewMode!=="walk";
+    walkPad.hidden=mode!=="webgl"||viewMode!=="walk";
   }
   function pickRoom(id,notify=true){
     if(!Object.hasOwn(roomNames,id))return;
@@ -116,6 +129,37 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       ring.position.copy(sphere.position);ring.userData.room=id;scene.add(ring);
       glowObjects.push(ring);
     }
+    // The front courtyard is walkable in first-person view, without external models.
+    objectBox(15,.18,12,0x272438,0,-.34,9);
+    objectBox(2.5,.055,10.8,0x6f607a,0,-.215,9.05);
+    for(let i=0;i<8;i++){
+      const z=4.7+i*1.18;
+      for(const x of [-1.4,1.4]){
+        objectBox(.25,.085,.65,0x8b799b,x,-.16,z);
+      }
+    }
+    const portals=[
+      {id:"hall",x:-3.6,z:5.75,color:0xf3be7a},
+      {id:"library",x:-1.35,z:6.8,color:0xbe91fb},
+      {id:"tower",x:1.35,z:6.8,color:0xbbe8ff},
+      {id:"crypt",x:3.6,z:5.75,color:0x9ddcb1}
+    ];
+    for(const portal of portals){
+      // A paired set of standing stones surrounds a glowing crystal.
+      for(const offset of [-.57,.57]){
+        objectBox(.3,2.05,.37,0x82728f,portal.x+offset,.97,portal.z);
+        objectBox(.43,.17,.42,0xc3a783,portal.x+offset,2.03,portal.z);
+      }
+      objectBox(1.4,.23,.42,0x9b849e,portal.x,2.15,portal.z);
+      const crystal=new THREE.Mesh(
+        new THREE.OctahedronGeometry(.34,0),
+        new THREE.MeshStandardMaterial({color:portal.color,emissive:portal.color,emissiveIntensity:1.75,metalness:.22,roughness:.24})
+      );
+      crystal.position.set(portal.x,1.55,portal.z);crystal.userData.room=portal.id;
+      scene.add(crystal);walkPortals.push(crystal);
+      const aura=new THREE.PointLight(portal.color,6,3);
+      aura.position.copy(crystal.position);scene.add(aura);
+    }
     // A distant moon and original procedurally distributed points of light.
     const moon=new THREE.Mesh(new THREE.SphereGeometry(1.16,24,16),new THREE.MeshBasicMaterial({color:0xf7dfbe}));
     moon.position.set(-6.1,9,-11.4);scene.add(moon);
@@ -141,6 +185,72 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     const z=target.z+Math.cos(theta)*cos*radius;
     camera.position.set(x,y,z);camera.lookAt(target);
   }
+  function updateWalkCamera(){
+    if(!camera)return;
+    camera.position.set(walkX,1.64,walkZ);
+    camera.lookAt(walkX-Math.sin(walkYaw),1.64+Math.sin(walkPitch),walkZ-Math.cos(walkYaw));
+    canvas.dataset.walkX=walkX.toFixed(2);
+    canvas.dataset.walkZ=walkZ.toFixed(2);
+    canvas.dataset.walkYaw=walkYaw.toFixed(3);
+    document.querySelector("#castle-walk-coords").textContent="X "+walkX.toFixed(1)+" · Z "+walkZ.toFixed(1);
+  }
+  function nearestPortal(){
+    let nearest=null,distance=Infinity;
+    for(const portal of walkPortals){
+      const d=Math.hypot(portal.position.x-walkX,portal.position.z-walkZ);
+      if(d<distance){distance=d;nearest=portal.userData.room;}
+    }
+    return distance<=1.85?nearest:null;
+  }
+  function updateNearby(){
+    const found=nearestPortal();
+    walkInteract.disabled=!(active&&viewMode==="walk"&&found);
+    document.querySelector("#castle-walk-nearby").textContent=found
+      ?"✦ CỔNG "+roomNames[found].toUpperCase()+" — NHẤN E / VÀO CỔNG"
+      :"ĐI ĐẾN MỘT TRONG BỐN CỔNG SÁNG ĐỂ TƯƠNG TÁC";
+    if(found!==walkNear){
+      walkNear=found;
+      if(found)showStatus("✦ Đã đến cổng "+roomNames[found]+". Nhấn E hoặc VÀO CỔNG để mở câu đố.");
+    }
+  }
+  function walkMove(forward=0,strafe=0,units=.65){
+    if(!active||viewMode!=="walk")return;
+    const length=Math.hypot(forward,strafe)||1;
+    forward/=length;strafe/=length;
+    // Solid courtyard bounds keep the player outside castle walls and cliffs.
+    walkX=THREE.MathUtils.clamp(walkX+(-Math.sin(walkYaw)*forward+Math.cos(walkYaw)*strafe)*units,-6.6,6.6);
+    walkZ=THREE.MathUtils.clamp(walkZ+(-Math.cos(walkYaw)*forward-Math.sin(walkYaw)*strafe)*units,4.75,14.2);
+    updateWalkCamera();updateNearby();
+  }
+  function updateWalkMovement(now){
+    const delta=Math.min(.065,Math.max(0,(now-walkLast)/1000));
+    walkLast=now;
+    if(!walkKeys.size)return;
+    const forward=Number(walkKeys.has("w")||walkKeys.has("arrowup"))-Number(walkKeys.has("s")||walkKeys.has("arrowdown"));
+    const strafe=Number(walkKeys.has("d"))-Number(walkKeys.has("a"));
+    if(walkKeys.has("arrowleft"))walkYaw-=delta*1.6;
+    if(walkKeys.has("arrowright"))walkYaw+=delta*1.6;
+    if(forward||strafe)walkMove(forward,strafe,delta*4.25);
+    else updateWalkCamera();
+  }
+  function switchView(){
+    if(!active)return;
+    viewMode=viewMode==="walk"?"orbit":"walk";
+    walkKeys.clear();dragging=false;
+    if(viewMode==="walk"){
+      walkX=0;walkZ=11.5;walkYaw=0;walkPitch=-.08;
+      updateWalkCamera();updateNearby();
+      showStatus("✦ Đang đi bộ ngoài sân lâu đài. W/A/S/D di chuyển, mũi tên quay, E vào cổng.");
+      canvas.focus({preventScroll:true});
+    }else{
+      updateCamera(1);
+      showStatus("✦ Đã trở lại góc nhìn toàn cảnh 3D.");
+    }
+    root.dataset.tourView=viewMode;
+    viewToggle.setAttribute("aria-pressed",String(viewMode==="walk"));
+    viewToggle.textContent=viewMode==="walk"?"✧ TRỞ VỀ TOÀN CẢNH":"🚶 ĐI BỘ WASD";
+    walkHud.hidden=viewMode!=="walk";walkPad.hidden=viewMode!=="walk";
+  }
   function resize(){
     if(!renderer||!camera)return;
     const rect=stage.getBoundingClientRect();
@@ -163,16 +273,17 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     renderer=null;scene=null;camera=null;hotspots=[];glowObjects=[];
   }
   function stop(reason){
-    active=false;dragging=false;dispose();setMode("illustration");
+    active=false;dragging=false;walkKeys.clear();walkNear=null;dispose();setMode("illustration");
     if(reason)showStatus(reason);
   }
   function renderFrame(now){
     if(!active)return;
     raf=requestAnimationFrame(renderFrame);
-    if(document.hidden||!inView)return;
+    if(document.hidden||!inView){walkLast=now;return;}
     if(now-lastFrame<(window.innerWidth<680?1000/25:1000/36))return;
     lastFrame=now;
-    updateCamera();
+    if(viewMode==="walk")updateWalkMovement(now);
+    else updateCamera();
     if(isEffectsEnabled()&&!reduceMotion){
       const t=now*.001;
       glowObjects.forEach((mesh,i)=>{mesh.rotation.z=Math.sin(t*.55+i)*.12;});
@@ -191,7 +302,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       canvas.style.display="block";
       renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:"default",alpha:false});
       makeCastle();resize();renderer.render(scene,camera);
-      active=true;lastFrame=0;setMode("webgl");
+      active=true;lastFrame=0;walkLast=0;setMode("webgl");
       showStatus("✦ Lâu đài 3D đã mở. Kéo để xoay hoặc chạm các quả cầu sáng để chọn phòng.");
       raf=requestAnimationFrame(renderFrame);
     }catch(error){
@@ -200,6 +311,17 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     }
   }
   toggle.addEventListener("click",()=>{if(active)stop("Đã tắt WebGL để tiết kiệm tài nguyên. Vẫn chọn phòng bằng nút được.");else start();});
+  viewToggle.addEventListener("click",switchView);
+  document.querySelectorAll("[data-walk-action]").forEach(button=>button.addEventListener("click",()=>{
+    if(!active||viewMode!=="walk")return;
+    const action=button.dataset.walkAction;
+    if(action==="forward")walkMove(1,0,.7);
+    if(action==="back")walkMove(-1,0,.7);
+    if(action==="left")walkMove(0,-1,.7);
+    if(action==="right")walkMove(0,1,.7);
+    if(action==="turn-left"){walkYaw-=.24;updateWalkCamera();}
+    if(action==="turn-right"){walkYaw+=.24;updateWalkCamera();}
+  }));
   function orbit(delta){theta+=delta;canvas.dataset.orbitYaw=theta.toFixed(3);if(active)updateCamera(.22);}
   function zoom(delta){radius=THREE.MathUtils.clamp(radius+delta,7.6,22);canvas.dataset.orbitZoom=radius.toFixed(2);if(active)updateCamera(.22);}
   document.querySelector("#castle-tour-left").addEventListener("click",()=>orbit(-.28));
@@ -207,12 +329,24 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   document.querySelector("#castle-tour-zoom-in").addEventListener("click",()=>zoom(-1.4));
   document.querySelector("#castle-tour-zoom-out").addEventListener("click",()=>zoom(1.4));
   canvas.addEventListener("keydown",e=>{
+    if(viewMode==="walk"&&active){
+      const key=e.key.toLowerCase();
+      if(key==="e"){e.preventDefault();if(!e.repeat)walkInteract.click();return;}
+      if(key==="escape"){e.preventDefault();switchView();return;}
+      if(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright"].includes(key)){
+        e.preventDefault();walkKeys.add(key);return;
+      }
+      return;
+    }
     const deltas={ArrowLeft:-.22,ArrowRight:.22,ArrowUp:-.13,ArrowDown:.13};
     if(!(e.key in deltas))return;
     e.preventDefault();
     if(e.key==="ArrowLeft"||e.key==="ArrowRight")orbit(deltas[e.key]);
     else phi=THREE.MathUtils.clamp(phi+deltas[e.key],.13,1.17);
   });
+  canvas.addEventListener("keyup",e=>walkKeys.delete(e.key.toLowerCase()));
+  canvas.addEventListener("blur",()=>walkKeys.clear());
+  window.addEventListener("keyup",e=>walkKeys.delete(e.key.toLowerCase()));
   canvas.addEventListener("wheel",e=>{if(!active)return;e.preventDefault();zoom(Math.sign(e.deltaY)*.85);},{passive:false});
   canvas.addEventListener("pointerdown",e=>{
     if(!active)return;
@@ -223,8 +357,14 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     if(!dragging||!active)return;
     const dx=e.clientX-lastX,dy=e.clientY-lastY;
     if(Math.abs(dx)+Math.abs(dy)>2)moved=true;
-    theta-=dx*.008;canvas.dataset.orbitYaw=theta.toFixed(3);
-    phi=THREE.MathUtils.clamp(phi+dy*.005,.13,1.17);
+    if(viewMode==="walk"){
+      walkYaw-=dx*.006;
+      walkPitch=THREE.MathUtils.clamp(walkPitch-dy*.004,-.65,.5);
+      updateWalkCamera();
+    }else{
+      theta-=dx*.008;canvas.dataset.orbitYaw=theta.toFixed(3);
+      phi=THREE.MathUtils.clamp(phi+dy*.005,.13,1.17);
+    }
     lastX=e.clientX;lastY=e.clientY;
   });
   canvas.addEventListener("pointerup",e=>{
@@ -234,7 +374,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     const rect=canvas.getBoundingClientRect();
     pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);
     raycaster.setFromCamera(pointer,camera);
-    const intersections=raycaster.intersectObjects(hotspots,false);
+    const intersections=raycaster.intersectObjects(viewMode==="walk"?walkPortals:hotspots,false);
     if(intersections.length)pickRoom(intersections[0].object.userData.room);
   });
   canvas.addEventListener("pointercancel",()=>{dragging=false;});
@@ -248,11 +388,17 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   if(typeof ResizeObserver!=="undefined")new ResizeObserver(()=>{if(active)resize();}).observe(stage);
   window.addEventListener("pagehide",()=>stop(),{once:true});
   roomButtons.forEach(button=>button.addEventListener("click",()=>pickRoom(button.dataset.castleRoom)));
-  document.querySelector("#castle-tour-enter").addEventListener("click",()=>{
+  function openSelectedRoom(){
     const room=document.querySelector('#expedition-map [data-room="'+selected+'"]');
     room?.click();
     document.querySelector("#expedition-scene")?.scrollIntoView({block:"center",behavior:reduceMotion?"auto":"smooth"});
     showStatus("✦ Đã mở câu đố tại "+roomNames[selected]+".");
+  }
+  document.querySelector("#castle-tour-enter").addEventListener("click",openSelectedRoom);
+  walkInteract.addEventListener("click",()=>{
+    if(!active||viewMode!=="walk"||!walkNear)return;
+    pickRoom(walkNear);
+    openSelectedRoom();
   });
   document.querySelectorAll("#expedition-map [data-room]").forEach(button=>{
     button.addEventListener("click",()=>pickRoom(button.dataset.room,false));

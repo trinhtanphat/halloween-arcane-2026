@@ -135,3 +135,14 @@ The game is fiction and is fully client-side. No account or server endpoint is u
 - **WebGL-safe:** Gracefully uses an original CSS-illustrated castle when WebGL is disabled or lost. The room selector and all riddles remain available in 2D, with truthful mode labels.
 - **Offline PWA:** service worker cache v10 includes castle-tour.css; the bundled app.js contains the new procedural Three.js module.
 - **Automated tests:** confirm the 3D launch and teardown, arrow-key orbit controls, zoom, 2D-only fallback, integration with room selection, offline mode, and all existing quests.
+
+## First-person castle courtyard (WASD, touch and portal interaction)
+
+- Added a genuine first-person camera mode to the existing opt-in Three.js castle tour. Visitors explicitly activate 3D, then press "ĐI BỘ WASD" to enter the courtyard.
+- The courtyard is original procedural geometry with a paved path and four glowing runic gateways. No third-party 3D meshes or extra download services are needed.
+- Keyboard: W/A/S/D to move, arrow keys to walk/turn, drag/touch to look, and E to enter a nearby gateway. Accessible on-screen mobile controls provide directional steps, turning, and a proximity-gated portal interaction button.
+- Movement is bounded to a courtyard, keeping the camera outside the castle's solid walls and away from the edges. The nearby-gateway indicator provides text guidance.
+- Switching back to the original orbit camera, switching off WebGL, or losing graphics support preserves the existing interactive 2D room selector, four relic quests and seven passport achievements.
+- FPS throttling, hidden/offscreen rendering pauses, and disposal of Three.js geometry/materials remain in place; no movement continues after keyboard focus leaves the canvas.
+- Automated browser checks cover movement via W and on-screen controls, turning, portal entry, boundary collision, mode switch and 2D fallback.
+- Offline service-worker cache v11 refreshes the modified bundled app.js, castle-tour.css and index.html.

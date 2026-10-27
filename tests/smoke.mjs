@@ -66,6 +66,37 @@ try {
     await page.locator("#castle-tour-canvas").focus();
     await page.keyboard.press("ArrowLeft");
     assert.notEqual(Number(await page.locator("#castle-tour-canvas").getAttribute("data-orbit-yaw")),yaw);
+    // First-person movement: W, on-screen controls, proximity interaction and bounds.
+    assert.equal(await page.locator("#castle-tour-view").isEnabled(),true);
+    await page.locator("#castle-tour-view").click();
+    assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-view"),"walk");
+    assert.equal(await page.locator("#castle-walk-pad").isVisible(),true);
+    const initialZ=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    await page.locator("#castle-tour-canvas").focus();
+    await page.keyboard.down("w");
+    await page.waitForTimeout(450);
+    await page.keyboard.up("w");
+    assert.ok(Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"))<initialZ-.3,"W moves forward");
+    const yaw0=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-yaw"));
+    await page.locator('[data-walk-action="turn-left"]').click();
+    assert.notEqual(Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-yaw")),yaw0);
+    await page.locator('[data-walk-action="turn-right"]').click();
+    const x0=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-x"));
+    await page.locator('[data-walk-action="right"]').click();
+    assert.ok(Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-x"))>x0);
+    for(let i=0;i<6;i++)await page.locator('[data-walk-action="forward"]').click();
+    assert.equal(await page.locator("#castle-walk-interact").isEnabled(),true,"must reach a glowing portal");
+    await page.locator("#castle-tour-canvas").focus();
+    await page.keyboard.press("e");
+    assert.ok(["tower","library"].includes(await page.locator("#expedition-scene").getAttribute("data-room-scene")),"E interacts with nearby portal");
+    await page.locator("#castle-walk-interact").click();
+    assert.ok(["tower","library"].includes(await page.locator("#expedition-scene").getAttribute("data-room-scene")));
+    for(let i=0;i<15;i++)await page.locator('[data-walk-action="forward"]').click();
+    const boundaryZ=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    assert.ok(boundaryZ>=4.75 && boundaryZ<=14.2,"walking remains in the courtyard");
+    await page.locator("#castle-tour-view").click();
+    assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-view"),"orbit");
+    assert.equal(await page.locator("#castle-walk-pad").isVisible(),false);
     await page.locator("#castle-tour-start").click();
     assert.equal(await page.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
   }else{
@@ -289,6 +320,8 @@ try {
   assert.equal(await forcedFallback.locator(".pumpkin-eye").count(),2);
   await forcedFallback.locator("#castle-tour-start").click();
   assert.equal(await forcedFallback.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
+  assert.equal(await forcedFallback.locator("#castle-tour-view").isDisabled(),true);
+  assert.equal(await forcedFallback.locator("#castle-walk-pad").isVisible(),false);
   assert.equal(await forcedFallback.locator("#castle-tour-start").getAttribute("aria-pressed"),"false");
   await forcedFallback.locator('[data-castle-room="crypt"]').click();
   await forcedFallback.locator("#castle-tour-enter").click();
@@ -383,7 +416,7 @@ try {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,castle_tour_3d:castleMode,castle_tour_controls:true,first_person_walk:castleMode==='webgl',candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

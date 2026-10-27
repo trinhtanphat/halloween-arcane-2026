@@ -195,7 +195,7 @@
             <span id="castle-tour-mode">3D CHƯA KÍCH HOẠT</span>
           </div>
           <div class="castle-tour-stage" id="castle-tour-stage">
-            <canvas id="castle-tour-canvas" tabindex="0" aria-label="Mô hình lâu đài Ravenhollow ba chiều: kéo để xoay, cuộn để thu phóng và dùng phím mũi tên để điều khiển" aria-description="Bấm kích hoạt 3D, sau đó dùng phím mũi tên hoặc kéo chuột để xoay, dùng cuộn chuột hoặc nút phóng to thu nhỏ để điều chỉnh khoảng cách"></canvas>
+            <canvas id="castle-tour-canvas" tabindex="0" aria-label="Lâu đài Ravenhollow 3D: xoay bằng chuột hoặc chuyển sang chế độ đi bộ WASD" aria-description="Chế độ ngắm toàn cảnh dùng mũi tên, cuộn và kéo; chế độ đi bộ dùng W A S D, mũi tên để quay, phím E để tương tác với cổng phòng"></canvas>
             <div id="castle-tour-illustration" class="castle-tour-illustration" role="img" aria-label="Minh họa lâu đài ma thuật với trăng tròn, hai tháp cao, cổng vòm và ánh sáng kỳ ảo">
               <div class="tour-moon"></div><div class="tour-sky-stars">✧　✦　☽　✧　✶</div>
               <div class="tour-structure" aria-hidden="true">
@@ -205,6 +205,7 @@
               </div>
               <div class="tour-foreground"></div>
             </div>
+            <div class="castle-walk-hud" id="castle-walk-hud" hidden aria-live="off"><span>✦ FIRST-PERSON EXPLORATION</span><strong id="castle-walk-coords">X 0.0 · Z 11.0</strong><small id="castle-walk-nearby">TIẾN GẦN CỔNG PHÉP THUẬT ĐỂ VÀO PHÒNG</small></div>
             <div class="castle-tour-overlay">
               <div class="castle-tour-eyebrow">A JOURNEY THROUGH FOUR SECRET REALMS</div>
               <h3 id="castle-tour-heading">BƯỚC VÀO <em>LÂU ĐÀI 3D.</em></h3>
@@ -220,13 +221,27 @@
             </div>
             <div class="castle-tour-actions">
               <button type="button" class="btn btn-outline" id="castle-tour-start" aria-pressed="false">✦ KÍCH HOẠT 3D</button>
+              <button type="button" class="btn btn-outline" id="castle-tour-view" aria-pressed="false" disabled>🚶 ĐI BỘ WASD</button>
               <button type="button" class="castle-tour-control" id="castle-tour-left" aria-label="Xoay lâu đài sang trái">↶</button>
               <button type="button" class="castle-tour-control" id="castle-tour-right" aria-label="Xoay lâu đài sang phải">↷</button>
               <button type="button" class="castle-tour-control" id="castle-tour-zoom-in" aria-label="Phóng to lâu đài">+</button>
               <button type="button" class="castle-tour-control" id="castle-tour-zoom-out" aria-label="Thu nhỏ lâu đài">−</button>
               <button type="button" class="btn btn-primary" id="castle-tour-enter">VÀO PHÒNG ĐÃ CHỌN ↗</button>
             </div>
-            <p class="castle-tour-help">DÙNG CHUỘT / CHẠM ĐỂ XOAY, CUỘN ĐỂ THU PHÓNG · BẤM ĐIỂM SÁNG TRONG CẢNH 3D ĐỂ CHỌN PHÒNG · CÁC NÚT CHỌN PHÒNG LUÔN HOẠT ĐỘNG Ở CHẾ ĐỘ 2D.</p>
+            <div class="castle-walk-pad" id="castle-walk-pad" hidden aria-label="Điều khiển đi bộ trên màn hình cảm ứng">
+              <div class="castle-walk-dpad" role="group" aria-label="Di chuyển quanh sân lâu đài">
+                <button type="button" data-walk-action="forward" aria-label="Tiến lên">↑</button>
+                <button type="button" data-walk-action="left" aria-label="Sang trái">←</button>
+                <button type="button" data-walk-action="back" aria-label="Lùi lại">↓</button>
+                <button type="button" data-walk-action="right" aria-label="Sang phải">→</button>
+              </div>
+              <div class="castle-walk-actions" role="group" aria-label="Xoay hướng nhìn và tương tác">
+                <button type="button" data-walk-action="turn-left" aria-label="Quay trái">↶ QUAY</button>
+                <button type="button" data-walk-action="turn-right" aria-label="Quay phải">QUAY ↷</button>
+                <button type="button" id="castle-walk-interact" aria-label="Tương tác với cổng phòng gần nhất" disabled>✦ VÀO CỔNG</button>
+              </div>
+            </div>
+            <p class="castle-tour-help">CHẾ ĐỘ NGẮM: KÉO / CUỘN ĐỂ XOAY VÀ PHÓNG TO. CHẾ ĐỘ ĐI BỘ: W A S D ĐỂ DI CHUYỂN, MŨI TÊN ĐỂ NHÌN, PHÍM E ĐỂ VÀO CỔNG. NÚT CHỌN PHÒNG VẪN HOẠT ĐỘNG KHI KHÔNG CÓ WEBGL.</p>
           </div>
         </div>
 

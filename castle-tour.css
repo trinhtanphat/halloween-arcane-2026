@@ -38,3 +38,27 @@
 .castle-tour[data-render-mode=webgl] #castle-tour-canvas{display:block}
 @media(max-width:720px){.castle-tour-stage{height:380px}.castle-tour-room-list{grid-template-columns:repeat(2,minmax(0,1fr))}.castle-tour-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}.castle-tour-actions #castle-tour-start,.castle-tour-actions #castle-tour-enter{grid-column:span 2}.castle-tour-actions .btn{font-size:9px}.castle-tour-control{min-width:0}}
 @media(max-width:430px){.castle-tour-header{font-size:8px;padding:12px}.castle-tour-stage{height:340px}.castle-tour-overlay{inset:13px 13px auto}.castle-tour-overlay h3{font-size:21px}.castle-tour-overlay p{font-size:10px}.tour-structure{width:93%;height:245px}.tour-tower{height:192px}.tour-tower-right{height:210px}.tour-keep{height:160px}.tour-door{height:82px}.tour-moon{width:108px;height:108px;left:calc(50% - 54px)}.castle-tour-footer{padding:13px}.castle-tour-room-list button{font-size:9px}.castle-tour-help{font-size:8px}}
+
+/* Optional true first-person courtyard exploration; never shown on 2D fallback. */
+.castle-tour[data-tour-view="walk"] #castle-tour-canvas{touch-action:none;cursor:crosshair}
+.castle-walk-hud{position:absolute;bottom:14px;left:17px;z-index:4;background:#120f25cc;border:1px solid #dfb67a8c;padding:10px 13px;max-width:calc(100% - 34px);display:flex;flex-direction:column;gap:5px;pointer-events:none;text-shadow:0 2px 5px #000}
+.castle-walk-hud[hidden],.castle-walk-pad[hidden]{display:none!important}
+.castle-walk-hud>span{font:600 9px var(--sans);letter-spacing:.16em;color:#f3c98b}
+.castle-walk-hud strong{font:600 12px var(--serif);color:#f8e6c7}
+.castle-walk-hud small{font:9px/1.5 var(--sans);letter-spacing:.05em;color:#e6d2e5}
+#castle-tour-view:disabled{opacity:.48;cursor:not-allowed}
+#castle-tour-view[aria-pressed=true]{border-color:#a6e2be;background:#3d6149;color:#ecffe9}
+.castle-walk-pad{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:14px;border:1px solid #cba87645;background:#261b34;padding:12px}
+.castle-walk-dpad{display:grid;grid-template-columns:repeat(3,38px);grid-template-rows:repeat(2,37px);gap:6px}
+.castle-walk-dpad button:nth-child(1){grid-column:2;grid-row:1}
+.castle-walk-dpad button:nth-child(2){grid-column:1;grid-row:2}
+.castle-walk-dpad button:nth-child(3){grid-column:2;grid-row:2}
+.castle-walk-dpad button:nth-child(4){grid-column:3;grid-row:2}
+.castle-walk-pad button{min-height:36px;border:1px solid #d4a8788c;background:#493452;color:#f9deb6;font:600 13px var(--sans)}
+.castle-walk-pad button:hover:not(:disabled),.castle-walk-pad button:focus-visible{background:#77526f;border-color:#ffe4b6}
+.castle-walk-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.castle-walk-actions button{min-height:48px;min-width:72px;padding:0 13px;font-size:10px}
+.castle-walk-actions #castle-walk-interact{background:#e9bb76;color:#2a1c2f;font-size:10px}
+.castle-walk-actions #castle-walk-interact:disabled{background:#3f344c;color:#ad9bb3;cursor:not-allowed;opacity:.6}
+@media(max-width:690px){.castle-tour-actions #castle-tour-view{grid-column:span 2}.castle-walk-pad{flex-direction:column;align-items:stretch}.castle-walk-dpad{justify-content:center}.castle-walk-actions{justify-content:center}.castle-walk-actions button{flex:1}.castle-walk-hud{bottom:10px;left:10px}}
+@media(prefers-reduced-motion:reduce){.castle-walk-hud{transition:none}}
