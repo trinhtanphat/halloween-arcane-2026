@@ -208,3 +208,13 @@ Regression tests exercise long press, release (must stop), single-step taps, los
 - Retains npm test as the full gameplay, responsive, PWA/offline and achievement smoke suite; cache version v18 updates the changed expedition, passport, and bundled Three.js scripts.
 
 Result definition: no failures detected in the documented tested scope — not a guarantee that every GPU, OS, browser version or assistive technology has been exhaustively certified.
+
+## Release QA XX — mobile touch, multi-tab synchronization, optional browser runtime
+
+- The reliability suite now includes a real touch-enabled mobile viewport with touchStart/touchEnd input, not a mouse simulation. It checks continuous hold, prompt release, single-tap movement and no horizontal overflow in the 3D UI.
+- Fixed missing same-origin cross-tab quest synchronization: if a visitor keeps two Ravenhollow tabs open, new relics, unlocked vault state and quest replay refresh the other tab's canonical 2D quest UI. Changes dispatch the original ravenhollow-progress event, keeping the 3D chest, compass and Passport in sync with no duplicate stored achievements. The suite verifies both directions.
+- npm test and npm run test:reliability accept an optional BROWSER_EXE environment variable for a preinstalled Chromium-family browser. Default remains Google Chrome.
+- On WIN11-181, Chrome headless passed seven reliability tests. Microsoft Edge is present, but its headless process exited before browser startup with status 1002: Edge compatibility is UNVERIFIED. No system security settings or policies were changed or bypassed.
+- Service worker v19 refreshes the cross-tab sync module. Existing WebGL, 2D fallback, offline, and Passport progress remain supported.
+
+A passing test suite is not proof of exhaustive certification on every operating system, browser engine, GPU and assistive-technology combination.

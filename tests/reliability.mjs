@@ -38,7 +38,7 @@ async function test(name,fn){
   console.log("PASS "+name);
 }
 try{
-  browser=await chromium.launch({headless:true,executablePath:"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",args:["--no-first-run","--disable-background-networking","--enable-unsafe-swiftshader"]});
+  browser=await chromium.launch({headless:true,executablePath:process.env.BROWSER_EXE||"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",args:["--no-first-run","--disable-background-networking","--enable-unsafe-swiftshader"]});
   await test("invalid vault state never grants final relic or passport stamp",async()=>{
     const {page,context}=await createPage({
       "ravenhollow-expedition-relics":'["hall","unexpected-room","hall"]',
@@ -76,6 +76,35 @@ try{
     assert.equal(await page.locator("#expedition-relic").isVisible(),true);
     await context.close();
   });
+  await test("two tabs synchronize relics, opened vault, and replay",async()=>{
+    const {page:writer,context}=await createPage();
+    const reader=await context.newPage();
+    reader.on("pageerror",error=>report.errors.push(error.message));
+    await reader.goto(base,{waitUntil:"load",timeout:30000});
+    const answers={hall:1,library:0,tower:2,crypt:0};
+    for(const [id,correct] of Object.entries(answers)){
+      await writer.locator('#expedition-map [data-room="'+id+'"]').click();
+      await writer.locator('#expedition-answers [data-answer="'+correct+'"]').click();
+      await reader.waitForFunction((room)=>
+        document.querySelector('#expedition-map [data-room="'+room+'"]')?.classList.contains("found"),id);
+    }
+    assert.match(await reader.locator("#expedition-progress-label").innerText(),/4\s*\/\s*4/);
+    assert.equal(await reader.locator("#castle-tour").getAttribute("data-vault-state"),"ready");
+    await writer.locator("#vault-open").click();
+    await reader.waitForFunction(()=>document.querySelector("#castle-tour")?.dataset.vaultState==="opened");
+    assert.equal(await reader.locator("#expedition-final").isVisible(),true);
+    assert.equal(await reader.locator("#stamp-vault").getAttribute("data-complete"),"true");
+    await writer.locator("#expedition-replay").click();
+    await reader.waitForFunction(()=>document.querySelector("#castle-tour")?.dataset.vaultState==="locked");
+    assert.match(await reader.locator("#expedition-progress-label").innerText(),/0\s*\/\s*4/);
+    assert.equal(await reader.locator("#stamp-vault").getAttribute("data-complete"),"false");
+    assert.equal(await reader.locator("#expedition-final").isVisible(),false);
+    // Progress made from the other tab must also propagate back.
+    await reader.locator('#expedition-map [data-room="hall"]').click();
+    await reader.locator('#expedition-answers [data-answer="1"]').click();
+    await writer.waitForFunction(()=>document.querySelector('#expedition-map [data-room="hall"]')?.classList.contains("found"));
+    await context.close();
+  });
   await test("WebGL can repeatedly initialize and dispose with room transitions",async()=>{
     const {page,context}=await createPage();
     for(let i=0;i<4;i++){
@@ -92,6 +121,42 @@ try{
       assert.equal(await page.locator("#castle-wayfinder").isVisible(),false);
     }
     assert.equal(await page.locator("[data-castle-room]").count(),4);
+    await context.close();
+  });
+  await test("genuine mobile touch hold, release and single-tap movement",async()=>{
+    // Emulate actual touch pointer events, not mouse clicks.
+    const context=await browser.newContext({
+      viewport:{width:390,height:844},deviceScaleFactor:1,hasTouch:true,isMobile:true
+    });
+    const page=await context.newPage();
+    page.on("pageerror",error=>report.errors.push(error.message));
+    await page.goto(base,{waitUntil:"load",timeout:30000});
+    await page.locator("#castle-tour-start").click();
+    assert.equal(await page.locator("#castle-tour").getAttribute("data-render-mode"),"webgl");
+    await page.locator("#castle-tour-view").click();
+    const control=page.locator('[data-walk-action="forward"]');
+    await control.scrollIntoViewIfNeeded();
+    const rect=await control.boundingBox();
+    assert.ok(rect?.width>=35&&rect?.height>=35,"phone pad has adequate target size");
+    const x=rect.x+rect.width/2,y=rect.y+rect.height/2;
+    const initial=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    const client=await context.newCDPSession(page);
+    await client.send("Input.dispatchTouchEvent",{type:"touchStart",touchPoints:[{x,y}]});
+    await page.waitForTimeout(720);
+    const held=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    assert.ok(held<initial-1.25,"touch hold must move steadily: "+initial+" -> "+held);
+    await client.send("Input.dispatchTouchEvent",{type:"touchEnd",touchPoints:[]});
+    await page.waitForTimeout(90);
+    assert.equal(await control.getAttribute("data-pressed"),null);
+    const released=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    await page.waitForTimeout(220);
+    const after=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    assert.ok(Math.abs(after-released)<.08,"released touch must stop movement: "+released+" -> "+after);
+    await page.touchscreen.tap(x,y);
+    const tapped=Number(await page.locator("#castle-tour-canvas").getAttribute("data-walk-z"));
+    assert.ok(tapped<=after-.62&&tapped>=after-.78,"mobile tap must move one step: "+after+" -> "+tapped);
+    assert.equal(await page.locator("#castle-wayfinder").isVisible(),true);
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+3),"mobile 3D pad should not overflow");
     await context.close();
   });
   await test("castle WebGL context loss gracefully falls back to fully working 2D",async()=>{

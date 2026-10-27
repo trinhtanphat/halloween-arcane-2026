@@ -23,7 +23,7 @@ await new Promise(resolve=>server.listen(PORT,"127.0.0.1",resolve));
 const base = (process.env.SMOKE_URL || "http://127.0.0.1:"+server.address().port).replace(/\/$/, "");
 let browser;
 try {
-  const chrome = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+  const chrome = process.env.BROWSER_EXE || "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
   browser = await chromium.launch({headless:true,executablePath:chrome,args:["--no-first-run","--disable-background-networking","--enable-unsafe-swiftshader"]});
   const context = await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
   const page = await context.newPage();

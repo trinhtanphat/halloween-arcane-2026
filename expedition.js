@@ -133,4 +133,13 @@ $("#expedition-replay").addEventListener("click",()=>{
   renderRoom("hall");
   window.dispatchEvent(new Event("ravenhollow-progress"));
 });
+// Synchronize all quest consumers when progress changes in another tab.
+// Storage events are delivered only to other tabs of the same origin.
+window.addEventListener("storage",event=>{
+  if(event.key!==null&&event.key!==storeKey&&event.key!==vaultKey)return;
+  collected=restoreRelics();
+  opened=read(vaultKey)==="1"&&collected.size===rooms.length;
+  renderRoom(current);
+  window.dispatchEvent(new Event("ravenhollow-progress"));
+});
 renderRoom("hall");
