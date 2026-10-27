@@ -79,3 +79,5 @@
 .effects-off .cauldron-bubbles i,.effects-off .cauldron-fire i{animation:none!important}
 /* The fifth achievement is a real bonus objective, with responsive 5-column desktop stamps. */
 @media(min-width:1100px){.passport-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+/* Seven badges — four compact columns at wide desktop sizes, then responsive existing rules. */
+@media(min-width:1100px){.passport-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}

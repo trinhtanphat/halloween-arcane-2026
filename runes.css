@@ -1,0 +1,43 @@
+/* Ancient Rune Memory Game — accessible 12/16 real-button board */
+.rune-section{background:radial-gradient(ellipse at 17% 41%,#382b5770,transparent 58%),#12101f;border-block:1px solid #dcaf7660}
+.rune-layout{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);align-items:center;gap:44px}
+.rune-board-shell{position:relative;padding:20px 18px 22px;border:1px solid #c5a06e90;background:linear-gradient(135deg,#2b203c,#110e1c);box-shadow:0 27px 76px #05020e8c,inset 0 0 33px #94709c24}
+.rune-board-shell:before{content:"";pointer-events:none;position:absolute;inset:8px;border:1px solid #d5b67e31}
+.rune-frame-head,.rune-frame-foot{display:flex;justify-content:space-between;gap:10px;color:#d8b57f;letter-spacing:.1em;font-size:9px;line-height:1.5}
+.rune-frame-head{margin:1px 0 19px}.rune-frame-foot{margin-top:18px;color:#ab9baf}
+.rune-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;position:relative}
+.rune-board .rune-card{min-width:0;aspect-ratio:.75;min-height:94px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:8px 2px;color:#d4b4ea;border:1px solid #ae8cb27a;background:radial-gradient(ellipse at 50% 27%,#654d7498,#322240 65%,#1a1529);box-shadow:inset 0 0 0 4px #bfaa9f15,0 5px 12px #0003;transition:transform .16s,border-color .16s,background .18s;cursor:pointer}
+.rune-board .rune-card:not(:disabled):hover{transform:translateY(-3px);border-color:#f0c68a;background:#654a75}
+.rune-board .rune-card:focus-visible{outline:3px solid #fff1c1;outline-offset:2px}
+.rune-card.revealed{border-color:#e7bd82;background:radial-gradient(ellipse at 42% 23%,#866d84,#403250 73%);color:#fff0d4}
+.rune-card.matched{border-color:#a9dfaf;background:radial-gradient(ellipse at 50% 22%,#456b577f,#262d32);color:#d4f6d2;cursor:default}
+.rune-face-symbol{font:500 clamp(27px,4vw,53px) Georgia,serif;line-height:1.1;text-shadow:0 0 17px #dca16b8c}
+.rune-face-name{font:700 8px/1.4 var(--sans);letter-spacing:.04em;text-align:center;max-width:100%;min-height:11px}
+.rune-board[data-level=hard] .rune-card{min-height:72px;aspect-ratio:.88}
+.rune-board[data-level=hard] .rune-face-symbol{font-size:clamp(26px,3.2vw,40px)}
+.rune-panel .tiny-rule{margin-bottom:14px}
+.rune-panel h3{font:600 clamp(28px,3vw,40px)/1.4 var(--serif);margin:0 0 14px}
+.rune-panel h3 em{font:400 1.2em "Great Vibes",cursive;color:var(--gold)}
+.rune-panel>p:not(.rune-message){font:13px/1.9 var(--sans);color:#c9bad0;margin:0 0 22px}
+.rune-difficulties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.rune-difficulties button{min-height:50px;padding:12px 6px;border:1px solid #cfaa7858;color:#efddc7;background:#30243c;font-size:10px;line-height:1.5}
+.rune-difficulties button[aria-pressed=true]{border-color:#f2c789;background:#574262;color:#fff1d6}
+.rune-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:24px 0 0}
+.rune-stats>div{padding:15px 5px;text-align:center;display:flex;align-items:center;flex-direction:column;gap:9px;border:1px solid #d0ab7947;background:#241b31}
+.rune-stats span{font-size:9px;color:var(--gold);letter-spacing:.08em}
+.rune-stats strong{font:600 30px var(--serif)}
+.rune-stats small{color:#a99ab1;font-size:8px;letter-spacing:.06em;line-height:1.5}
+.rune-progress{height:4px;background:#503d57;margin:22px 0}
+.rune-progress>div{width:0;height:100%;background:linear-gradient(90deg,#9373e9,#e7c080);transition:width .3s}
+.rune-message{font-size:12px;line-height:1.8;color:#efd3a5;min-height:44px}
+.rune-victory{display:flex;gap:12px;align-items:center;padding:14px;background:#43554052;border:1px solid #b8d79d7a;margin:17px 0}
+.rune-victory[hidden]{display:none}
+.rune-victory>span{font:40px var(--serif);color:#d2e9bc}
+.rune-victory strong{font:600 13px var(--serif)}
+.rune-victory p{font:12px/1.7 var(--sans);color:#ddd6d2;margin:7px 0 0}
+#rune-restart{min-height:47px;font-size:11px;margin:12px 0}
+.rune-note{display:block;font-size:9px;line-height:1.7;color:#9e90ab;letter-spacing:.07em;margin-top:14px}
+@media(max-width:1000px){.rune-layout{grid-template-columns:1fr;gap:37px}.rune-board-shell{width:min(100%,650px);margin:auto}.rune-panel{max-width:680px;width:100%;margin:auto}}
+@media(max-width:580px){.rune-board-shell{padding:15px 10px}.rune-board{gap:7px}.rune-board .rune-card{min-height:67px}.rune-board[data-level=hard] .rune-card{min-height:58px}.rune-face-symbol{font-size:30px}.rune-face-name{font-size:7px}.rune-panel h3{font-size:29px}.rune-stats strong{font-size:25px}.rune-frame-head,.rune-frame-foot{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.rune-board .rune-card{transition:none!important}}
+.effects-off .rune-board .rune-card{transition:none!important}

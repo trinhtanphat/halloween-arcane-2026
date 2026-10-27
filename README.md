@@ -114,3 +114,14 @@ The game is original, fictional and browser-only; no login, purchases or analyti
 - **Automated QA:** Verify each design palette changes pixels, nickname synchronization, invalid input, actual downloadable PNG magic bytes and dimensions, offline preview, all previous minigames and 320–1440px responsive views.
 
 The virtual Halloween date is 31 October 2026, 18:00 in GMT+7; the website is a fictional online experience, not a real-world ticketed gathering.
+
+## Ancient Rune Memory — Chapter XII
+
+- Original memory matching minigame: 6 pairs (normal) or 8 pairs (advanced), randomly shuffled, untimed, touch-and-keyboard friendly.
+- Each card is a native button with hidden/revealed/matched screen-reader labels and Enter/Space support; mismatched pairs remain visible briefly before flipping back.
+- Best move counts are tracked separately per difficulty in browser localStorage, and can be replayed without losing unlocked achievements.
+- Completing at least six pairs grants the seventh Arcane Passport stamp, the Memory Keeper. All six existing achievements are preserved.
+- The offline PWA cache (v9) now includes the new rune CSS/JS.
+- Automated tests cover a deliberate mismatch, its timed reset, keyboard-driven matching, victory, best score persistence and replay at both normal and hard difficulty, all earlier site features and offline rendering.
+
+The game is fiction and is fully client-side. No account or server endpoint is used for player data.

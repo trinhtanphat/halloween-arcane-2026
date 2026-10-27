@@ -36,7 +36,7 @@ try {
   assert.match(await page.locator("#hero-title").innerText(),/MAGIC/);
   assert.equal(await page.locator(".realm-card").count(),3);
   assert.equal(await page.locator(".timeline-item").count(),4);
-  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css","expedition.js","expedition.css","pumpkin.css","soundscape.js","candy.js","candy.css","poster.js","poster.css"];
+  const assets = ["assets/party-hero.webp","assets/party-location.webp","assets/haunted-hero.jpg","assets/haunted-origins.jpg","app.js","style.css","magic.js","magic.css","sw.js","manifest.webmanifest","icon-192.png","icon-512.png","alchemy.js","alchemy.css","expedition.js","expedition.css","pumpkin.css","soundscape.js","candy.js","candy.css","poster.js","poster.css","runes.js","runes.css"];
   for(const asset of assets){
     const response=await page.request.get(base+"/"+asset);
     assert.equal(response.status(),200,"asset missing: "+asset);
@@ -125,7 +125,7 @@ try {
     if(i<potionRecipes.length-1) await page.locator("#potion-next").click();
   }
   assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-potion-finished")),"1");
-  assert.equal(await page.locator("#passport-count").innerText(),"4/6");
+  assert.equal(await page.locator("#passport-count").innerText(),"4/7");
   assert.equal(await page.locator(".passport-stamp.unlocked").count(),4);
   assert.equal(await page.locator("#vault-open").isDisabled(),true);
   await page.locator('[data-room="hall"]').click();
@@ -142,7 +142,7 @@ try {
   await page.locator("#vault-open").click();
   assert.equal(await page.locator("#expedition-final").isVisible(),true);
   assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-vault-finished")),"1");
-  assert.equal(await page.locator("#passport-count").innerText(),"5/6");
+  assert.equal(await page.locator("#passport-count").innerText(),"5/7");
   assert.equal(await page.locator(".passport-stamp.unlocked").count(),5);
   assert.equal(await page.locator("#candy-score").innerText(),"0");
   assert.equal(await page.locator("#candy-round").innerText(),"LƯỢT 01 / 10");
@@ -168,17 +168,67 @@ try {
   assert.equal(await page.locator("#candy-best").innerText(),"9");
   assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-candy-best")),"9");
   assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-candy-finished")),"1");
-  assert.equal(await page.locator("#passport-count").innerText(),"6/6");
+  assert.equal(await page.locator("#passport-count").innerText(),"6/7");
   assert.equal(await page.locator(".passport-stamp.unlocked").count(),6);
-  assert.match(await page.locator("#passport-status").innerText(),/ĐẠI PHÁP SƯ/);
+  assert.match(await page.locator("#passport-status").innerText(),/6\/7 nhiệm vụ/);
   await page.locator("#candy-replay").click();
   assert.equal(await page.locator("#candy-score").innerText(),"0");
   assert.equal(await page.locator("#candy-best").innerText(),"9");
-  assert.equal(await page.locator("#passport-count").innerText(),"6/6");
+  assert.equal(await page.locator("#passport-count").innerText(),"6/7");
   await page.locator("#potion-next").click();
   assert.match(await page.locator("#potion-step").innerText(),/01 \/ 03/);
-  assert.equal(await page.locator("#passport-count").innerText(),"6/6");
+  assert.equal(await page.locator("#passport-count").innerText(),"6/7");
   assert.equal((JSON.parse(await page.evaluate(()=>localStorage.getItem("ravenhollow-spells")))).length,4);
+  // Accessible memory game: mismatched cards reset after a short grace period.
+  assert.equal(await page.locator("#rune-board .rune-card").count(),12);
+  assert.equal(await page.locator("#rune-matched").innerText(),"0/6");
+  assert.equal(await page.locator("#passport-count").innerText(),"6/7");
+  let cards=await page.locator("#rune-board .rune-card").evaluateAll(els=>els.map(e=>({index:Number(e.dataset.runeCard),pair:e.dataset.pair})));
+  const wrongPair=cards.find(card=>card.pair!==cards[0].pair);
+  await page.locator('[data-rune-card="0"]').click();
+  assert.match(await page.locator('[data-rune-card="0"]').getAttribute("aria-label"),/đang mở/);
+  await page.locator('[data-rune-card="'+wrongPair.index+'"]').click();
+  assert.equal(await page.locator("#rune-moves").innerText(),"1");
+  assert.match(await page.locator("#rune-message").innerText(),/khác nhau/);
+  await page.waitForFunction(()=>[...document.querySelectorAll("#rune-board .rune-card")].every(e=>!e.classList.contains("revealed")),{timeout:7000});
+  const pairs=new Map();
+  for(const card of cards){if(!pairs.has(card.pair))pairs.set(card.pair,[]);pairs.get(card.pair).push(card.index);}
+  for(const indices of pairs.values()){
+    // Mouse/touch and native keyboard activation must both reveal a card.
+    await page.locator('[data-rune-card="'+indices[0]+'"]').focus();
+    await page.keyboard.press("Enter");
+    await page.locator('[data-rune-card="'+indices[1]+'"]').click();
+  }
+  assert.equal(await page.locator("#rune-matched").innerText(),"6/6");
+  assert.equal(await page.locator("#rune-moves").innerText(),"7");
+  assert.equal(await page.locator("#rune-victory").isVisible(),true);
+  assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-runes-finished")),"1");
+  assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-runes-best-normal")),"7");
+  assert.equal(await page.locator("#passport-count").innerText(),"7/7");
+  assert.equal(await page.locator(".passport-stamp.unlocked").count(),7);
+  assert.match(await page.locator("#passport-status").innerText(),/ĐẠI PHÁP SƯ/);
+  await page.locator("#rune-restart").click();
+  assert.equal(await page.locator("#rune-moves").innerText(),"0");
+  assert.equal(await page.locator("#rune-best").innerText(),"7");
+  assert.equal(await page.locator("#passport-count").innerText(),"7/7");
+  // Hard mode adds two new pairs without removing previously earned badges.
+  await page.locator('[data-rune-level="hard"]').click();
+  assert.equal(await page.locator("#rune-board .rune-card").count(),16);
+  assert.equal(await page.locator('[data-rune-level="hard"]').getAttribute("aria-pressed"),"true");
+  cards=await page.locator("#rune-board .rune-card").evaluateAll(els=>els.map(e=>({index:Number(e.dataset.runeCard),pair:e.dataset.pair})));
+  const hardPairs=new Map();
+  for(const card of cards){if(!hardPairs.has(card.pair))hardPairs.set(card.pair,[]);hardPairs.get(card.pair).push(card.index);}
+  for(const indices of hardPairs.values()){
+    await page.locator('[data-rune-card="'+indices[0]+'"]').click();
+    await page.locator('[data-rune-card="'+indices[1]+'"]').click();
+  }
+  assert.equal(await page.locator("#rune-matched").innerText(),"8/8");
+  assert.equal(await page.locator("#rune-moves").innerText(),"8");
+  assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-runes-best-hard")),"8");
+  assert.equal(await page.locator("#passport-count").innerText(),"7/7");
+  await page.locator("#rune-restart").click();
+  assert.equal(await page.locator("#rune-best").innerText(),"8");
+
   const sound=page.locator("#sound-toggle");
   assert.equal(await sound.getAttribute("aria-pressed"),"false");
   await sound.click();
@@ -278,9 +328,12 @@ try {
     assert.match(await offlineTab.locator("#hero-title").innerText(),/MAGIC/);
     assert.equal(await offlineTab.locator(".order-emblem").count(),4);
     assert.equal(await offlineTab.locator("[data-ingredient]").count(),6);
-    assert.equal(await offlineTab.locator("#passport-count").innerText(),"6/6");
+    assert.equal(await offlineTab.locator("#passport-count").innerText(),"7/7");
     assert.equal(await offlineTab.locator("#candy-road [data-lane]").count(),5);
     assert.equal(await offlineTab.locator("#candy-best").innerText(),"9");
+    assert.equal(await offlineTab.locator("#rune-board .rune-card").count(),12);
+    assert.equal(await offlineTab.locator("#rune-best").innerText(),"7");
+    assert.equal(await offlineTab.evaluate(()=>localStorage.getItem("ravenhollow-runes-best-hard")),"8");
     assert.equal(await offlineTab.locator("#poster-canvas").evaluate(canvas=>canvas.width),900);
     assert.equal(await offlineTab.locator("#poster-name").inputValue(),"Luna Pháp Sư");
     assert.equal(await offlineTab.locator("[data-room]").count(),4);
@@ -289,7 +342,7 @@ try {
     await context.setOffline(false);
     await offlineTab.close();
   }
-  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",passport:"6/6",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
+  console.log(JSON.stringify({ok:true,base,assets_checked:assets.length,quiz:"3/3",invitation:true,ghosts:true,mobile_menu:true,mobileWidth,viewports:viewportReport,scene,render_mode:mode,webgl_fallback:true,context_loss_tested:contextLossChecked,soundscape:true,effects_toggle:true,arcane_orders:true,spellbook:true,potions:true,castle_expedition:true,candy_hunt:true,poster_studio:true,poster_png:"900x1200",rune_memory:true,passport:"7/7",pwa:sw,offline:true,js_errors:errors,desktop_screenshot:"tests/artifacts/desktop.png",mobile_screenshot:"tests/artifacts/mobile.png"},null,2));
   await context.close();
 }catch(err){console.error(err.stack||String(err));process.exitCode=1;}
 finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

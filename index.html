@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="./pumpkin.css" />
   <link rel="stylesheet" href="./candy.css" />
   <link rel="stylesheet" href="./poster.css" />
+  <link rel="stylesheet" href="./runes.css" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <script defer type="module" src="./app.js"></script>
   <script defer type="module" src="./magic.js"></script>
@@ -35,6 +36,7 @@
   <script defer type="module" src="./soundscape.js"></script>
   <script defer type="module" src="./candy.js"></script>
   <script defer type="module" src="./poster.js"></script>
+  <script defer type="module" src="./runes.js"></script>
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -50,7 +52,7 @@
       </a>
       <button class="menu-toggle" id="menu-toggle" aria-label="Mở menu" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
       <nav id="nav-links" aria-label="Điều hướng chính">
-        <a href="#about">Truyền thuyết</a><a href="#realms">Thế giới</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#expedition">Lâu đài</a><a href="#candy-hunt">Săn kẹo</a><a href="#alchemy">Pha chế</a><a href="#schedule">Đêm hội</a><a href="#poster-studio">Tạo thiệp</a>
+        <a href="#about">Truyền thuyết</a><a href="#realms">Thế giới</a><a href="#portal">Cổng phép thuật</a><a href="#orders">Học viện</a><a href="#expedition">Lâu đài</a><a href="#candy-hunt">Săn kẹo</a><a href="#rune-memory">Ghép cặp</a><a href="#alchemy">Pha chế</a><a href="#schedule">Đêm hội</a><a href="#poster-studio">Tạo thiệp</a>
       </nav>
       <a href="#invitation" class="nav-cta"><span>Nhận thư mời</span><span aria-hidden="true">↗</span></a>
     </div>
@@ -268,6 +270,43 @@
       </div>
     </section>
 
+
+    <section class="section rune-section" id="rune-memory" aria-labelledby="rune-title">
+      <div class="shell">
+        <div class="section-heading center">
+          <span class="kicker">✦ THE FORGOTTEN RUNES ✦</span>
+          <h2 id="rune-title">KÝ ỨC <em>CỔ NGỮ</em></h2>
+          <p>Lật những phiến đá khắc dấu ấn cổ đại, ghi nhớ vị trí rồi tìm các cặp giống nhau. Vượt qua sáu cặp để nhận huy hiệu Người Giữ Ký Ức.</p>
+        </div>
+        <div class="rune-layout">
+          <div class="rune-board-shell">
+            <div class="rune-frame-head"><span>✧ ANCIENT MEMORY CHAMBER</span><span id="rune-board-mode">6 CẶP CỔ NGỮ</span></div>
+            <div class="rune-board" id="rune-board" role="group" aria-label="Bàn chơi ghép cặp cổ ngữ bằng các nút tương tác"></div>
+            <div class="rune-frame-foot"><span>✦ RAVENHOLLOW ACADEMY</span><span>CHOOSE • REMEMBER • MATCH</span></div>
+          </div>
+          <div class="rune-panel">
+            <span class="tiny-rule">CHAPTER XII — MEMORY OF THE ARCANE</span>
+            <h3>Giải mã <em>những phiến đá.</em></h3>
+            <p>Lật hai phiến đá. Nếu giống nhau, cặp ký hiệu sẽ được niêm phong; nếu khác nhau, hai phiến đá úp lại. Bạn không bị giới hạn thời gian.</p>
+            <div class="rune-difficulties" role="group" aria-label="Chọn cấp độ ghép cặp">
+              <button type="button" data-rune-level="normal" aria-pressed="true">✧ 6 CẶP · THƯỜNG</button>
+              <button type="button" data-rune-level="hard" aria-pressed="false">✶ 8 CẶP · THỬ THÁCH</button>
+            </div>
+            <div class="rune-stats">
+              <div><span>ĐÃ GHÉP</span><strong id="rune-matched">0/6</strong><small>CẶP CỔ NGỮ</small></div>
+              <div><span>LƯỢT LẬT</span><strong id="rune-moves">0</strong><small>HAI PHIẾN / LƯỢT</small></div>
+              <div><span>KỶ LỤC</span><strong id="rune-best">—</strong><small>ÍT LƯỢT NHẤT</small></div>
+            </div>
+            <div class="rune-progress"><div id="rune-progress-fill"></div></div>
+            <p class="rune-message" id="rune-message" role="status" aria-live="polite">✦ Chọn hai phiến đá để tìm một cặp cổ ngữ.</p>
+            <div class="rune-victory" id="rune-victory" hidden><span>✶</span><div><strong>MEMORY KEEPER · HOÀN THÀNH</strong><p id="rune-win-message">Bạn đã giải mã toàn bộ cổ ngữ!</p></div></div>
+            <button type="button" class="btn btn-outline" id="rune-restart">↺ XÁO BÀI & CHƠI LẠI</button>
+            <small class="rune-note">HỖ TRỢ ENTER / SPACE / TAB · CHƠI OFFLINE · LƯU KỶ LỤC TRÊN THIẾT BỊ</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="section alchemy-section" id="alchemy" aria-labelledby="alchemy-title">
       <div class="shell">
         <div class="section-heading center">
@@ -313,7 +352,7 @@
       <div class="passport-panel">
         <div class="passport-heading">
           <div><span class="kicker">✧ YOUR ARCANE PASSPORT ✧</span><h2 id="passport-title">HÀNH TRÌNH <em>PHÁP SƯ</em></h2><p>Hoàn thành các thử thách trong trang web để mở khóa huy hiệu Đại Pháp Sư. Thành tích chỉ lưu trên trình duyệt hiện tại.</p></div>
-          <div class="passport-ring"><strong id="passport-count">0/6</strong><span>NHIỆM VỤ</span></div>
+          <div class="passport-ring"><strong id="passport-count">0/7</strong><span>NHIỆM VỤ</span></div>
         </div>
         <div class="passport-progress"><div id="passport-progress-bar"></div></div>
         <div class="passport-grid">
@@ -323,6 +362,7 @@
           <div class="passport-stamp" id="stamp-potion"><span>⚗</span><strong>NHÀ GIẢ KIM</strong><small>Pha đủ 3 loại thuốc</small></div>
           <div class="passport-stamp" id="stamp-vault"><span>✶</span><strong>NGƯỜI GIỮ KHO BÁU</strong><small>Khám phá 4 căn phòng</small></div>
           <div class="passport-stamp" id="stamp-candy"><span>🍬</span><strong>THỢ SĂN KẸO</strong><small>Nhặt ít nhất 6/10 viên kẹo</small></div>
+          <div class="passport-stamp" id="stamp-runes"><span>❖</span><strong>NGƯỜI GIỮ KÝ ỨC</strong><small>Giải mã đủ 6 cặp cổ ngữ</small></div>
         </div>
         <p class="passport-status" id="passport-status" aria-live="polite">Hành trình học viện của bạn đang bắt đầu.</p>
         <button type="button" class="btn btn-outline passport-share" id="passport-share">✦ SAO CHÉP THÀNH TÍCH</button>
