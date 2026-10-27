@@ -43,6 +43,12 @@ try {
   }
   // Interactive Three.js castle is opt-in; its 2D controls must remain useful.
   assert.equal(await page.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
+  assert.equal(await page.locator("#castle-tour").getAttribute("data-vault-state"),"locked");
+  await page.locator("#castle-vault-action").click();
+  assert.equal(await page.locator("#castle-vault-dialog").isVisible(),true);
+  assert.equal(await page.locator("#castle-vault-relics [data-collected=true]").count(),0);
+  assert.equal(await page.locator("#castle-vault-unlock").isDisabled(),true);
+  await page.locator("#castle-vault-close").click();
   assert.equal(await page.locator("[data-castle-room]").count(),4);
   assert.equal(await page.locator("#castle-tour-start").getAttribute("aria-pressed"),"false");
   await page.locator('[data-castle-room="library"]').click();
@@ -249,8 +255,30 @@ try {
     assert.equal(await page.locator('[data-room="'+room+'"] .room-check').innerText(),"✓");
   }
   assert.equal(await page.locator("#vault-open").isEnabled(),true);
-  await page.locator("#vault-open").click();
+  assert.equal(await page.locator("#castle-tour").getAttribute("data-vault-state"),"ready");
+  await page.locator("#castle-tour-start").click();
+  assert.equal(await page.locator("#castle-tour").getAttribute("data-render-mode"),"webgl");
+  await page.locator("#castle-tour-view").click();
+  assert.equal(await page.locator("#castle-tour").getAttribute("data-tour-view"),"walk");
+  assert.equal(await page.locator("#castle-walk-interact").isDisabled(),true);
+  // The treasury altar is behind the courtyard spawn, reached by stepping back.
+  await page.locator('[data-walk-action="back"]').click();
+  await page.locator('[data-walk-action="back"]').click();
+  assert.equal(await page.locator("#castle-walk-interact").isEnabled(),true);
+  assert.match(await page.locator("#castle-walk-interact").innerText(),/KHO BÁU/);
+  await page.locator("#castle-tour-canvas").focus();
+  await page.keyboard.press("e");
+  assert.equal(await page.locator("#castle-vault-dialog").isVisible(),true);
+  assert.equal(await page.locator("#castle-vault-relics [data-collected=true]").count(),4);
+  assert.equal(await page.locator("#castle-vault-unlock").isEnabled(),true);
+  await page.locator("#castle-vault-unlock").click();
+  assert.equal(await page.locator("#castle-tour").getAttribute("data-vault-state"),"opened");
+  assert.equal(await page.locator("#castle-vault-dialog").getAttribute("data-completed"),"true");
+  assert.equal(await page.locator("#castle-vault-unlock").isDisabled(),true);
   assert.equal(await page.locator("#expedition-final").isVisible(),true);
+  await page.locator("#castle-vault-return").click();
+  await page.locator("#castle-tour-start").click();
+  assert.equal(await page.locator("#castle-tour").getAttribute("data-render-mode"),"illustration");
   assert.equal(await page.evaluate(()=>localStorage.getItem("ravenhollow-vault-finished")),"1");
   assert.equal(await page.locator("#passport-count").innerText(),"5/7");
   assert.equal(await page.locator(".passport-stamp.unlocked").count(),5);

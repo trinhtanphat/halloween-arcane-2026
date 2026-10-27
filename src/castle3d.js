@@ -17,6 +17,9 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   const walkPad=document.querySelector("#castle-walk-pad");
   const walkInteract=document.querySelector("#castle-walk-interact");
   const riddleDialog=document.querySelector("#castle-riddle-dialog");
+  const vaultDialog=document.querySelector("#castle-vault-dialog");
+  const vaultAction=document.querySelector("#castle-vault-action");
+  const vaultUnlock=document.querySelector("#castle-vault-unlock");
   const riddleChoices=document.querySelector("#castle-riddle-choices");
   const riddleFeedback=document.querySelector("#castle-riddle-feedback");
   const interiorExit=document.querySelector("#castle-interior-exit");
@@ -27,6 +30,8 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   let theta=.58,phi=.43,radius=13.8,dragging=false,moved=false,lastX=0,lastY=0,lastFrame=0;
   let viewMode="orbit",walkX=0,walkZ=11.5,walkYaw=0,walkPitch=-.08,walkNear=null,walkLast=0,walkPortals=[];
   let zone="courtyard",interior=null,exteriorObjects=[],outsidePosition=null;
+  let vaultChest=null,vaultLid=null,vaultGem=null;
+  const vaultPosition={x:0,z:13.45};
   const walkKeys=new Set();
   const target=new THREE.Vector3(0,2,0),wanted=new THREE.Vector3(0,2,0);
   const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
@@ -59,6 +64,104 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     for(const sphere of hotspots)sphere.material.emissiveIntensity=sphere.userData.room===id?2.2:1.0;
     if(notify)showStatus("✦ Đã chọn "+roomNames[id]+". Nhấn VÀO PHÒNG ĐÃ CHỌN để giải câu đố.");
   }
+  function vaultProgress(){
+    const collected=[...document.querySelectorAll("#expedition-map .expedition-room.found")]
+      .map(node=>node.dataset.room);
+    const completed=!document.querySelector("#expedition-final")?.hidden;
+    return {collected,completed,ready:collected.length===4};
+  }
+  function refreshVaultDialog(){
+    const progress=vaultProgress();
+    const relicNames={
+      hall:"Ngọn Nến Hoàng Hôn",
+      library:"Trang Sách Vĩnh Cửu",
+      tower:"Mảnh Trăng Bạc",
+      crypt:"Ấn Chú Ngàn Năm"
+    };
+    const icons={hall:"♜",library:"❖",tower:"☽",crypt:"✶"};
+    const relics=document.querySelector("#castle-vault-relics");
+    relics.replaceChildren();
+    for(const id of Object.keys(relicNames)){
+      const found=progress.collected.includes(id);
+      const row=document.createElement("div");
+      row.className="castle-vault-relic";
+      row.dataset.collected=String(found);
+      row.setAttribute("role","listitem");
+      const glyph=document.createElement("b");
+      glyph.textContent=found?"✓":icons[id];
+      const name=document.createElement("span");
+      name.textContent=relicNames[id]+(found?" — đã có":" — còn thiếu");
+      row.append(glyph,name);
+      relics.append(row);
+    }
+    vaultDialog.dataset.completed=String(progress.completed);
+    document.querySelector("#castle-vault-feedback").textContent=progress.completed
+      ?"✦ Đã mở kho báu! Vương Miện Bí Ẩn thuộc về người giữ Ravenhollow."
+      :progress.ready?"✦ Bốn cổ vật đã hội tụ. Hãy giải phong ấn kho báu!"
+      :"☽ Đã có "+progress.collected.length+"/4 cổ vật. Cần thêm "+(4-progress.collected.length)+" cổ vật để mở khóa.";
+    vaultUnlock.disabled=!progress.ready||progress.completed;
+    vaultUnlock.textContent=progress.completed?"✦ KHO BÁU ĐÃ MỞ":progress.ready
+      ?"✦ GIẢI PHONG ẤN KHO BÁU":"♛ CẦN ĐỦ BỐN CỔ VẬT";
+    return progress;
+  }
+  function syncVaultState(){
+    const progress=vaultProgress();
+    root.dataset.vaultState=progress.completed?"opened":progress.ready?"ready":"locked";
+    root.dataset.vaultRelics=String(progress.collected.length);
+    vaultAction.setAttribute("aria-label",progress.completed?"Kho báu đã mở":progress.ready
+      ?"Đã đủ bốn cổ vật, khám phá kho báu cuối":"Kho báu đang khóa, thu thập đủ bốn cổ vật");
+    if(vaultGem){
+      vaultGem.material.color.setHex(progress.completed?0xc8f0a5:progress.ready?0xffe8a1:0xdcb46e);
+      vaultGem.material.emissive.setHex(progress.completed?0x8fd96b:progress.ready?0xe6b979:0xc78c42);
+      vaultGem.material.emissiveIntensity=progress.completed?2.7:progress.ready?1.6:.4;
+    }
+    if(!active||reduceMotion||!isEffectsEnabled()){
+      if(vaultLid)vaultLid.rotation.x=progress.completed?-1.12:0;
+    }
+    if(vaultDialog.open)refreshVaultDialog();
+  }
+  function closeVaultDialog(){
+    if(vaultDialog.open)vaultDialog.close();
+  }
+  function openVaultDialog(fromWorld=false){
+    if(riddleDialog.open||vaultDialog.open)return;
+    if(fromWorld&&(!active||viewMode!=="walk"||zone!=="courtyard"||!nearVault())){
+      showStatus("☽ Hãy đến gần rương báu ở cuối sân lâu đài.");
+      return;
+    }
+    walkKeys.clear();dragging=false;
+    refreshVaultDialog();
+    vaultDialog.showModal();
+    (vaultUnlock.disabled?document.querySelector("#castle-vault-return"):vaultUnlock)?.focus();
+    showStatus("♛ Bạn đã tìm thấy kho báu cuối cùng của Ravenhollow.");
+  }
+  function nearVault(){
+    return zone==="courtyard"&&Math.hypot(walkX-vaultPosition.x,walkZ-vaultPosition.z)<=1.55;
+  }
+  vaultAction.addEventListener("click",()=>{
+    if(active&&viewMode==="walk"&&zone==="interior"){
+      showStatus("☽ Hãy rời phòng để đến rương báu ngoài sân.");
+      return;
+    }
+    openVaultDialog(active&&viewMode==="walk");
+  });
+  document.querySelector("#castle-vault-close").addEventListener("click",closeVaultDialog);
+  document.querySelector("#castle-vault-return").addEventListener("click",closeVaultDialog);
+  vaultDialog.addEventListener("close",()=>{
+    walkKeys.clear();
+    if(active&&viewMode==="walk")canvas.focus({preventScroll:true});
+  });
+  vaultUnlock.addEventListener("click",()=>{
+    const progress=vaultProgress();
+    if(!progress.ready||progress.completed)return;
+    const canonical=document.querySelector("#vault-open");
+    if(canonical?.disabled)return;
+    canonical.click();
+    syncVaultState();
+    refreshVaultDialog();
+    showStatus("✦ Kho báu 3D đã giải phong ấn — Vương Miện Bí Ẩn đã được nhận!");
+  });
+  window.addEventListener("ravenhollow-progress",syncVaultState);
   function objectBox(w,h,d,color,x,y,z){
     const mat=new THREE.MeshStandardMaterial({color,roughness:.86,metalness:.12});
     const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
@@ -126,6 +229,39 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       const flame=new THREE.Mesh(new THREE.ConeGeometry(.21,.64,9),new THREE.MeshBasicMaterial({color:0xffb75b,transparent:true,opacity:.85}));
       flame.position.set(x,.92,3.6);scene.add(flame);glowObjects.push(flame);
     }
+    // A final 3D treasury chest in the courtyard, locked to four quest relics.
+    vaultChest=new THREE.Group();
+    vaultChest.position.set(vaultPosition.x,0,vaultPosition.z);
+    scene.add(vaultChest);
+    const plinth=new THREE.Mesh(new THREE.CylinderGeometry(1.0,1.14,.28,12),new THREE.MeshStandardMaterial({color:0x6f597c,roughness:.8}));
+    plinth.position.y=.12;vaultChest.add(plinth);
+    const wood=new THREE.MeshStandardMaterial({color:0x633d35,roughness:.7,metalness:.1});
+    const metal=new THREE.MeshStandardMaterial({color:0xe2ba72,metalness:.65,roughness:.29});
+    const body=new THREE.Mesh(new THREE.BoxGeometry(1.45,.81,.86),wood);
+    body.position.y=.7;vaultChest.add(body);
+    for(const z of [-.47,.47]){
+      const band=new THREE.Mesh(new THREE.BoxGeometry(1.54,.16,.08),metal);
+      band.position.set(0,.75,z);vaultChest.add(band);
+    }
+    const lock=new THREE.Mesh(new THREE.BoxGeometry(.26,.3,.1),metal);
+    lock.position.set(0,.76,.48);vaultChest.add(lock);
+    vaultLid=new THREE.Group();
+    vaultLid.position.set(0,1.12,-.43);
+    vaultChest.add(vaultLid);
+    const lid=new THREE.Mesh(new THREE.BoxGeometry(1.58,.26,1.02),wood);
+    lid.position.set(0,.14,.45);vaultLid.add(lid);
+    for(const x of [-.55,.55]){
+      const band=new THREE.Mesh(new THREE.BoxGeometry(.12,.3,1.08),metal);
+      band.position.set(x,.15,.45);vaultLid.add(band);
+    }
+    const glow=new THREE.MeshStandardMaterial({color:0xdcb46e,emissive:0xc78c42,emissiveIntensity:.4,metalness:.3});
+    vaultGem=new THREE.Mesh(new THREE.OctahedronGeometry(.33,0),glow);
+    vaultGem.position.set(0,1.65,0);vaultChest.add(vaultGem);
+    const sigil=new THREE.Mesh(new THREE.TorusGeometry(.74,.045,6,40),new THREE.MeshBasicMaterial({color:0xe3bc77}));
+    sigil.rotation.x=Math.PI/2;sigil.position.y=1.33;vaultChest.add(sigil);
+    const vaultLight=new THREE.PointLight(0xe4ac6a,7,5);
+    vaultLight.position.set(0,1.9,0);vaultChest.add(vaultLight);
+    syncVaultState();
     // Four magical clickable points. Color-coded for orientation.
     const hues={hall:0xf3be7a,library:0xbe91fb,tower:0xbbe8ff,crypt:0x9ddcb1};
     for(const [id,position] of Object.entries(roomPoints)){
@@ -332,6 +468,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     showStatus("✦ Đã ra sân lâu đài. Đến gần cổng khác để khám phá phòng tiếp theo.");
   }
   function nearestPortal(){
+    if(zone==="courtyard"&&nearVault())return "vault";
     if(zone==="interior"&&interior){
       return Math.hypot(interior.relic.position.x-walkX,interior.relic.position.z-walkZ)<=1.75
         ?interior.roomId:null;
@@ -346,20 +483,20 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   function updateNearby(){
     const found=nearestPortal();
     walkInteract.disabled=!(active&&viewMode==="walk"&&found);
-    walkInteract.textContent=zone==="interior"?"✦ GIẢI CÂU ĐỐ":"✦ VÀO CỔNG";
+    walkInteract.textContent=zone==="interior"?"✦ GIẢI CÂU ĐỐ":found==="vault"?"♛ KHO BÁU":"✦ VÀO CỔNG";
     document.querySelector("#castle-walk-nearby").textContent=zone==="interior"
       ?(found?"✦ CỔ VẬT ĐÃ Ở TRONG TẦM TAY — NHẤN E ĐỂ GIẢI ĐỐ":"TÌM CỔ VẬT PHÁT SÁNG Ở CUỐI PHÒNG — NHẤN E KHI ĐẾN GẦN")
-      :(found?"✦ CỔNG "+roomNames[found].toUpperCase()+" — NHẤN E / VÀO CỔNG"
+      :(found==="vault"?"♛ RƯƠNG BÁU CUỐI CÙNG — NHẤN E ĐỂ KIỂM TRA CỔ VẬT":found?"✦ CỔNG "+roomNames[found].toUpperCase()+" — NHẤN E / VÀO CỔNG"
       :"ĐI ĐẾN MỘT TRONG BỐN CỔNG SÁNG ĐỂ TƯƠNG TÁC");
     if(found!==walkNear){
       walkNear=found;
       if(found)showStatus(zone==="interior"
         ?"✦ Đã tìm thấy cổ vật trong "+roomNames[found]+". Nhấn E để giải câu đố."
-        :"✦ Đã đến cổng "+roomNames[found]+". Nhấn E để đi vào nội thất 3D.");
+        :found==="vault"?"♛ Đã đến rương báu. Nhấn E để giải phong ấn.":"✦ Đã đến cổng "+roomNames[found]+". Nhấn E để đi vào nội thất 3D.");
     }
   }
   function walkMove(forward=0,strafe=0,units=.65){
-    if(!active||viewMode!=="walk"||riddleDialog.open)return;
+    if(!active||viewMode!=="walk"||riddleDialog.open||vaultDialog.open)return;
     const length=Math.hypot(forward,strafe)||1;
     forward/=length;strafe/=length;
     // Solid courtyard bounds keep the player outside castle walls and cliffs.
@@ -380,7 +517,7 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     updateWalkCamera();updateNearby();
   }
   function updateWalkMovement(now){
-    if(riddleDialog.open){walkKeys.clear();walkLast=now;return;}
+    if(riddleDialog.open||vaultDialog.open){walkKeys.clear();walkLast=now;return;}
     const delta=Math.min(.065,Math.max(0,(now-walkLast)/1000));
     walkLast=now;
     if(!walkKeys.size)return;
@@ -431,9 +568,11 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     try{renderer?.dispose();}catch(_){}
     renderer=null;scene=null;camera=null;hotspots=[];glowObjects=[];walkPortals=[];
     interior=null;exteriorObjects=[];outsidePosition=null;zone="courtyard";
+    vaultChest=null;vaultLid=null;vaultGem=null;
     delete root.dataset.interiorRoom;root.dataset.tourZone=zone;
   }
   function stop(reason){
+    closeVaultDialog();
     active=false;closeRelicRiddle();dragging=false;walkKeys.clear();walkNear=null;dispose();setMode("illustration");
     if(reason)showStatus(reason);
   }
@@ -445,6 +584,11 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     lastFrame=now;
     if(viewMode==="walk")updateWalkMovement(now);
     else updateCamera();
+    if(vaultLid){
+      const open=vaultProgress().completed;
+      const targetAngle=open?-1.12:0;
+      vaultLid.rotation.x=(reduceMotion||!isEffectsEnabled())?targetAngle:THREE.MathUtils.lerp(vaultLid.rotation.x,targetAngle,.085);
+    }
     if(interior&&isEffectsEnabled()&&!reduceMotion){
       interior.relic.rotation.y=now*.0008;
       interior.relicHalo.rotation.z=now*.00035;
@@ -546,6 +690,10 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       }
       return;
     }
+    if(viewMode==="walk"&&vaultGem&&raycaster.intersectObject(vaultGem,false).length){
+      openVaultDialog(true);
+      return;
+    }
     const intersections=raycaster.intersectObjects(viewMode==="walk"?walkPortals:hotspots,false);
     if(intersections.length)pickRoom(intersections[0].object.userData.room);
   });
@@ -578,6 +726,10 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
       openRelicRiddle();
       return;
     }
+    if(walkNear==="vault"){
+      openVaultDialog(true);
+      return;
+    }
     enterInterior(walkNear);
   });
   document.querySelectorAll("#expedition-map [data-room]").forEach(button=>{
@@ -587,4 +739,5 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
   canvas.dataset.orbitYaw=theta.toFixed(3);
   canvas.dataset.orbitZoom=radius.toFixed(2);
   setMode("illustration");
+  syncVaultState();
 }

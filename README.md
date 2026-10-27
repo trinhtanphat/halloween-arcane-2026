@@ -162,3 +162,11 @@ When exploring an interior in first-person WebGL, approach its luminous relic an
 The dialog does not own a second answer list or progress store. Instead it mirrors the already installed `expedition.js` controls and clicks the canonical answer, preserving all four relics, existing `localStorage` progress, vault unlock, passport badges, and replay. Wrong answers do not grant a relic; correct answers make the matching 3D crystal glow green. Reopening a previously completed challenge displays the earned relic as read-only. Movement is frozen while the dialog is open and returns on close. WebGL fallback and 2D quests remain functional.
 
 Service worker cache v13 refreshes the new interface. Regression tests verify the dialog, wrong answer, correct answer, saved progress, close/return controls, all four rooms and legacy quests.
+
+## Forgotten Vault 3D finale — Chapter XV
+
+The Ravenhollow courtyard now includes an original procedural **3D treasure chest** behind the player's spawn area. It displays three visually distinct states: locked (fewer than four relics), ready (all four), and opened (the chest lid animates and the seal emits green light). The altar can be activated when close using **E**, a pointer click on its crystal or the on-screen interaction control. A dedicated "KHO BÁU CUỐI CÙNG" control also provides a keyboard/touch-accessible dialog from 2D, while preserving the original expedition's accessible 2D vault button.
+
+The treasury dialog lists all four canonical relics and marks which were earned; unlocking is disabled until all four are collected. On unlock, it clicks the *existing* #vault-open action, which remains the single source of truth for the existing localStorage key, vault achievement, and all seven Arcane Passport stamps. In 3D the original quest no longer scrolls the page away from the immersive scene. Dialog close/return retains the camera and progress, and the fallback 2D vault remains supported.
+
+The updated Playwright smoke suite checks the locked dialog, 0/4 and 4/4 relic state, the courtyard proximity trigger, keyboard E, unlocking via the 3D dialog, and the existing vault localStorage + passport side effects, as well as all old games, responsive widths, and PWA offline. PWA cache v14 refreshes the update.

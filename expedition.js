@@ -120,7 +120,9 @@ vaultButton.addEventListener("click",()=>{
   store(vaultKey,"1");
   updateStatus();
   window.dispatchEvent(new Event("ravenhollow-progress"));
-  vaultFinal.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
+  if(!document.querySelector("#castle-vault-dialog")?.open){
+    vaultFinal.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
+  }
 });
 $("#expedition-replay").addEventListener("click",()=>{
   collected=new Set();opened=false;store(storeKey,"[]");store(vaultKey,"");

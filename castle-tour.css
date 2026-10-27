@@ -95,3 +95,23 @@
 .castle-riddle-bottom>span{font:9px/1.6 var(--sans);color:#b7a2c7;letter-spacing:.08em}
 .castle-riddle-bottom button{border:1px solid #edc084;background:#e5b77b;color:#241729;padding:12px 18px;min-height:44px;font:700 10px var(--sans)}
 @media(max-width:580px){.castle-riddle-top{padding:11px 15px}.castle-riddle-room{padding:16px 17px 0}.castle-riddle-dialog h3{padding:0 17px}.castle-riddle-story{padding:0 17px}.castle-riddle-question{margin:0 17px 14px;padding:14px}.castle-riddle-choices{margin:0 17px 16px}.castle-riddle-feedback{margin:0 17px 17px}.castle-riddle-earned{margin:0 17px 17px}.castle-riddle-bottom{padding:16px 17px;flex-direction:column;align-items:stretch}.castle-riddle-bottom button{width:100%}}
+
+/* Final in-world treasury: accessible modal mirrors the canonical 2D vault. */
+.castle-vault-dialog{width:min(92vw,570px);max-height:90vh;overflow:auto;padding:0;border:1px solid #dfb66e;background:radial-gradient(ellipse at 50% 6%,#75587599,transparent 58%),#1a1328;color:#f7e7d1;box-shadow:0 20px 100px #030207ed}
+.castle-vault-dialog::backdrop{background:#080510d1;backdrop-filter:blur(5px)}
+.castle-vault-top{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid #d1ae705b;color:#ebc687;font:600 10px var(--sans);letter-spacing:.17em}
+.castle-vault-top button{width:39px;height:38px;background:#452f49;color:#fff1db;border:1px solid #ddb97d;font-size:19px}
+.castle-vault-crown{text-align:center;font:96px Georgia,serif;color:#dfbc73;line-height:1.1;text-shadow:0 0 38px #e8a44980;margin:14px 0 0}
+.castle-vault-dialog h3{font:600 clamp(24px,4vw,35px) var(--serif);text-align:center;margin:0;padding:0 18px}
+.castle-vault-dialog h3 em{font:400 1.2em "Great Vibes",cursive;color:#f0cb89}
+#castle-vault-description{padding:0 26px;text-align:center;line-height:1.8;font-size:13px;color:#ddcde0}
+.castle-vault-relics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:20px 25px}
+.castle-vault-relic{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #bd99596b;background:#2d2238;color:#b4a5ba;font-size:11px;line-height:1.6}
+.castle-vault-relic[data-collected=true]{border-color:#a8d4a1;color:#ebffdf;background:#34483d}
+.castle-vault-relic b{font-size:23px;color:#f1ca8f}
+.castle-vault-feedback{padding:0 26px;text-align:center;color:#eac995;font-size:12px;line-height:1.8;min-height:24px}
+.castle-vault-unlock,.castle-vault-return{display:block;width:calc(100% - 50px);margin:9px 25px;min-height:48px;padding:11px 16px;border:1px solid #e7c084;background:#e9c38b;color:#291a2f;font:700 12px var(--sans);letter-spacing:.04em}
+.castle-vault-unlock:disabled{background:#47384b;color:#bba9bf;border-color:#958299;cursor:not-allowed}
+.castle-vault-return{background:transparent;color:#f4d8b1;border-color:#a88378;margin-bottom:25px}
+.castle-vault-dialog[data-completed=true] .castle-vault-crown{color:#d9f3a7;text-shadow:0 0 60px #83ca76}
+@media(max-width:480px){.castle-vault-relics{grid-template-columns:1fr}.castle-vault-crown{font-size:69px}.castle-vault-dialog h3{font-size:26px}}

@@ -205,6 +205,16 @@
               </div>
               <div class="tour-foreground"></div>
             </div>
+            <dialog id="castle-vault-dialog" class="castle-vault-dialog" aria-labelledby="castle-vault-title" aria-describedby="castle-vault-description">
+              <div class="castle-vault-top"><span>✶ THE FORGOTTEN VAULT</span><button type="button" id="castle-vault-close" aria-label="Đóng kho báu 3D">✕</button></div>
+              <div class="castle-vault-crown" aria-hidden="true">♛</div>
+              <h3 id="castle-vault-title">KHO BÁU <em>RAVENHOLLOW</em></h3>
+              <p id="castle-vault-description">Hội tụ bốn cổ vật để giải phong ấn rương báu cuối cùng của lâu đài.</p>
+              <div id="castle-vault-relics" class="castle-vault-relics" role="list" aria-label="Tiến độ bốn cổ vật"></div>
+              <p id="castle-vault-feedback" class="castle-vault-feedback" role="status" aria-live="polite"></p>
+              <button type="button" id="castle-vault-unlock" class="castle-vault-unlock" disabled>✦ CHƯA ĐỦ CỔ VẬT</button>
+              <button type="button" id="castle-vault-return" class="castle-vault-return">↩ TRỞ LẠI SÂN LÂU ĐÀI</button>
+            </dialog>
             <dialog id="castle-riddle-dialog" class="castle-riddle-dialog" aria-labelledby="castle-riddle-title" aria-describedby="castle-riddle-question">
               <div class="castle-riddle-top"><span>✶ THE ENCHANTED RELIC CHALLENGE</span><button type="button" id="castle-riddle-close" aria-label="Đóng câu đố và trở lại đi bộ">✕</button></div>
               <span class="castle-riddle-room" id="castle-riddle-room">RAVENHOLLOW ACADEMY</span>
@@ -238,6 +248,7 @@
               <button type="button" class="castle-tour-control" id="castle-tour-zoom-in" aria-label="Phóng to lâu đài">+</button>
               <button type="button" class="castle-tour-control" id="castle-tour-zoom-out" aria-label="Thu nhỏ lâu đài">−</button>
               <button type="button" class="btn btn-primary" id="castle-tour-enter">VÀO PHÒNG ĐÃ CHỌN ↗</button>
+              <button type="button" class="btn btn-outline" id="castle-vault-action">♛ KHO BÁU CUỐI CÙNG</button>
             </div>
             <div class="castle-walk-pad" id="castle-walk-pad" hidden aria-label="Điều khiển đi bộ trên màn hình cảm ứng">
               <div class="castle-walk-dpad" role="group" aria-label="Di chuyển quanh sân lâu đài">
