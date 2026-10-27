@@ -38,7 +38,11 @@ function restoreRelics() {
     return new Set(parsed.filter(value=>typeof value==="string"&&known.has(value)));
   } catch (_) {return new Set();}
 }
-let collected=restoreRelics(), current="hall", lastWrong=null, opened=read(vaultKey)==="1";
+let collected=restoreRelics(), current="hall", lastWrong=null;
+// An interrupted backup/restore can leave the final-vault flag behind while
+// the required four relics are absent. Only a complete quest unlocks the finale.
+let opened=read(vaultKey)==="1" && collected.size===rooms.length;
+if(!opened && read(vaultKey)==="1")store(vaultKey,"");
 const buttons=[...document.querySelectorAll("[data-room]")];
 const answerBox=$("#expedition-answers");
 const vaultButton=$("#vault-open");

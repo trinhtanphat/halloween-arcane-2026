@@ -186,6 +186,9 @@ export function mountCastleTour(THREE,{isEffectsEnabled=()=>true}={}){
     showStatus("✦ Kho báu 3D đã giải phong ấn — Vương Miện Bí Ẩn đã được nhận!");
   });
   window.addEventListener("ravenhollow-progress",syncVaultState);
+  // Module scripts can execute before expedition.js has restored saved relics.
+  // Reconcile 3D quest/vault state after all deferred modules have initialized.
+  window.addEventListener("load",syncVaultState,{once:true});
   function objectBox(w,h,d,color,x,y,z){
     const mat=new THREE.MeshStandardMaterial({color,roughness:.86,metalness:.12});
     const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);

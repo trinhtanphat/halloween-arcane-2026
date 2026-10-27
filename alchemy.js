@@ -102,6 +102,13 @@ loadRecipe();
 
 // Achievements are intentionally checked from local state, never inferred from UI alone.
 const stampIds = ["order","spells","portal","potion","vault","candy","runes"];
+function validVaultProgress(){
+  if(read("ravenhollow-vault-finished")!=="1")return false;
+  try{
+    const relics=JSON.parse(read("ravenhollow-expedition-relics")||"[]");
+    return Array.isArray(relics)&&["hall","library","tower","crypt"].every(id=>relics.includes(id));
+  }catch(_){return false;}
+}
 function completed(){
   const rawOrder=read("ravenhollow-order");
   let spellList=[];
@@ -112,7 +119,7 @@ function completed(){
     spells: allSpells,
     portal: read("ravenhollow-portal-finished")==="1",
     potion: read("ravenhollow-potion-finished")==="1",
-    vault: read("ravenhollow-vault-finished")==="1",
+    vault: validVaultProgress(),
     candy: read("ravenhollow-candy-finished")==="1",
     runes: read("ravenhollow-runes-finished")==="1"
   };

@@ -198,3 +198,13 @@ The mobile direction pad now supports **press-and-hold** to walk or turn continu
 Keyboard and touch states are cleared on zone transitions, modal openings, view-mode changes, 3D shutdown, window blur and visibility loss, preventing stuck movement after interruptions. If a pointer is cancelled, its held input is removed; a new press resets its click-suppression state. Neither the canonical quests nor localStorage progression is modified.
 
 Regression tests exercise long press, release (must stop), single-step taps, loss-of-focus cancellation, collision limits, all four 3D interiors, crown chamber, responsive viewports, WebGL loss fallback and offline PWA. Cache v17 refreshes the bundled controls and CSS.
+
+## Release QA — saved-progress integrity and WebGL lifecycle (Chapter XIX)
+
+- Fixed a real save-game integrity failure: the persistent vault-open flag could survive a partial/corrupted restore while fewer than four canonical relics existed, incorrectly showing the grand finale and passport vault achievement. The expedition now validates all four distinct known room relics before accepting the saved ending and clears an orphaned completion flag.
+- The Arcane Passport independently validates its vault stamp against the same four canonical relic IDs, so script load timing or partial restore cannot award an incorrect stamp.
+- Fixed a second restore failure in the 3D UI: the Three.js tour module can initialize before the deferred expedition module restores saved data, displaying a locked 3D chest even when a full valid save is present. Reconciliation on page load now synchronizes chest state, waypoint navigation and progress after all deferred modules complete.
+- Added npm run test:reliability (tests/reliability.mjs), a standalone isolated-browser regression suite covering invalid/valid saved state and reload, corrupt JSON recovery, four real WebGL start/stop + room-entry cycles, and simulated castle WebGL context loss with working 2D fallback. Uses a separate headless Chromium instance and does not attach to existing Chrome tabs.
+- Retains npm test as the full gameplay, responsive, PWA/offline and achievement smoke suite; cache version v18 updates the changed expedition, passport, and bundled Three.js scripts.
+
+Result definition: no failures detected in the documented tested scope — not a guarantee that every GPU, OS, browser version or assistive technology has been exhaustively certified.

@@ -6,7 +6,8 @@
   "scripts": {
     "build": "esbuild src/main.js --bundle --format=esm --target=es2020 --minify --outfile=app.js",
     "check": "node --check src/main.js",
-    "test": "node tests/smoke.mjs"
+    "test": "node tests/smoke.mjs",
+    "test:reliability": "node tests/reliability.mjs"
   },
   "dependencies": {
     "three": "0.170.0"
