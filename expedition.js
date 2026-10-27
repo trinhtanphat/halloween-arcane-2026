@@ -105,6 +105,9 @@ function submitAnswer(id,answer){
     $("#expedition-feedback").textContent="☽ Chưa đúng. Hãy đọc lại câu đố và thử một lời giải khác.";
     return;
   }
+  // The other tab may have earned a relic while this tab was suspended.
+  // Merge against the latest saved state rather than overwriting with a stale copy.
+  collected=read(storeKey)===null?collected:restoreRelics();
   collected.add(id);
   store(storeKey,JSON.stringify([...collected]));
   choices.forEach(choice=>{

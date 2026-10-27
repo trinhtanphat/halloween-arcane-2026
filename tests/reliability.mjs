@@ -105,6 +105,43 @@ try{
     await writer.waitForFunction(()=>document.querySelector('#expedition-map [data-room="hall"]')?.classList.contains("found"));
     await context.close();
   });
+  await test("concurrent tabs preserve both relics even if storage events are delayed",async()=>{
+    const context=await browser.newContext({viewport:{width:1100,height:800}});
+    // Simulate suspended/background tabs where storage listeners have not run yet.
+    await context.addInitScript(()=>{
+      const originalAdd=window.addEventListener.bind(window);
+      window.addEventListener=(type,...args)=>type==="storage"?undefined:originalAdd(type,...args);
+    });
+    const a=await context.newPage(),b=await context.newPage();
+    a.on("pageerror",error=>report.errors.push(error.message));
+    b.on("pageerror",error=>report.errors.push(error.message));
+    await Promise.all([
+      a.goto(base,{waitUntil:"load",timeout:30000}),
+      b.goto(base,{waitUntil:"load",timeout:30000})
+    ]);
+    await a.locator('#expedition-map [data-room="hall"]').click();
+    await b.locator('#expedition-map [data-room="library"]').click();
+    await a.locator('#expedition-answers [data-answer="1"]').click();
+    await b.locator('#expedition-answers [data-answer="0"]').click();
+    const relics=JSON.parse(await b.evaluate(()=>localStorage.getItem("ravenhollow-expedition-relics")));
+    assert.deepEqual(new Set(relics),new Set(["hall","library"]),
+      "stale tab must merge its new relic with existing persisted relics");
+    await b.reload({waitUntil:"load"});
+    assert.match(await b.locator("#expedition-progress-label").innerText(),/2\s*\/\s*4/);
+    // A replay must not resurrect a previous run from a second stale tab.
+    // Simulate a reset from another suspended tab before storage events arrive.
+    await a.evaluate(()=>{
+      localStorage.setItem("ravenhollow-expedition-relics","[]");
+      localStorage.setItem("ravenhollow-vault-finished","");
+    });
+    await b.locator('#expedition-map [data-room="crypt"]').click();
+    await b.locator('#expedition-answers [data-answer="0"]').click();
+    const afterReset=JSON.parse(await b.evaluate(()=>localStorage.getItem("ravenhollow-expedition-relics")));
+    assert.deepEqual(afterReset,["crypt"],"stale tab must not restore relics erased by replay");
+    await a.reload({waitUntil:"load"});
+    assert.match(await a.locator("#expedition-progress-label").innerText(),/1\s*\/\s*4/);
+    await context.close();
+  });
   await test("WebGL can repeatedly initialize and dispose with room transitions",async()=>{
     const {page,context}=await createPage();
     for(let i=0;i<4;i++){

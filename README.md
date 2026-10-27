@@ -218,3 +218,11 @@ Result definition: no failures detected in the documented tested scope — not a
 - Service worker v19 refreshes the cross-tab sync module. Existing WebGL, 2D fallback, offline, and Passport progress remain supported.
 
 A passing test suite is not proof of exhaustive certification on every operating system, browser engine, GPU and assistive-technology combination.
+
+## Release QA XXI — Prevent lost relics across suspended tabs
+
+The existing cross-tab storage event synchronizes live tabs, but browsers can suspend background tabs and delay events. This exposed a real lost-update bug: two tabs with stale in-memory expedition state could each solve a different room, and the later save overwrote the earlier relic. The submit-answer handler now reads the newest persisted relic set before adding and saving a newly earned relic. If browser storage is unavailable, it retains the in-memory session's progress rather than erasing it.
+
+The regression suite now simulates delayed storage events on two same-origin tabs, validates that both independent relics survive, verifies a reset cannot resurrect relics from a suspended tab, and reruns the existing normal cross-tab sync, corrupt save, valid reload, WebGL lifecycle, actual touch events and 2D fallback checks. Cache v20 refreshes expedition.js for offline visitors.
+
+No new account system, external data transfer, browser security policy change or GitHub Actions workflow is required. The separate two-tab state is not a substitute for an atomic multiuser server, but robustly handles ordered browser storage writes even when event delivery is delayed.
