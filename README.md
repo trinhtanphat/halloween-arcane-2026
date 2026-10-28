@@ -247,3 +247,13 @@ The Ghost Rhythm Duel now includes a third mode, **"MỖI NGÀY"**, which genera
 A daily personal best is stored under a **date-scoped** localStorage key, separate from the permanent Practice and Rhythm records. Results have a copy/share control with score, hit count, max combo and challenge date, plus an invitation link to this section. Clipboard failures fall back to browser copy and a selectable on-page summary. Sound remains opt-in and synthesized, and all original 7/7 Passport stamps are unchanged.
 
 Browser tests assert deterministic patterns across independent pages and replay, 16-note count, paused daily timer, failed-round result, shareable text, distinct daily best, unchanged practice record, PWA offline and the existing gameplay regression suite. Service worker cache v22 refreshes both arcade files.
+
+## Bonus Chapter XXIII — Shareable calendar-day challenge links
+
+The Ghost Rhythm Duel now generates replayable dated challenge links, e.g. https://trinhtanphat.github.io/halloween-arcane-2026/?duelDate=2026-10-28#spell-duel
+
+An invited visitor arrives directly in the "Mỗi ngày" mode and receives the **same 16-rune sequence for the shared date**, even when the invitation is opened later. The UI clearly labels it as a shared challenge rather than today's current challenge, and offers "TRỞ VỀ THỬ THÁCH HÔM NAY" after the visitor completes or resets the current run. The return action removes only the invite URL parameter without a page reload, preserves other query parameters, and retains all personal best scores. Each run's date is immutable once it starts.
+
+The duelDate query parser requires one genuine Gregorian YYYY-MM-DD date in the supported range 2026-01-01 through the current Vietnamese calendar date, rejecting impossible dates (for example February 30), future dates, duplicates and arbitrary script strings. Invalid links fall back safely to normal practice mode. Date-scoped scores are never combined with normal Practice and Rhythm best scores. Shares contain only score, hit count, combo, date and a public URL; no accounts or other personal data.
+
+The expanded reliability suite verifies valid archived invites, same sequence across pages, a round's date being locked mid-play, dated copy/share text, switching back to today, and malformed/future/duplicate query rejection. The smoke suite additionally verifies that an invited day can launch fully offline via cached PWA assets. Static cache v23 refreshes the website scripts and styles. These are deterministic local challenges, not verifiable online leaderboards.

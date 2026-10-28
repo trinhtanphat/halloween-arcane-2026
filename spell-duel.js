@@ -14,7 +14,20 @@ const dailyDate=()=>{
   const find=type=>parts.find(part=>part.type===type).value;
   return find("year")+"-"+find("month")+"-"+find("day");
 };
-let challengeDate=dailyDate();
+// Challenge links use a real Gregorian date, never arbitrary seed text.
+function validChallengeDate(value){
+  if(typeof value!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;
+  const [year,month,day]=value.split("-").map(Number);
+  const utc=new Date(Date.UTC(year,month-1,day));
+  return year>=2026 && year<=9999 && utc.getUTCFullYear()===year &&
+    utc.getUTCMonth()===month-1 && utc.getUTCDate()===day && value<=dailyDate();
+}
+function linkedChallengeDate(){
+  const dates=new URLSearchParams(location.search).getAll("duelDate");
+  return dates.length===1&&validChallengeDate(dates[0])?dates[0]:null;
+}
+let invitedDate=linkedChallengeDate();
+let challengeDate=invitedDate||dailyDate();
 const bestKey=mode=>"ravenhollow-duel-best-"+(mode==="daily"?"daily-"+challengeDate:mode);
 function seededRunes(date,count){
   // Versioned FNV-1a + xorshift32 seed. Everyone on the same VN calendar day
@@ -34,7 +47,7 @@ let mode="practice",state="idle",sequence=[],index=0,score=0,combo=0,health=5,hi
 let startAt=0,pausedAt=0,frame=0,lastCue=-1,audio=null,muted=true;
 const start=$("#duel-start"),pauseButton=$("#duel-pause"),resetButton=$("#duel-restart");
 const feedback=$("#duel-feedback"),status=$("#duel-status");
-const soundButton=$("#duel-sound"),shareButton=$("#duel-share");
+const soundButton=$("#duel-sound"),shareButton=$("#duel-share"),todayButton=$("#duel-today");
 const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function readBest(){
@@ -98,12 +111,17 @@ function paint(){
   $("#duel-mode-note").textContent=mode==="practice"?"LUYỆN TẬP · 12 ẤN CHÚ":mode==="daily"?"THỬ THÁCH NGÀY · 16 ẤN CHÚ":"ĐẤU NHỊP · 16 ẤN CHÚ";
   $("#duel-daily-label").hidden=mode!=="daily";
   $("#duel-daily-date").textContent=mode==="daily"?challengeDate:"—";
+  $("#duel-invite-label").hidden=!(mode==="daily"&&invitedDate!==null);
+  todayButton.hidden=!(mode==="daily"&&invitedDate!==null);
+  todayButton.disabled=state==="running"||state==="paused";
+  root.dataset.challengeSource=mode==="daily"?(invitedDate?"invite":"today"):"none";
   shareButton.hidden=!(mode==="daily"&&state==="finished");
   readStats();
 }
 function cancelLoop(){if(frame)cancelAnimationFrame(frame);frame=0;}
 function reset(){
   cancelLoop();state="idle";sequence=[];index=score=combo=hits=misses=peak=0;health=5;startAt=pausedAt=0;lastCue=-1;
+  if(mode==="daily")challengeDate=invitedDate||dailyDate();
   root.style.setProperty("--duel-flight","0%");
   $("#duel-result").hidden=true;
   $("#duel-share-preview").hidden=true;
@@ -117,7 +135,7 @@ function shareSummary(){
   const outcome=health>0&&index===sequence.length?"ĐÃ THẮNG":"CHƯA THẮNG";
   return "☾ RAVENHOLLOW — THỬ THÁCH NHỊP PHÉP "+challengeDate+"\n"+
     "✧ "+outcome+" · "+score+" ĐIỂM · "+hits+"/"+sequence.length+" PHÉP TRÚNG · COMBO "+peak+"\n"+
-    "Bạn thử vượt điểm mình nhé! https://trinhtanphat.github.io/halloween-arcane-2026/#spell-duel";
+    "Bạn thử vượt điểm mình nhé! https://trinhtanphat.github.io/halloween-arcane-2026/?duelDate="+encodeURIComponent(challengeDate)+"#spell-duel";
 }
 function end(){
   cancelLoop();state="finished";
@@ -178,7 +196,7 @@ function gameTick(now){
 }
 function startGame(){
   cancelLoop();
-  challengeDate=dailyDate();
+  challengeDate=mode==="daily"?(invitedDate||dailyDate()):dailyDate();
   sequence=mode==="daily"?seededRunes(challengeDate,settings.daily.count):[];
   if(mode!=="daily")for(let i=0;i<settings[mode].count;i++){
     let value=Math.floor(Math.random()*4);
@@ -221,7 +239,7 @@ function press(lane){
 root.querySelectorAll("[data-duel-mode]").forEach(button=>button.addEventListener("click",()=>{
   if(state==="running"||state==="paused")return;
   mode=button.dataset.duelMode;
-  challengeDate=dailyDate();
+  challengeDate=invitedDate||dailyDate();
   root.querySelectorAll("[data-duel-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b===button)));
   reset();
 }));
@@ -229,6 +247,16 @@ laneButtons.forEach(button=>button.addEventListener("click",()=>press(Number(but
 start.addEventListener("click",startGame);
 pauseButton.addEventListener("click",pause);
 resetButton.addEventListener("click",reset);
+todayButton.addEventListener("click",()=>{
+  if(mode!=="daily"||(state!=="idle"&&state!=="finished")||!invitedDate)return;
+  invitedDate=null;
+  challengeDate=dailyDate();
+  const url=new URL(location.href);
+  url.searchParams.delete("duelDate");
+  history.replaceState(history.state,"",url.pathname+url.search+url.hash);
+  reset();
+  say("✦ Đã trở về thử thách hôm nay theo giờ Việt Nam.");
+});
 shareButton.addEventListener("click",async()=>{
   if(mode!=="daily"||state!=="finished")return;
   const text=shareSummary();
@@ -262,4 +290,8 @@ document.addEventListener("keydown",event=>{
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&state==="running")pause();});
 window.addEventListener("blur",()=>{if(state==="running")pause();});
 window.addEventListener("pagehide",()=>{cancelLoop();audio?.close?.().catch(()=>{});audio=null;});
+if(invitedDate){
+  mode="daily";
+  root.querySelectorAll("[data-duel-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.duelMode==="daily")));
+}
 reset();

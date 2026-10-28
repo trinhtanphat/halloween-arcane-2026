@@ -142,6 +142,52 @@ try{
     assert.match(await a.locator("#expedition-progress-label").innerText(),/1\s*\/\s*4/);
     await context.close();
   });
+  await test("shared past-day challenge link reproduces rune pattern and ignores malformed dates",async()=>{
+    const context=await browser.newContext({viewport:{width:1100,height:800}});
+    const a=await context.newPage(),b=await context.newPage();
+    for(const p of [a,b])p.on("pageerror",err=>report.errors.push(err.message));
+    const date="2026-10-27";
+    const url=base+"/?duelDate="+date+"#spell-duel";
+    await a.goto(url,{waitUntil:"load",timeout:30000});
+    assert.equal(await a.locator("#duel-game").getAttribute("data-mode"),"daily");
+    assert.equal(await a.locator("#duel-game").getAttribute("data-challenge-source"),"invite");
+    assert.equal(await a.locator("#duel-daily-date").innerText(),date);
+    assert.equal(await a.locator("#duel-invite-label").isVisible(),true);
+    assert.equal(await a.locator("#duel-today").isVisible(),true);
+    await a.locator("#duel-start").click();
+    const pattern=await a.locator("#duel-game").getAttribute("data-challenge-pattern");
+    assert.match(pattern,/^[0-3]{16}$/);
+    assert.equal(await a.locator("#duel-today").isDisabled(),true,"cannot change invite mid-round");
+    await a.locator("#duel-pause").click();
+    await b.goto(url,{waitUntil:"load",timeout:30000});
+    assert.equal(await b.locator("#duel-game").getAttribute("data-mode"),"daily");
+    await b.locator("#duel-start").click();
+    assert.equal(await b.locator("#duel-game").getAttribute("data-challenge-pattern"),pattern);
+    await b.locator("#duel-restart").click();
+    await a.locator("#duel-pause").click();
+    // Force a quick loss within a single browser task, avoiding timer advances.
+    await a.evaluate(()=>{
+      const game=document.querySelector("#duel-game");
+      for(let i=0;i<5;i++){
+        const target=Number(game.dataset.currentLane);
+        game.querySelector('[data-duel-lane="'+((target+1)%4)+'"]').click();
+      }
+    });
+    assert.equal(await a.locator("#duel-game").getAttribute("data-state"),"finished");
+    const summary=await a.locator("#duel-share-preview").innerText();
+    assert.ok(summary.includes("?duelDate="+date+"#spell-duel"),"shared link preserves archive date");
+    await a.locator("#duel-today").click();
+    assert.equal(await a.locator("#duel-game").getAttribute("data-challenge-source"),"today");
+    assert.equal(await a.locator("#duel-today").isVisible(),false);
+    assert.equal(new URL(a.url()).searchParams.has("duelDate"),false);
+    await b.goto(base+"/?duelDate=2026-02-30#spell-duel",{waitUntil:"load"});
+    assert.equal(await b.locator("#duel-game").getAttribute("data-mode"),"practice","invalid Gregorian date ignored");
+    await b.goto(base+"/?duelDate=2999-01-01#spell-duel",{waitUntil:"load"});
+    assert.equal(await b.locator("#duel-game").getAttribute("data-mode"),"practice","future date ignored");
+    await b.goto(base+"/?duelDate="+date+"&duelDate="+date+"#spell-duel",{waitUntil:"load"});
+    assert.equal(await b.locator("#duel-game").getAttribute("data-mode"),"practice","duplicate invite params ignored");
+    await context.close();
+  });
   await test("WebGL can repeatedly initialize and dispose with room transitions",async()=>{
     const {page,context}=await createPage();
     for(let i=0;i<4;i++){

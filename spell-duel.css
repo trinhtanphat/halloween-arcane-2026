@@ -73,3 +73,10 @@
 .duel-actions #duel-share{grid-column:1/-1;background:#5b4470;border-color:#d9c18e;color:#fff0d9}
 .duel-actions #duel-share[hidden]{display:none!important}
 @media(max-width:390px){.duel-modes button{font-size:9px;letter-spacing:0;padding:8px 2px}.duel-daily-label{font-size:9px!important}}
+
+/* Shared challenge link: clearly distinguish an invited date from today's round. */
+#duel-invite-label{color:#bcebd7;font-weight:700}
+#duel-invite-label[hidden],#duel-today[hidden]{display:none!important}
+#duel-today{display:block;width:100%;min-height:39px;margin:8px 0 12px;padding:8px 12px;border:1px solid #b8d2af;color:#e0f0d5;background:#365147;font:700 10px/1.45 var(--sans);letter-spacing:.03em}
+#duel-today:disabled{opacity:.55;cursor:not-allowed}
+#duel-today:focus-visible{outline:3px solid #ffe8b8;outline-offset:3px}

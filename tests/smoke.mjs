@@ -528,7 +528,7 @@ try {
   }}));
   await page.locator("#duel-share").click();
   const shared=await page.evaluate(()=>window.__testDuelShare);
-  assert.ok(shared.includes(dailyDate)&&shared.includes("#spell-duel"),"copy includes date and game link");
+  assert.ok(shared.includes("?duelDate="+dailyDate+"#spell-duel"),"copy includes a dated challenge link");
   await page.locator("#duel-restart").click();
   await page.locator("#duel-start").click();
   assert.equal(await duel.getAttribute("data-challenge-pattern"),dailyPattern,"daily replay must use same pattern");
@@ -681,6 +681,13 @@ try {
     assert.equal(await offlineTab.locator("#poster-name").inputValue(),"Luna Pháp Sư");
     assert.equal(await offlineTab.locator("[data-room]").count(),4);
     assert.equal(await offlineTab.locator("#expedition-final").isVisible(),true);
+    // An archived invite must remain navigable using only cached offline files.
+    await offlineTab.goto(base+"/?duelDate=2026-10-27#spell-duel",{waitUntil:"domcontentloaded",timeout:20000});
+    await offlineTab.waitForFunction(()=>document.querySelector("#duel-game")?.dataset.challengeSource==="invite",{timeout:10000});
+    assert.equal(await offlineTab.locator("#duel-game").getAttribute("data-mode"),"daily");
+    assert.equal(await offlineTab.locator("#duel-daily-date").innerText(),"2026-10-27");
+    await offlineTab.locator("#duel-start").click();
+    assert.match(await offlineTab.locator("#duel-game").getAttribute("data-challenge-pattern"),/^[0-3]{16}$/);
   } finally {
     await context.setOffline(false);
     await offlineTab.close();
